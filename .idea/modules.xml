@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/Upgrade.iml" filepath="$PROJECT_DIR$/Upgrade.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/UpgradeDemo.iml" filepath="$PROJECT_DIR$/UpgradeDemo.iml" />
+>>>>>>> 7a716d58523a83668ab82bf71977b5360654f740
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" filepath="$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" />
     </modules>
