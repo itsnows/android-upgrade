@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">UpgradeLibrary</string>
+    <string name="check_for_update" tools:ignore="TypographyEllipsis">获取更新中...</string>
+    <string name="check_for_update_failure">获取更新失败，请稍候重试！</string>
+    <string name="check_for_update_notfound">已安装最新版本！</string>
+    <string name="dialog_upgrade_title">发现新版本，快下载体验吧！</string>
+    <string name="dialog_upgrade_message">1、新增了xxxxxx\n2、修复了xxxxxx\n3、优化了xxxxxx</string>
+    <string name="dialog_upgrade_date">发布日期 [%1$s]</string>
+    <string name="dialog_upgrade_versions">版本号 [v%1$s]</string>
+    <string name="dialog_upgrade_btn_negative">以后再说</string>
+    <string name="dialog_upgrade_btn_positive">立即体验</string>
+    <string name="dialog_upgrade_btn__neutral">忽略</string>
+    <string name="download_start" tools:ignore="TypographyEllipsis">下载连接中...</string>
+    <string name="download_pause">下载暂停</string>
+    <string name="download_cancel">下载取消</string>
+    <string name="download_error">下载出错</string>
+    <string name="download_complete">下载完成</string>
+    <string name="download_check" tools:ignore="TypographyEllipsis">安装包效验中...</string>
+</resources>
