@@ -2,7 +2,7 @@
 <paths>
     <external-path
         name="files_root"
-        path="Android/data/com.upgradedemo/" />
+        path="Android/data/com.upgrade/" />
     <external-path
         name="external_storage_root"
         path="." />
