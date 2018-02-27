@@ -4,14 +4,6 @@
         <!--device：灰度升级模式根据设备序列号更新-->
         <device>
             <sn>JGB9K17928918126</sn>
-            <sn>BTFDU17113013878</sn>
-            <sn>RSIZAINFYSFASKCE</sn>
-            <sn>3a2c55a</sn>
-            <sn>RV8G303QPPD</sn>
-            <sn>AYKNW17C13006681</sn>
-            <sn>f4e3d8e9</sn>
-            <sn>73ead6d60804</sn>
-            <sn>621QEDQ93W5JA</sn>
         </device>
         <!--date：更新日期-->
         <date>2018-02-09</date>
@@ -32,7 +24,7 @@
         <!--versionCode：新版App版本名称-->
         <versionName>1.0.8.6</versionName>
         <!--dowanloadUrl：新版App下载链接-->
-        <dowanloadUrl>http://run.rainen.cn/download/com.runen.maxhealth_86.apk</dowanloadUrl>
+        <dowanloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</dowanloadUrl>
         <!--md5：新版App安装包完整性-->
         <md5></md5>
     </app>
