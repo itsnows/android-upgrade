@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="dialog_upgrade_button_light_color">#FFFF4081</color>
+    <color name="dialog_upgrade_button_dark_color">#FF757575</color>
+    <color name="dialog_upgrade_button_selected">#33969696</color>
+
+    <color name="pinka200">#FF4081</color>
+    <color name="grey600">#757575</color>
+    <color name="grey900">#212121</color>
+    <color name="grey1000">#FFFFFF</color>
+</resources>
