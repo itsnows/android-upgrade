@@ -1,4 +1,4 @@
-package com.upgradedemo;
+package com.upgrade;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

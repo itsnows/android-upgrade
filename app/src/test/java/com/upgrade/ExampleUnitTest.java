@@ -1,4 +1,4 @@
-package com.upgradedemo;
+package com.upgrade;
 
 import org.junit.Test;
 
