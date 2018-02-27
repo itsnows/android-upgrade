@@ -216,7 +216,7 @@ public class UpgradeDialog extends DialogFragment implements View.OnClickListene
         UpgradeService.start(getActivity(), new UpgradeOptions.Builder()
                 .setUrl(upgrade.getDowanloadUrl())
                 .setMd5(upgrade.getMd5())
-                .setMutiThreadEnabled(true)
+                .setMutiThreadEnabled(false)
                 .setMaxThreadPools(10)
                 .build(), this);
     }

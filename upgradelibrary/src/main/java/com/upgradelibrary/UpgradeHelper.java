@@ -1,10 +1,13 @@
 package com.upgradelibrary;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Preconditions;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,11 +24,18 @@ import android.widget.Toast;
 @SuppressWarnings("deprecation")
 public class UpgradeHelper {
     private static final String TAG = UpgradeHelper.class.getSimpleName();
-    private AppCompatActivity activity;
+    private Context context;
+    private FragmentManager fragmentManager;
     private CheckForUpdatesTask task;
 
-    public UpgradeHelper(AppCompatActivity activity) {
-        this.activity = activity;
+    public UpgradeHelper(AppCompatActivity context) {
+        this.context = context;
+        this.fragmentManager = context.getSupportFragmentManager();
+    }
+
+    public UpgradeHelper(Fragment fragment) {
+        this.context = fragment.getActivity();
+        this.fragmentManager = fragment.getChildFragmentManager();
     }
 
     /**
@@ -82,7 +92,7 @@ public class UpgradeHelper {
      * @param upgradeOptions 下载选项
      */
     public void executeUpgrade(UpgradeOptions upgradeOptions) {
-        UpgradeService.start(activity, upgradeOptions);
+        UpgradeService.start(context, upgradeOptions);
     }
 
     public static interface CallBack {
@@ -157,25 +167,25 @@ public class UpgradeHelper {
          */
         private void handlerResult(Upgrade upgrade, boolean isAutoCheck) {
             if (upgrade == null && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_failure), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.check_for_update_failure), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (upgrade.getVersionCode() <= Util.getVersionCode(activity) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+            if (upgrade.getVersionCode() <= Util.getVersionCode(context) && !isAutoCheck) {
+                Toast.makeText(context, context.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (upgrade.getMode() == Upgrade.UPGRADE_MODE_PARTIAL && !upgrade.getDevice().contains(Util.getSerial()) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getVersionCode()) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+            if (UpgradeHistorical.isIgnoreVersion(context, upgrade.getVersionCode()) && !isAutoCheck) {
+                Toast.makeText(context, context.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
                 return;
             }
-            UpgradeDialog.newInstance(upgrade).show(activity.getSupportFragmentManager());
+            UpgradeDialog.newInstance(upgrade).show(fragmentManager.beginTransaction());
         }
 
         /**
@@ -190,21 +200,21 @@ public class UpgradeHelper {
             }
 
             if (upgrade == null) {
-                callBack.failed(activity.getString(R.string.check_for_update_failure));
+                callBack.failed(context.getString(R.string.check_for_update_failure));
                 return;
             }
 
-            if (upgrade.getVersionCode() <= Util.getVersionCode(activity)) {
-                callBack.failed(activity.getString(R.string.check_for_update_notfound));
+            if (upgrade.getVersionCode() <= Util.getVersionCode(context)) {
+                callBack.failed(context.getString(R.string.check_for_update_notfound));
                 return;
             }
 
             if (upgrade.getMode() == Upgrade.UPGRADE_MODE_PARTIAL && !upgrade.getDevice().contains(Util.getSerial())) {
-                callBack.failed(activity.getString(R.string.check_for_update_notfound));
+                callBack.failed(context.getString(R.string.check_for_update_notfound));
                 return;
             }
-            if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getVersionCode())) {
-                callBack.failed(activity.getString(R.string.check_for_update_notfound));
+            if (UpgradeHistorical.isIgnoreVersion(context, upgrade.getVersionCode())) {
+                callBack.failed(context.getString(R.string.check_for_update_notfound));
                 return;
             }
             callBack.succeed(upgrade);
