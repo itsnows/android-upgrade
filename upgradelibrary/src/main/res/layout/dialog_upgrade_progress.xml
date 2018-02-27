@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="40dp"
     android:orientation="vertical"
@@ -21,4 +21,4 @@
         android:progress="0"
         android:progressDrawable="@drawable/bg_dialog_upgrade_progress" />
 
-</android.support.v7.widget.LinearLayoutCompat>
+</LinearLayout>

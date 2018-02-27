@@ -6,7 +6,7 @@
     android:minHeight="56dp"
     android:paddingBottom="8dp">
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_dialog_upgrade_neutral"
         style="@style/AppTheme.Dialog.ActionButton.Text"
         android:layout_width="wrap_content"
@@ -14,9 +14,9 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:text="@string/dialog_upgrade_btn_negative" />
+        android:text="@string/dialog_upgrade_btn_neutral" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_dialog_upgrade_positive"
         style="@style/AppTheme.Dialog.ActionButton.Text"
         android:layout_width="wrap_content"
@@ -27,13 +27,13 @@
         android:text="@string/dialog_upgrade_btn_positive"
         android:textColor="@color/dialog_upgrade_button_light_color" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_dialog_upgrade_negative"
         style="@style/AppTheme.Dialog.ActionButton.Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_toStartOf="@id/btn_dialog_upgrade_positive"
-        android:text="@string/dialog_upgrade_btn__neutral" />
+        android:text="@string/dialog_upgrade_btn_negative" />
 
 </RelativeLayout>

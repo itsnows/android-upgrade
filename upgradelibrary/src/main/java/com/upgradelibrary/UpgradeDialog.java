@@ -1,5 +1,8 @@
 package com.upgradelibrary;
 
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -7,16 +10,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Preconditions;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * Author: SXF
@@ -28,13 +28,13 @@ import android.view.ViewGroup;
 
 public class UpgradeDialog extends DialogFragment implements View.OnClickListener, ServiceConnection {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
-    private AppCompatTextView tvTitle;
-    private AppCompatTextView tvDate;
-    private AppCompatTextView tvVersions;
-    private AppCompatTextView tvLogs;
-    private AppCompatButton btnNegative;
-    private AppCompatButton btnNeutral;
-    private AppCompatButton btnPositive;
+    private TextView tvTitle;
+    private TextView tvDate;
+    private TextView tvVersions;
+    private TextView tvLogs;
+    private Button btnNegative;
+    private Button btnNeutral;
+    private Button btnPositive;
     private UpgradeService upgradeService;
 
     @NonNull
@@ -157,9 +157,9 @@ public class UpgradeDialog extends DialogFragment implements View.OnClickListene
         int i = v.getId();
         if (i == R.id.btn_dialog_upgrade_negative) {
             dismiss();
-            UpgradeHistorical.setIgnoreVersion(getActivity(), upgrade.getVersionCode());
         } else if (i == R.id.btn_dialog_upgrade_neutral) {
             dismiss();
+            UpgradeHistorical.setIgnoreVersion(getActivity(), upgrade.getVersionCode());
         } else if (i == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(getActivity())) {
                 dismiss();
