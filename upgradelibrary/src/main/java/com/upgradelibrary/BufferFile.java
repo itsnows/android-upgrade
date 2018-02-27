@@ -15,32 +15,37 @@ import java.util.List;
 
 public class BufferFile implements Parcelable {
     public static final int EXPIRY_DATE = 7 * 24 * 60 * 60 * 1000;
+    public static final Creator<BufferFile> CREATOR = new Creator<BufferFile>() {
+        @Override
+        public BufferFile createFromParcel(Parcel in) {
+            return new BufferFile(in);
+        }
 
+        @Override
+        public BufferFile[] newArray(int size) {
+            return new BufferFile[size];
+        }
+    };
     /**
      * 下载链接
      */
     private String url;
-
     /**
      * MD5文件完整校验
      */
     private String md5;
-
     /**
      * 文件总长度
      */
     private long length;
-
     /**
      * 缓存长度
      */
     private long bufferLength;
-
     /**
      * 分流缓存部分
      */
     private List<Part> parts;
-
     /**
      * 最后修改时间
      */
@@ -67,6 +72,10 @@ public class BufferFile implements Parcelable {
         lastModified = in.readLong();
     }
 
+    public static int getExpiryDate() {
+        return EXPIRY_DATE;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(url);
@@ -80,22 +89,6 @@ public class BufferFile implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    public static final Creator<BufferFile> CREATOR = new Creator<BufferFile>() {
-        @Override
-        public BufferFile createFromParcel(Parcel in) {
-            return new BufferFile(in);
-        }
-
-        @Override
-        public BufferFile[] newArray(int size) {
-            return new BufferFile[size];
-        }
-    };
-
-    public static int getExpiryDate() {
-        return EXPIRY_DATE;
     }
 
     public String getUrl() {
@@ -159,6 +152,17 @@ public class BufferFile implements Parcelable {
     }
 
     public static class Part implements Parcelable {
+        public static final Creator<Part> CREATOR = new Creator<Part>() {
+            @Override
+            public Part createFromParcel(Parcel in) {
+                return new Part(in);
+            }
+
+            @Override
+            public Part[] newArray(int size) {
+                return new Part[size];
+            }
+        };
         private long startLength;
         private long endLength;
 
@@ -185,18 +189,6 @@ public class BufferFile implements Parcelable {
         public int describeContents() {
             return 0;
         }
-
-        public static final Creator<Part> CREATOR = new Creator<Part>() {
-            @Override
-            public Part createFromParcel(Parcel in) {
-                return new Part(in);
-            }
-
-            @Override
-            public Part[] newArray(int size) {
-                return new Part[size];
-            }
-        };
 
         public long getStartLength() {
             return startLength;

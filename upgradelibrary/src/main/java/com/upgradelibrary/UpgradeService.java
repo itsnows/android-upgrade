@@ -372,6 +372,90 @@ public class UpgradeService extends Service {
     }
 
     /**
+     * 下载处理
+     */
+    private static class DownloadHandler extends Handler {
+        private final SoftReference<UpgradeService> softReference;
+
+        public DownloadHandler(UpgradeService upgradeService) {
+            this.softReference = new SoftReference<>(upgradeService);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            UpgradeService upgradeService = softReference.get();
+            if (upgradeService == null) {
+                return;
+            }
+            switch (msg.what) {
+                case SATUS_START:
+                    upgradeService.setNotify(upgradeService.getString(R.string.download_start));
+                    break;
+                case SATUS_PROGRESS:
+                    upgradeService.setNotify(Util.formatByte(upgradeService.progress) + "/" + Util.formatByte(upgradeService.maxProgress));
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onProgress(upgradeService.progress, upgradeService.maxProgress);
+                    }
+                    break;
+                case SATUS_PAUSE:
+                    upgradeService.setNotify(upgradeService.getString(R.string.download_pause));
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onPause();
+                    }
+                    break;
+                case SATUS_CANCEL:
+                    upgradeService.setNotify(upgradeService.getString(R.string.download_cancel));
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onCancel();
+                    }
+                    break;
+                case SATUS_ERROR:
+                    upgradeService.setNotify(upgradeService.getString(R.string.download_error));
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onError();
+                    }
+                    break;
+                case SATUS_COMPLETE:
+                    upgradeService.setNotify(upgradeService.getString(R.string.download_complete));
+                    upgradeService.install();
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onComplete();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+
+    }
+
+    /**
+     * 下载监听回调接口
+     */
+    public static abstract class OnDownloadListener {
+
+        public void onStart() {
+
+        }
+
+        public abstract void onProgress(long progress, long maxProgress);
+
+        public void onPause() {
+
+        }
+
+        public void onCancel() {
+
+        }
+
+        public abstract void onError();
+
+        public abstract void onComplete();
+
+    }
+
+    /**
      * 任务线程
      */
     private class TaskThread extends Thread {
@@ -680,90 +764,6 @@ public class UpgradeService extends Service {
             oldParts.add(new BufferFile.Part(startLength, endLength));
             UpgradeHistorical.setBufferFile(UpgradeService.this, bufferFile);
         }
-    }
-
-    /**
-     * 下载处理
-     */
-    private static class DownloadHandler extends Handler {
-        private final SoftReference<UpgradeService> softReference;
-
-        public DownloadHandler(UpgradeService upgradeService) {
-            this.softReference = new SoftReference<>(upgradeService);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            UpgradeService upgradeService = softReference.get();
-            if (upgradeService == null) {
-                return;
-            }
-            switch (msg.what) {
-                case SATUS_START:
-                    upgradeService.setNotify(upgradeService.getString(R.string.download_start));
-                    break;
-                case SATUS_PROGRESS:
-                    upgradeService.setNotify(Util.formatByte(upgradeService.progress) + "/" + Util.formatByte(upgradeService.maxProgress));
-                    if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onProgress(upgradeService.progress, upgradeService.maxProgress);
-                    }
-                    break;
-                case SATUS_PAUSE:
-                    upgradeService.setNotify(upgradeService.getString(R.string.download_pause));
-                    if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onPause();
-                    }
-                    break;
-                case SATUS_CANCEL:
-                    upgradeService.setNotify(upgradeService.getString(R.string.download_cancel));
-                    if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onCancel();
-                    }
-                    break;
-                case SATUS_ERROR:
-                    upgradeService.setNotify(upgradeService.getString(R.string.download_error));
-                    if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onError();
-                    }
-                    break;
-                case SATUS_COMPLETE:
-                    upgradeService.setNotify(upgradeService.getString(R.string.download_complete));
-                    upgradeService.install();
-                    if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onComplete();
-                    }
-                    break;
-                default:
-                    break;
-            }
-            super.handleMessage(msg);
-        }
-
-    }
-
-    /**
-     * 下载监听回调接口
-     */
-    public static abstract class OnDownloadListener {
-
-        public void onStart() {
-
-        }
-
-        public abstract void onProgress(long progress, long maxProgress);
-
-        public void onPause() {
-
-        }
-
-        public void onCancel() {
-
-        }
-
-        public abstract void onError();
-
-        public abstract void onComplete();
-
     }
 
     /**

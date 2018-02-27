@@ -27,10 +27,6 @@ public final class UpgradeOptions implements Parcelable {
         }
     };
     /**
-     * 通知栏图标
-     */
-    private Bitmap icon;
-    /**
      * 通知栏标题
      */
     private final CharSequence title;
@@ -58,6 +54,10 @@ public final class UpgradeOptions implements Parcelable {
      * 多线程下载线程池最大数量
      */
     private final int maxThreadPools;
+    /**
+     * 通知栏图标
+     */
+    private Bitmap icon;
 
     private UpgradeOptions(Builder builder) {
         this.icon = builder.icon;

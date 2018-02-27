@@ -85,6 +85,13 @@ public class UpgradeHelper {
         UpgradeService.start(activity, upgradeOptions);
     }
 
+    public static interface CallBack {
+
+        void succeed(Upgrade upgrade);
+
+        void failed(String message);
+    }
+
     /**
      * 检测更新异步任务
      */
@@ -203,12 +210,5 @@ public class UpgradeHelper {
             callBack.succeed(upgrade);
         }
 
-    }
-
-    public static interface CallBack {
-
-        void succeed(Upgrade upgrade);
-
-        void failed(String message);
     }
 }
