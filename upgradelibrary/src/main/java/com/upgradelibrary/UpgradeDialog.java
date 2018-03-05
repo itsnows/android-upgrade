@@ -18,7 +18,7 @@ import android.view.View;
 
 import com.upgradelibrary.data.bean.Upgrade;
 import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.data.source.Historical;
+import com.upgradelibrary.data.Historical;
 import com.upgradelibrary.service.UpgradeService;
 
 /**

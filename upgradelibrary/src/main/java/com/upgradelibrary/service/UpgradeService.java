@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.data.source.Historical;
+import com.upgradelibrary.data.Historical;
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
 import com.upgradelibrary.data.bean.UpgradeBuffer;
