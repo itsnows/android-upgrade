@@ -23,11 +23,11 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.Historical;
+import com.upgradelibrary.data.source.Historical;
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
-import com.upgradelibrary.bean.UpgradeBuffer;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.UpgradeBuffer;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -10,8 +10,9 @@ import android.support.v4.util.Preconditions;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.upgradelibrary.bean.Upgrade;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.source.Historical;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
 
 /**

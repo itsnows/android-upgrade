@@ -16,8 +16,9 @@ import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.View;
 
-import com.upgradelibrary.bean.Upgrade;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
+import com.upgradelibrary.data.source.Historical;
 import com.upgradelibrary.service.UpgradeService;
 
 /**
