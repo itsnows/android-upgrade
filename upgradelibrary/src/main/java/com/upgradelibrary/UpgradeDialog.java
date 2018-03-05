@@ -1,22 +1,24 @@
 package com.upgradelibrary;
 
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.ComponentName;
-import android.content.Intent;
+import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
 import android.support.v4.util.Preconditions;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+
+import com.upgradelibrary.bean.Upgrade;
+import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.service.UpgradeService;
 
 /**
  * Author: SXF
@@ -26,27 +28,40 @@ import android.widget.TextView;
  * UpgradeDialog
  */
 
-public class UpgradeDialog extends DialogFragment implements View.OnClickListener, ServiceConnection {
+public class UpgradeDialog extends AlertDialog implements View.OnClickListener, ServiceConnection {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
-    private TextView tvTitle;
-    private TextView tvDate;
-    private TextView tvVersions;
-    private TextView tvLogs;
-    private Button btnNegative;
-    private Button btnNeutral;
-    private Button btnPositive;
+    private AppCompatTextView tvTitle;
+    private AppCompatTextView tvDate;
+    private AppCompatTextView tvVersions;
+    private AppCompatTextView tvLogs;
+    private AppCompatButton btnNegative;
+    private AppCompatButton btnNeutral;
+    private AppCompatButton btnPositive;
     private UpgradeService upgradeService;
 
     @NonNull
     private Upgrade upgrade;
 
+    private UpgradeDialog(@NonNull Context context) {
+        super(context);
+    }
+
+    private UpgradeDialog(@NonNull Context context, @StyleRes int themeResId) {
+        super(context, themeResId);
+    }
+
+    private UpgradeDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
+        super(context, cancelable, cancelListener);
+    }
+
     /**
+     * @param context Context
      * @param upgrade 更新实体
      * @return
      */
-    public static UpgradeDialog newInstance(@NonNull Upgrade upgrade) {
+    public static UpgradeDialog newInstance(@NonNull Context context, @NonNull Upgrade upgrade) {
         Preconditions.checkNotNull(upgrade);
-        UpgradeDialog upgradeDialog = new UpgradeDialog();
+        UpgradeDialog upgradeDialog = new UpgradeDialog(context);
         upgradeDialog.initArgs(upgrade);
         return upgradeDialog;
     }
@@ -54,42 +69,28 @@ public class UpgradeDialog extends DialogFragment implements View.OnClickListene
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme_Dialog);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_upgrade, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initView(view);
+        setContentView(R.layout.dialog_upgrade);
+        initView();
     }
 
     private void initArgs(Upgrade upgrade) {
         this.upgrade = upgrade;
     }
 
-    private void initView(View view) {
-        tvTitle = view.findViewById(R.id.tv_dialog_upgrade_title);
-        tvDate = view.findViewById(R.id.tv_dialog_upgrade_date);
-        tvVersions = view.findViewById(R.id.tv_dialog_upgrade_version);
-        tvLogs = view.findViewById(R.id.tv_dialog_upgrade_logs);
-        btnNegative = view.findViewById(R.id.btn_dialog_upgrade_negative);
-        btnNeutral = view.findViewById(R.id.btn_dialog_upgrade_neutral);
-        btnPositive = view.findViewById(R.id.btn_dialog_upgrade_positive);
+    private void initView() {
+        tvTitle = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_title);
+        tvDate = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_date);
+        tvVersions = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_version);
+        tvLogs = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_logs);
+        btnNegative = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_negative);
+        btnNeutral = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_neutral);
+        btnPositive = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_positive);
 
         tvTitle.setText(getString(R.string.dialog_upgrade_title));
         tvDate.setText(getString(R.string.dialog_upgrade_date, upgrade.getDate()));
         tvVersions.setText(getString(R.string.dialog_upgrade_versions, upgrade.getVersionName()));
-        StringBuilder logs = new StringBuilder();
-        for (int i = 0; i < this.upgrade.getLogs().size(); i++) {
-            logs.append(this.upgrade.getLogs().get(i)).append(i < this.upgrade.getLogs().size() - 1 ? "\n" : "");
-        }
-        tvLogs.setText(logs.toString());
+
+        tvLogs.setText(getLogs());
         btnNeutral.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
         btnPositive.setOnClickListener(this);
@@ -99,71 +100,67 @@ public class UpgradeDialog extends DialogFragment implements View.OnClickListene
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private String getString(@StringRes int id) {
+        return getContext().getResources().getString(id);
+    }
+
+    private String getString(@StringRes int id, Object... formatArgs) {
+        return getContext().getResources().getString(id, formatArgs);
+    }
+
+    private String getLogs() {
+        StringBuilder logs = new StringBuilder();
+        for (int i = 0; i < this.upgrade.getLogs().size(); i++) {
+            logs.append(this.upgrade.getLogs().get(i));
+            logs.append(i < this.upgrade.getLogs().size() - 1 ? "\n" : "");
+        }
+        return logs.toString();
+    }
+
+    private void ignoreUpgrade() {
+        Historical.setIgnoreVersion(getContext(), upgrade.getVersionCode());
+    }
+
+    private void executeUpgrade() {
+        UpgradeService.start(getContext(), new UpgradeOptions.Builder()
+                .setUrl(upgrade.getDowanloadUrl())
+                .setMd5(upgrade.getMd5())
+                .setMutiThreadEnabled(false)
+                .setMaxThreadPools(10)
+                .build(), this);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        executeUpgrade();
-    }
-
-    public void show(FragmentManager fragmentManager) {
-        super.show(fragmentManager, TAG);
-    }
-
-    @Override
-    @Deprecated
-    public final void show(FragmentManager manager, String tag) {
-        super.show(manager, tag);
-    }
-
-    public void show(FragmentTransaction transaction) {
-        super.show(transaction, TAG);
-    }
-
-    @Override
-    @Deprecated
-    public final int show(FragmentTransaction transaction, String tag) {
-        return super.show(transaction, tag);
+    public void show() {
+        super.show();
     }
 
     @Override
     public void dismiss() {
-        if (!isCancelable()) {
-            return;
+        if (upgradeService != null) {
+            getContext().unbindService(this);
         }
         super.dismiss();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (upgradeService != null) {
-            getActivity().unbindService(this);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.btn_dialog_upgrade_negative) {
+        int id = v.getId();
+        if (id == R.id.btn_dialog_upgrade_negative) {
             dismiss();
-        } else if (i == R.id.btn_dialog_upgrade_neutral) {
+            return;
+        }
+
+        if (id == R.id.btn_dialog_upgrade_neutral) {
+            ignoreUpgrade();
             dismiss();
-            UpgradeHistorical.setIgnoreVersion(getActivity(), upgrade.getVersionCode());
-        } else if (i == R.id.btn_dialog_upgrade_positive) {
-            if (Util.mayRequestExternalStorage(getActivity())) {
-                dismiss();
+            return;
+        }
+
+        if (id == R.id.btn_dialog_upgrade_positive) {
+            if (Util.mayRequestExternalStorage(getContext())) {
                 executeUpgrade();
+                dismiss();
             }
         }
     }
@@ -212,12 +209,4 @@ public class UpgradeDialog extends DialogFragment implements View.OnClickListene
         upgradeService = null;
     }
 
-    private void executeUpgrade() {
-        UpgradeService.start(getActivity(), new UpgradeOptions.Builder()
-                .setUrl(upgrade.getDowanloadUrl())
-                .setMd5(upgrade.getMd5())
-                .setMutiThreadEnabled(false)
-                .setMaxThreadPools(10)
-                .build(), this);
-    }
 }

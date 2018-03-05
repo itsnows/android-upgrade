@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.bean;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
@@ -39,7 +39,7 @@ public final class UpgradeOptions implements Parcelable {
      */
     private final File storage;
     /**
-     * 下载链接
+     * 下载链接或更新文档链接
      */
     private final String url;
     /**

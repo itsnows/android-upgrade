@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,79 +10,75 @@ import java.util.List;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/10 23:56
  * <p>
- * BufferFile
+ * UpgradeBuffer
  */
 
-public class BufferFile implements Parcelable {
+public class UpgradeBuffer implements Parcelable {
     public static final int EXPIRY_DATE = 7 * 24 * 60 * 60 * 1000;
-    public static final Creator<BufferFile> CREATOR = new Creator<BufferFile>() {
+    public static final Creator<UpgradeBuffer> CREATOR = new Creator<UpgradeBuffer>() {
         @Override
-        public BufferFile createFromParcel(Parcel in) {
-            return new BufferFile(in);
+        public UpgradeBuffer createFromParcel(Parcel in) {
+            return new UpgradeBuffer(in);
         }
 
         @Override
-        public BufferFile[] newArray(int size) {
-            return new BufferFile[size];
+        public UpgradeBuffer[] newArray(int size) {
+            return new UpgradeBuffer[size];
         }
     };
     /**
      * 下载链接
      */
-    private String url;
+    private String downloadUrl;
     /**
      * MD5文件完整校验
      */
-    private String md5;
+    private String fileMd5;
     /**
      * 文件总长度
      */
-    private long length;
+    private long fileLength;
     /**
      * 缓存长度
      */
     private long bufferLength;
     /**
-     * 分流缓存部分
+     * 分流段部分
      */
-    private List<Part> parts;
+    private List<ShuntPart> shuntParts;
     /**
      * 最后修改时间
      */
     private long lastModified;
 
-    public BufferFile() {
+    public UpgradeBuffer() {
     }
 
-    public BufferFile(String url, String md5, long length, long bufferLength, List<Part> parts, long lastModified) {
-        this.url = url;
-        this.md5 = md5;
-        this.length = length;
+    public UpgradeBuffer(String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<ShuntPart> shuntParts, long lastModified) {
+        this.downloadUrl = downloadUrl;
+        this.fileMd5 = fileMd5;
+        this.fileLength = fileLength;
         this.bufferLength = bufferLength;
-        this.parts = parts;
+        this.shuntParts = shuntParts;
         this.lastModified = lastModified;
     }
 
-    protected BufferFile(Parcel in) {
-        url = in.readString();
-        md5 = in.readString();
-        length = in.readLong();
+    protected UpgradeBuffer(Parcel in) {
+        downloadUrl = in.readString();
+        fileMd5 = in.readString();
+        fileLength = in.readLong();
         bufferLength = in.readLong();
-        parts = in.createTypedArrayList(Part.CREATOR);
+        shuntParts = in.createTypedArrayList(ShuntPart.CREATOR);
         lastModified = in.readLong();
-    }
-
-    public static int getExpiryDate() {
-        return EXPIRY_DATE;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(url);
-        dest.writeString(md5);
-        dest.writeLong(length);
+        dest.writeString(downloadUrl);
+        dest.writeString(fileMd5);
+        dest.writeLong(fileLength);
         dest.writeLong(bufferLength);
-        dest.writeTypedList(parts);
+        dest.writeTypedList(shuntParts);
         dest.writeLong(lastModified);
     }
 
@@ -91,28 +87,28 @@ public class BufferFile implements Parcelable {
         return 0;
     }
 
-    public String getUrl() {
-        return url;
+    public String getDownloadUrl() {
+        return downloadUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
-    public String getMd5() {
-        return md5;
+    public String getFileMd5() {
+        return fileMd5;
     }
 
-    public void setMd5(String md5) {
-        this.md5 = md5;
+    public void setFileMd5(String fileMd5) {
+        this.fileMd5 = fileMd5;
     }
 
-    public long getLength() {
-        return length;
+    public long getFileLength() {
+        return fileLength;
     }
 
-    public void setLength(long length) {
-        this.length = length;
+    public void setFileLength(long fileLength) {
+        this.fileLength = fileLength;
     }
 
     public long getBufferLength() {
@@ -123,12 +119,12 @@ public class BufferFile implements Parcelable {
         this.bufferLength = bufferLength;
     }
 
-    public List<Part> getParts() {
-        return parts;
+    public List<ShuntPart> getShuntParts() {
+        return shuntParts;
     }
 
-    public void setParts(List<Part> parts) {
-        this.parts = parts;
+    public void setShuntParts(List<ShuntPart> shuntParts) {
+        this.shuntParts = shuntParts;
     }
 
     public long getLastModified() {
@@ -141,40 +137,40 @@ public class BufferFile implements Parcelable {
 
     @Override
     public String toString() {
-        return "BufferFile{" +
-                "url='" + url + '\'' +
-                ", md5='" + md5 + '\'' +
-                ", length=" + length +
+        return "UpgradeBuffer{" +
+                "downloadUrl='" + downloadUrl + '\'' +
+                ", fileMd5='" + fileMd5 + '\'' +
+                ", fileLength=" + fileLength +
                 ", bufferLength=" + bufferLength +
-                ", parts=" + parts +
+                ", shuntParts=" + shuntParts +
                 ", lastModified=" + lastModified +
                 '}';
     }
 
-    public static class Part implements Parcelable {
-        public static final Creator<Part> CREATOR = new Creator<Part>() {
+    public static class ShuntPart implements Parcelable {
+        public static final Creator<ShuntPart> CREATOR = new Creator<ShuntPart>() {
             @Override
-            public Part createFromParcel(Parcel in) {
-                return new Part(in);
+            public ShuntPart createFromParcel(Parcel in) {
+                return new ShuntPart(in);
             }
 
             @Override
-            public Part[] newArray(int size) {
-                return new Part[size];
+            public ShuntPart[] newArray(int size) {
+                return new ShuntPart[size];
             }
         };
         private long startLength;
         private long endLength;
 
-        public Part() {
+        public ShuntPart() {
         }
 
-        public Part(long startLength, long endLength) {
+        public ShuntPart(long startLength, long endLength) {
             this.startLength = startLength;
             this.endLength = endLength;
         }
 
-        protected Part(Parcel in) {
+        protected ShuntPart(Parcel in) {
             startLength = in.readLong();
             endLength = in.readLong();
         }
@@ -208,7 +204,7 @@ public class BufferFile implements Parcelable {
 
         @Override
         public String toString() {
-            return "Part{" +
+            return "ShuntPart{" +
                     "startLength=" + startLength +
                     ", endLength=" + endLength +
                     '}';

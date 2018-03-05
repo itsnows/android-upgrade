@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.upgradelibrary.bean.UpgradeBuffer;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,75 +21,95 @@ import java.util.Set;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/10 23:55
  * <p>
- * UpgradeHistorical
+ * Historical
  */
 
-public class UpgradeHistorical {
-    private static final String TAG = UpgradeHistorical.class.getSimpleName();
+public class Historical {
+    private static final String TAG = Historical.class.getSimpleName();
     private static final String FILE_NAME = "upgrade";
     private static final String KEY_IGNORE_VERSION = "ignore_version";
     private static final String KEY_DOWNLOAD_HISTORICAL = "download_historical";
 
-    public static boolean isIgnoreVersion(Context context, int version) {
+    /**
+     * 是否忽略版本
+     *
+     * @param context     Context
+     * @param versionCode 版本号
+     * @return
+     */
+    public static boolean isIgnoreVersion(Context context, int versionCode) {
         try {
             Set<Integer> versions = new HashSet<>(0);
             String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
-            Log.d(TAG, jsonArray.toString());
+            Log.d(TAG, "Ignored version " + jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                versions.add(jsonObject.optInt("version"));
+                versions.add(jsonObject.optInt("version_code"));
             }
-            return versions.contains(version);
+            return versions.contains(versionCode);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    public static void setIgnoreVersion(Context context, int version) {
+    /**
+     * 设置忽略版本
+     *
+     * @param context     Context
+     * @param versionCode 版本号
+     */
+    public static void setIgnoreVersion(Context context, int versionCode) {
         try {
             String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
+            Log.d(TAG, "Ignored version " + jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Log.d(TAG, jsonArray.toString());
-                if (jsonObject.getInt("version") == version) {
+                if (jsonObject.optInt("version_code") == versionCode) {
                     return;
                 }
             }
-            jsonArray.put(new JSONObject().put("version", version));
+            jsonArray.put(new JSONObject().put("version_code", versionCode));
             put(context, KEY_IGNORE_VERSION, jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public static BufferFile getBufferFile(Context context, String url) {
+    /**
+     * 获取当前下载链接缓存数据
+     *
+     * @param context     Context
+     * @param downloadUrl 下载链接
+     * @return
+     */
+    public static UpgradeBuffer getUpgradeBuffer(Context context, String downloadUrl) {
         try {
             String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
             Log.d(TAG, jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (TextUtils.equals(jsonObject.getString("url"), url)) {
-                    BufferFile bufferFile = new BufferFile();
-                    bufferFile.setUrl(jsonObject.optString("url"));
-                    bufferFile.setMd5(jsonObject.optString("md5"));
-                    bufferFile.setLength(jsonObject.optLong("length"));
-                    bufferFile.setBufferLength(jsonObject.optLong("bufferLength"));
-                    JSONArray childJsonArray = jsonObject.optJSONArray("part");
-                    List<BufferFile.Part> parts = new ArrayList<>(0);
+                if (TextUtils.equals(jsonObject.getString("download_url"), downloadUrl)) {
+                    UpgradeBuffer buffer = new UpgradeBuffer();
+                    buffer.setDownloadUrl(jsonObject.optString("download_url"));
+                    buffer.setFileMd5(jsonObject.optString("file_md5"));
+                    buffer.setFileLength(jsonObject.optLong("file_length"));
+                    buffer.setBufferLength(jsonObject.optLong("buffer_length"));
+                    JSONArray childJsonArray = jsonObject.optJSONArray("shunt_part");
+                    List<UpgradeBuffer.ShuntPart> shuntParts = new ArrayList<>(0);
                     for (int j = 0; j < childJsonArray.length(); j++) {
                         JSONObject childJSONObject = childJsonArray.getJSONObject(j);
-                        BufferFile.Part part = new BufferFile.Part();
-                        part.setStartLength(childJSONObject.optLong("startLength"));
-                        part.setEndLength(childJSONObject.optLong("endLength"));
-                        parts.add(part);
+                        UpgradeBuffer.ShuntPart shuntPart = new UpgradeBuffer.ShuntPart();
+                        shuntPart.setStartLength(childJSONObject.optLong("start_length"));
+                        shuntPart.setEndLength(childJSONObject.optLong("end_length"));
+                        shuntParts.add(shuntPart);
                     }
-                    bufferFile.setParts(parts);
-                    bufferFile.setLastModified(jsonObject.optLong("lastModified"));
-                    return bufferFile;
+                    buffer.setShuntParts(shuntParts);
+                    buffer.setLastModified(jsonObject.optLong("last_modified"));
+                    return buffer;
                 }
             }
         } catch (JSONException e) {
@@ -96,7 +118,13 @@ public class UpgradeHistorical {
         return null;
     }
 
-    public static void setBufferFile(Context context, BufferFile bufferFile) {
+    /**
+     * 设置当前下载缓存数据
+     *
+     * @param context Context
+     * @param buffer  缓存数据
+     */
+    public static void setUpgradeBuffer(Context context, UpgradeBuffer buffer) {
         try {
             String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
@@ -104,25 +132,25 @@ public class UpgradeHistorical {
             int index = jsonArray.length();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                if (TextUtils.equals(jsonObject.getString("url"), bufferFile.getUrl())) {
+                if (TextUtils.equals(jsonObject.getString("download_url"), buffer.getDownloadUrl())) {
                     index = i;
                     break;
                 }
             }
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", bufferFile.getUrl());
-            jsonObject.put("md5", bufferFile.getMd5());
-            jsonObject.put("length", bufferFile.getLength());
-            jsonObject.put("bufferLength", bufferFile.getBufferLength());
+            jsonObject.put("download_url", buffer.getDownloadUrl());
+            jsonObject.put("file_md5", buffer.getFileMd5());
+            jsonObject.put("file_length", buffer.getFileLength());
+            jsonObject.put("buffer_length", buffer.getBufferLength());
             JSONArray childJSONArray = new JSONArray();
-            for (BufferFile.Part part : bufferFile.getParts()) {
+            for (UpgradeBuffer.ShuntPart shuntPart : buffer.getShuntParts()) {
                 JSONObject childJSONObject = new JSONObject();
-                childJSONObject.put("startLength", part.getStartLength());
-                childJSONObject.put("endLength", part.getEndLength());
+                childJSONObject.put("start_length", shuntPart.getStartLength());
+                childJSONObject.put("end_length", shuntPart.getEndLength());
                 childJSONArray.put(childJSONObject);
             }
-            jsonObject.put("part", childJSONArray);
-            jsonObject.put("lastModified", bufferFile.getLastModified());
+            jsonObject.put("shunt_part", childJSONArray);
+            jsonObject.put("last_modified", buffer.getLastModified());
             jsonArray.put(index, jsonObject);
             put(context, KEY_DOWNLOAD_HISTORICAL, jsonArray.toString());
         } catch (JSONException e) {

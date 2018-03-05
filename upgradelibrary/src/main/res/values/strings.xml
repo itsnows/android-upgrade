@@ -6,7 +6,7 @@
     <string name="dialog_upgrade_title">发现新版本，快下载体验吧！</string>
     <string name="dialog_upgrade_message">1、新增了xxxxxx\n2、修复了xxxxxx\n3、优化了xxxxxx</string>
     <string name="dialog_upgrade_date">发布日期 [%1$s]</string>
-    <string name="dialog_upgrade_versions">版本号 [v%1$s]</string>
+    <string name="dialog_upgrade_versions">版本号 [%1$s]</string>
     <string name="dialog_upgrade_btn_negative">以后再说</string>
     <string name="dialog_upgrade_btn_positive">立即体验</string>
     <string name="dialog_upgrade_btn_neutral">忽略更新</string>

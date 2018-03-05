@@ -10,6 +10,10 @@ import android.support.v4.util.Preconditions;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.upgradelibrary.bean.Upgrade;
+import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.service.UpgradeService;
+
 /**
  * Author: SXF
  * E-mail: xue.com.fei@outlook.com
@@ -36,6 +40,17 @@ public class UpgradeHelper {
      */
     public void checkForUpdates(@NonNull String documentUrl, boolean isAutoCheck) {
         execute(Preconditions.checkNotNull(documentUrl), isAutoCheck);
+    }
+
+    /**
+     * 检测更新
+     *
+     * @param options     更新文档链接
+     * @param isAutoCheck 是否自动检测更新
+     */
+    public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAutoCheck) {
+
+
     }
 
     /**
@@ -85,7 +100,7 @@ public class UpgradeHelper {
         UpgradeService.start(activity, upgradeOptions);
     }
 
-    public static interface CallBack {
+    public interface CallBack {
 
         void succeed(Upgrade upgrade);
 
@@ -156,26 +171,34 @@ public class UpgradeHelper {
          * @param isAutoCheck
          */
         private void handlerResult(Upgrade upgrade, boolean isAutoCheck) {
-            if (upgrade == null && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_failure), Toast.LENGTH_SHORT).show();
+            if (upgrade == null) {
+                if (!isAutoCheck) {
+                    Toast.makeText(activity, activity.getString(R.string.check_for_update_failure), Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
 
-            if (upgrade.getVersionCode() <= Util.getVersionCode(activity) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+            if (upgrade.getVersionCode() <= Util.getVersionCode(activity)) {
+                if (!isAutoCheck) {
+                    Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
 
-            if (upgrade.getMode() == Upgrade.UPGRADE_MODE_PARTIAL && !upgrade.getDevice().contains(Util.getSerial()) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+            if (upgrade.getMode() == Upgrade.UPGRADE_MODE_PARTIAL && !upgrade.getDevice().contains(Util.getSerial())) {
+                if (!isAutoCheck) {
+                    Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
 
-            if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getVersionCode()) && !isAutoCheck) {
-                Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
-                return;
+            if (isAutoCheck) {
+                if (Historical.isIgnoreVersion(activity, upgrade.getVersionCode())) {
+                    return;
+                }
             }
-            UpgradeDialog.newInstance(upgrade).show(activity.getFragmentManager());
+
+            UpgradeDialog.newInstance(activity, upgrade).show();
         }
 
         /**
@@ -203,7 +226,8 @@ public class UpgradeHelper {
                 callBack.failed(activity.getString(R.string.check_for_update_notfound));
                 return;
             }
-            if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getVersionCode())) {
+
+            if (Historical.isIgnoreVersion(activity, upgrade.getVersionCode())) {
                 callBack.failed(activity.getString(R.string.check_for_update_notfound));
                 return;
             }

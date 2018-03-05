@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,6 +22,12 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.upgradelibrary.Historical;
+import com.upgradelibrary.R;
+import com.upgradelibrary.Util;
+import com.upgradelibrary.bean.UpgradeBuffer;
+import com.upgradelibrary.bean.UpgradeOptions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -477,16 +483,16 @@ public class UpgradeService extends Service {
                     }
                 }
 
-                BufferFile bufferFile = UpgradeHistorical.getBufferFile(UpgradeService.this, upgradeOption.getUrl());
-                if (bufferFile != null && exists) {
-                    progress = bufferFile.getBufferLength();
-                    maxProgress = bufferFile.getLength();
-                    List<BufferFile.Part> parts = bufferFile.getParts();
-                    for (int i = 0; i < parts.size(); i++) {
-                        startLength = parts.get(i).getStartLength();
-                        endLength = parts.get(i).getEndLength();
-                        if (parts.size() == 1) {
-                            if (Math.abs(System.currentTimeMillis() - bufferFile.getLastModified()) > BufferFile.EXPIRY_DATE) {
+                UpgradeBuffer upgradeBuffer = Historical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
+                if (upgradeBuffer != null && exists) {
+                    progress = upgradeBuffer.getBufferLength();
+                    maxProgress = upgradeBuffer.getFileLength();
+                    List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
+                    for (int i = 0; i < shuntParts.size(); i++) {
+                        startLength = shuntParts.get(i).getStartLength();
+                        endLength = shuntParts.get(i).getEndLength();
+                        if (shuntParts.size() == 1) {
+                            if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
                                 file.delete();
                                 startLength = 0;
                                 progress = startLength;
@@ -738,31 +744,31 @@ public class UpgradeService extends Service {
          * @param md5 下载文件效验
          */
         private void recordDownload(String url, String md5) {
-            BufferFile bufferFile = UpgradeHistorical.getBufferFile(UpgradeService.this, url);
-            if (bufferFile == null) {
-                bufferFile = new BufferFile();
-                bufferFile.setUrl(url);
-                bufferFile.setMd5(md5);
-                bufferFile.setBufferLength(progress);
-                bufferFile.setLength(maxProgress);
-                bufferFile.setLastModified(System.currentTimeMillis());
-                List<BufferFile.Part> parts = new ArrayList<>(0);
-                parts.add(new BufferFile.Part(startLength, endLength));
-                bufferFile.setParts(parts);
-                UpgradeHistorical.setBufferFile(UpgradeService.this, bufferFile);
+            UpgradeBuffer upgradeBuffer = Historical.getUpgradeBuffer(UpgradeService.this, url);
+            if (upgradeBuffer == null) {
+                upgradeBuffer = new UpgradeBuffer();
+                upgradeBuffer.setDownloadUrl(url);
+                upgradeBuffer.setFileMd5(md5);
+                upgradeBuffer.setBufferLength(progress);
+                upgradeBuffer.setFileLength(maxProgress);
+                upgradeBuffer.setLastModified(System.currentTimeMillis());
+                List<UpgradeBuffer.ShuntPart> shuntParts = new ArrayList<>(0);
+                shuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
+                upgradeBuffer.setShuntParts(shuntParts);
+                Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                 return;
             }
-            bufferFile.setBufferLength(progress);
-            List<BufferFile.Part> oldParts = bufferFile.getParts();
-            for (BufferFile.Part part : oldParts) {
-                if (part.getEndLength() == endLength) {
-                    part.setStartLength(startLength);
-                    UpgradeHistorical.setBufferFile(UpgradeService.this, bufferFile);
+            upgradeBuffer.setBufferLength(progress);
+            List<UpgradeBuffer.ShuntPart> oldShuntParts = upgradeBuffer.getShuntParts();
+            for (UpgradeBuffer.ShuntPart shuntPart : oldShuntParts) {
+                if (shuntPart.getEndLength() == endLength) {
+                    shuntPart.setStartLength(startLength);
+                    Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                     return;
                 }
             }
-            oldParts.add(new BufferFile.Part(startLength, endLength));
-            UpgradeHistorical.setBufferFile(UpgradeService.this, bufferFile);
+            oldShuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
+            Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
         }
     }
 

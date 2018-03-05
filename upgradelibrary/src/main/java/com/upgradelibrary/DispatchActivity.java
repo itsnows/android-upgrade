@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Preconditions;
 
+import com.upgradelibrary.bean.Upgrade;
+
 /**
  * Author: SXF
  * E-mail: xue.com.fei@outlook.com

@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -79,6 +79,10 @@ public class Upgrade implements Parcelable {
      * 安装包MD5效验
      */
     private String md5;
+
+    private String sha1;
+
+    private String sha256;
 
     public Upgrade() {
     }

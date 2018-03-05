@@ -30,7 +30,7 @@
 
         <!-- 应用更新服务 -->
         <service
-            android:name=".UpgradeService"
+            android:name=".service.UpgradeService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -39,7 +39,7 @@
         </service>
 
         <!--时间分发界面-->
-        <activity
+        <context
             android:name=".DispatchActivity"
             android:exported="true"
             android:launchMode="singleTop"
