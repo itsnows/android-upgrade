@@ -1,11 +1,11 @@
-package com.upgradelibrary;
+package com.upgradelibrary.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.bean.UpgradeBuffer;
+import com.upgradelibrary.data.bean.UpgradeBuffer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,8 +27,8 @@ import java.util.Set;
 public class Historical {
     private static final String TAG = Historical.class.getSimpleName();
     private static final String FILE_NAME = "upgrade";
-    private static final String KEY_IGNORE_VERSION = "ignore_version";
-    private static final String KEY_DOWNLOAD_HISTORICAL = "download_historical";
+    private static final String KEY_NAME_IGNORE_VERSION = "ignore_version";
+    private static final String KEY_NAME_UPGRADE_BUFFER = "upgrade_buffer";
 
     /**
      * 是否忽略版本
@@ -40,7 +40,7 @@ public class Historical {
     public static boolean isIgnoreVersion(Context context, int versionCode) {
         try {
             Set<Integer> versions = new HashSet<>(0);
-            String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
+            String json = (String) get(context, KEY_NAME_IGNORE_VERSION, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
             Log.d(TAG, "Ignored version " + jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -62,7 +62,7 @@ public class Historical {
      */
     public static void setIgnoreVersion(Context context, int versionCode) {
         try {
-            String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
+            String json = (String) get(context, KEY_NAME_IGNORE_VERSION, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
             Log.d(TAG, "Ignored version " + jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -72,7 +72,7 @@ public class Historical {
                 }
             }
             jsonArray.put(new JSONObject().put("version_code", versionCode));
-            put(context, KEY_IGNORE_VERSION, jsonArray.toString());
+            put(context, KEY_NAME_IGNORE_VERSION, jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -87,7 +87,7 @@ public class Historical {
      */
     public static UpgradeBuffer getUpgradeBuffer(Context context, String downloadUrl) {
         try {
-            String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
+            String json = (String) get(context, KEY_NAME_UPGRADE_BUFFER, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
             Log.d(TAG, jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -126,7 +126,7 @@ public class Historical {
      */
     public static void setUpgradeBuffer(Context context, UpgradeBuffer buffer) {
         try {
-            String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
+            String json = (String) get(context, KEY_NAME_UPGRADE_BUFFER, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
             Log.d(TAG, jsonArray.toString());
             int index = jsonArray.length();
@@ -152,7 +152,7 @@ public class Historical {
             jsonObject.put("shunt_part", childJSONArray);
             jsonObject.put("last_modified", buffer.getLastModified());
             jsonArray.put(index, jsonObject);
-            put(context, KEY_DOWNLOAD_HISTORICAL, jsonArray.toString());
+            put(context, KEY_NAME_UPGRADE_BUFFER, jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
