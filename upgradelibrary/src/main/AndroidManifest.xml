@@ -39,7 +39,7 @@
         </service>
 
         <!--时间分发界面-->
-        <context
+        <activity
             android:name=".DispatchActivity"
             android:exported="true"
             android:launchMode="singleTop"
