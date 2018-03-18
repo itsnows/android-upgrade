@@ -13,12 +13,13 @@ import android.support.v4.util.Preconditions;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
-import com.upgradelibrary.data.bean.Upgrade;
-import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.data.Historical;
+import com.upgradelibrary.bean.Upgrade;
+import com.upgradelibrary.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
 
 /**
@@ -39,6 +40,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     private AppCompatButton btnNeutral;
     private AppCompatButton btnPositive;
     private UpgradeService upgradeService;
+    private LinearLayoutCompat linearLayoutCompat;
+    private ProgressBar progressView;
 
     @NonNull
     private Upgrade upgrade;
@@ -86,6 +89,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         btnNegative = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_negative);
         btnNeutral = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_neutral);
         btnPositive = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_positive);
+        progressView = (ProgressBar) findViewById(R.id.pb_dialog_upgrade_progress);
+
+        progressView.setMax(100);
+        progressView.setVisibility(View.GONE);
 
         tvTitle.setText(getString(R.string.dialog_upgrade_title));
         tvDate.setText(getString(R.string.dialog_upgrade_date, upgrade.getDate()));
@@ -97,7 +104,9 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         btnPositive.setOnClickListener(this);
 
         if (upgrade.getMode() == Upgrade.UPGRADE_MODE_FORCED) {
-            setCancelable(true);
+            btnNeutral.setVisibility(View.GONE);
+            btnNegative.setVisibility(View.GONE);
+            setCancelable(false);
         }
     }
 
@@ -161,7 +170,12 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         if (id == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(getContext())) {
                 executeUpgrade();
-                dismiss();
+                if (progressView.getVisibility() == View.GONE) {
+                    progressView.setVisibility(View.VISIBLE);
+                }
+                if (upgrade.getMode() != Upgrade.UPGRADE_MODE_FORCED) {
+                    dismiss();
+                }
             }
         }
     }
@@ -180,6 +194,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             @Override
             public void onProgress(long progress, long maxProgress) {
                 Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
+                progressView.setProgress((int) (progress * 100 / maxProgress));
             }
 
             @Override

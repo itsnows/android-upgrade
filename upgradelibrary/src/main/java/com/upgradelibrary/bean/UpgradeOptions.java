@@ -1,4 +1,4 @@
-package com.upgradelibrary.data.bean;
+package com.upgradelibrary.bean;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;

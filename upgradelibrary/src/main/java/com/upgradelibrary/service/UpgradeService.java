@@ -23,11 +23,11 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.data.Historical;
+import com.upgradelibrary.Historical;
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
-import com.upgradelibrary.data.bean.UpgradeBuffer;
-import com.upgradelibrary.data.bean.UpgradeOptions;
+import com.upgradelibrary.bean.UpgradeBuffer;
+import com.upgradelibrary.bean.UpgradeOptions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,7 +52,7 @@ import java.util.TimerTask;
  * 应用更新服务
  */
 
-@SuppressWarnings("deprecation,ResultOfMethodCallIgnored")
+@SuppressWarnings("deprecation")
 public class UpgradeService extends Service {
     public static final String TAG = UpgradeService.class.getSimpleName();
     private static final int CONNECT_TIMEOUT = 2000;
@@ -256,16 +256,16 @@ public class UpgradeService extends Service {
             channel.setSound(null, null);
             channel.setVibrationPattern(null);
             notificationManager.createNotificationChannel(channel);
-            builder = new Notification.Builder(this, String.valueOf(NOTIFY_ID))
-                    .setSmallIcon(android.R.drawable.stat_sys_download)
-                    .setLargeIcon(upgradeOption.getIcon())
-                    .setContentIntent(getDefalutIntent(PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setContentTitle(upgradeOption.getTitle())
-                    .setWhen(System.currentTimeMillis())
-                    .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
-                    .setOngoing(true)
-                    .setDefaults(Notification.FLAG_AUTO_CANCEL);
+            builder = new Notification.Builder(this, String.valueOf(NOTIFY_ID));
+            builder.setSmallIcon(android.R.drawable.stat_sys_download);
+            builder.setLargeIcon(upgradeOption.getIcon());
+            builder.setContentIntent(getDefalutIntent(PendingIntent.FLAG_UPDATE_CURRENT));
+            builder.setContentTitle(upgradeOption.getTitle());
+            builder.setWhen(System.currentTimeMillis());
+            builder.setPriority(Notification.PRIORITY_DEFAULT);
+            builder.setAutoCancel(true);
+            builder.setOngoing(true);
+            builder.setDefaults(Notification.FLAG_AUTO_CANCEL);
         } else {
             builder = new Notification.Builder(this)
                     .setSmallIcon(android.R.drawable.stat_sys_download)

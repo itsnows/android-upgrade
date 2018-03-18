@@ -1,4 +1,4 @@
-package com.upgradelibrary.data.bean;
+package com.upgradelibrary.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -164,9 +164,12 @@ public class Upgrade implements Parcelable {
                             appUpdate.setVersionName(xmlPullParser.nextText().trim());
                         } else if ("dowanloadUrl".equals(xmlPullParser.getName())) {
                             appUpdate.setDowanloadUrl(xmlPullParser.nextText().trim());
+                        } else if ("md5".equals(xmlPullParser.getName())) {
+                            appUpdate.setMd5(xmlPullParser.nextText().trim());
                         }
                         break;
                     case XmlPullParser.END_TAG:
+                        break;
                     default:
                         break;
                 }
