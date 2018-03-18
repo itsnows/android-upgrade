@@ -1,5 +1,6 @@
 package com.upgradelibrary;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -13,10 +14,8 @@ import android.support.v4.util.Preconditions;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import com.upgradelibrary.bean.Upgrade;
 import com.upgradelibrary.bean.UpgradeOptions;
@@ -32,6 +31,7 @@ import com.upgradelibrary.service.UpgradeService;
 
 public class UpgradeDialog extends AlertDialog implements View.OnClickListener, ServiceConnection {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
+    private Activity activity;
     private AppCompatTextView tvTitle;
     private AppCompatTextView tvDate;
     private AppCompatTextView tvVersions;
@@ -40,32 +40,33 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     private AppCompatButton btnNeutral;
     private AppCompatButton btnPositive;
     private UpgradeService upgradeService;
-    private LinearLayoutCompat linearLayoutCompat;
-    private ProgressBar progressView;
 
     @NonNull
     private Upgrade upgrade;
 
     private UpgradeDialog(@NonNull Context context) {
         super(context);
+        this.activity = (Activity) context;
     }
 
     private UpgradeDialog(@NonNull Context context, @StyleRes int themeResId) {
         super(context, themeResId);
+        this.activity = (Activity) context;
     }
 
     private UpgradeDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
+        this.activity = (Activity) context;
     }
 
     /**
-     * @param context Context
-     * @param upgrade 更新实体
+     * @param activity Activity
+     * @param upgrade  更新实体
      * @return
      */
-    public static UpgradeDialog newInstance(@NonNull Context context, @NonNull Upgrade upgrade) {
+    public static UpgradeDialog newInstance(@NonNull Activity activity, @NonNull Upgrade upgrade) {
         Preconditions.checkNotNull(upgrade);
-        UpgradeDialog upgradeDialog = new UpgradeDialog(context);
+        UpgradeDialog upgradeDialog = new UpgradeDialog(activity);
         upgradeDialog.initArgs(upgrade);
         return upgradeDialog;
     }
@@ -89,11 +90,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         btnNegative = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_negative);
         btnNeutral = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_neutral);
         btnPositive = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_positive);
-        progressView = (ProgressBar) findViewById(R.id.pb_dialog_upgrade_progress);
-
-        progressView.setMax(100);
-        progressView.setVisibility(View.GONE);
-
         tvTitle.setText(getString(R.string.dialog_upgrade_title));
         tvDate.setText(getString(R.string.dialog_upgrade_date, upgrade.getDate()));
         tvVersions.setText(getString(R.string.dialog_upgrade_versions, upgrade.getVersionName()));
@@ -168,11 +164,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
 
         if (id == R.id.btn_dialog_upgrade_positive) {
-            if (Util.mayRequestExternalStorage(getContext())) {
+            if (Util.mayRequestExternalStorage(activity)) {
                 executeUpgrade();
-                if (progressView.getVisibility() == View.GONE) {
-                    progressView.setVisibility(View.VISIBLE);
-                }
                 if (upgrade.getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                 }
@@ -194,7 +187,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             @Override
             public void onProgress(long progress, long maxProgress) {
                 Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
-                progressView.setProgress((int) (progress * 100 / maxProgress));
             }
 
             @Override
