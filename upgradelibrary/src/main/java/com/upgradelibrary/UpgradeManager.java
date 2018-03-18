@@ -7,11 +7,12 @@ import android.app.Activity;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/28 11:24
  * <p>
- * UpgradeManager
+ * 升级管理
  */
 
 public class UpgradeManager {
     private static final String TAG = UpgradeManager.class.getSimpleName();
     private Activity activity;
+
 
 }
