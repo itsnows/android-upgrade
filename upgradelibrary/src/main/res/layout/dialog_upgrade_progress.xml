@@ -1,25 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:orientation="vertical"
-    android:visibility="gone">
+    android:layout_height="56dp"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content">
 
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_dialog_upgrade_progress"
+            style="@style/AppTheme.Dialog.ActionButton.Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:text="@string/dialog_upgrade_btn_pause"
+            tools:ignore="RelativeOverlap" />
 
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tv_dialog_upgrade_progress"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="24dp"
+            android:text="@string/dialog_upgrade_progress"
+            android:textColor="@color/dialog_upgrade_accent_color"
+            android:textSize="10sp" />
+
+        <ProgressBar
+            android:id="@+id/pb_dialog_upgrade_progressbar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="104dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/tv_dialog_upgrade_progress"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_dialog_upgrade_progress" />
 
     </RelativeLayout>
-
-    <ProgressBar
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:max="100"
-        android:progress="0"
-        android:progressDrawable="@drawable/bg_dialog_upgrade_progress" />
 
 </android.support.v7.widget.LinearLayoutCompat>

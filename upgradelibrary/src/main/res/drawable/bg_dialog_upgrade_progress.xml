@@ -2,22 +2,18 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@android:color/transparent" />
-            <corners
-                android:bottomLeftRadius="2dp"
-                android:bottomRightRadius="2dp" />
+            <solid android:color="@color/dialog_upgrade_progress_background_color" />
+            <corners android:radius="2dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
                 <gradient
-                    android:centerColor="#5C6168"
-                    android:endColor="#535C68"
-                    android:startColor="#666769" />
-                <corners
-                    android:bottomLeftRadius="2dp"
-                    android:bottomRightRadius="2dp" />
+                    android:centerColor="@color/dialog_upgrade_progress_background_start_center"
+                    android:endColor="@color/dialog_upgrade_progress_background_start_end"
+                    android:startColor="@color/dialog_upgrade_progress_background_start_color" />
+                <corners android:radius="2dp" />
             </shape>
         </clip>
     </item>

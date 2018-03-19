@@ -197,8 +197,7 @@ public class UpgradeService extends Service {
 
         if (status == SATUS_COMPLETE) {
             clearNotify(NOTIFY_ID);
-            install();
-            stopSelf();
+            complete();
             return super.onStartCommand(intent, flags, startId);
         }
 
@@ -369,6 +368,15 @@ public class UpgradeService extends Service {
     }
 
     /**
+     * 完成
+     */
+    public void complete() {
+        status = SATUS_COMPLETE;
+        stopSelf();
+        install();
+    }
+
+    /**
      * 注入下载回调接口
      *
      * @param onDownloadListener
@@ -383,7 +391,7 @@ public class UpgradeService extends Service {
     private static class DownloadHandler extends Handler {
         private final SoftReference<UpgradeService> softReference;
 
-        public DownloadHandler(UpgradeService upgradeService) {
+        private DownloadHandler(UpgradeService upgradeService) {
             this.softReference = new SoftReference<>(upgradeService);
         }
 
@@ -396,6 +404,9 @@ public class UpgradeService extends Service {
             switch (msg.what) {
                 case SATUS_START:
                     upgradeService.setNotify(upgradeService.getString(R.string.download_start));
+                    if (upgradeService.onDownloadListener != null) {
+                        upgradeService.onDownloadListener.onStart();
+                    }
                     break;
                 case SATUS_PROGRESS:
                     upgradeService.setNotify(Util.formatByte(upgradeService.progress) + "/" + Util.formatByte(upgradeService.maxProgress));

@@ -10,6 +10,10 @@
     <string name="dialog_upgrade_btn_negative">以后再说</string>
     <string name="dialog_upgrade_btn_positive">立即体验</string>
     <string name="dialog_upgrade_btn_neutral">忽略更新</string>
+    <string name="dialog_upgrade_btn_pause">暂停</string>
+    <string name="dialog_upgrade_btn_resume">继续</string>
+    <string name="dialog_upgrade_btn_complete">完成</string>
+    <string name="dialog_upgrade_progress">%1$d%%</string>
     <string name="download_start" tools:ignore="TypographyEllipsis">下载连接中...</string>
     <string name="download_pause">下载暂停</string>
     <string name="download_cancel">下载取消</string>

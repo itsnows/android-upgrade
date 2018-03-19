@@ -14,9 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/dialog_upgrade_done_button" />
+        <include
+            android:id="@+id/v_dialog_upgrade_done_button"
+            layout="@layout/dialog_upgrade_done_button"
+            android:visibility="gone" />
 
-        <include layout="@layout/dialog_upgrade_progress" />
+        <include
+            android:id="@+id/v_dialog_upgrade_progress"
+            layout="@layout/dialog_upgrade_progress"
+            android:visibility="visible" />
 
     </FrameLayout>
 

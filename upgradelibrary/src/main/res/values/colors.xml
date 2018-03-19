@@ -7,4 +7,9 @@
     <color name="dialog_upgrade_button_light_color">@color/dialog_upgrade_accent_color</color>
     <color name="dialog_upgrade_button_dark_color">#FF757575</color>
     <color name="dialog_upgrade_button_selected">#33969696</color>
+    <color name="dialog_upgrade_progress_background_color">#EEEEEE</color>
+    <color name="dialog_upgrade_progress_background_start_color">#F48FB1</color>
+    <color name="dialog_upgrade_progress_background_start_center">#F06292</color>
+    <color name="dialog_upgrade_progress_background_start_end">@color/dialog_upgrade_accent_color
+    </color>
 </resources>
