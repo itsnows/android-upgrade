@@ -7,10 +7,16 @@
     tools:context="com.upgrade.MainActivity">
 
     <Button
-        android:id="@+id/button_check"
+        android:id="@+id/button_check_updates_default"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="检测更新" />
+        android:text="默认检测更新" />
+
+    <Button
+        android:id="@+id/button_check_updates_custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="自定义检测更新（自己实现更新提示）" />
 
     <Button
         android:id="@+id/button_cancle"

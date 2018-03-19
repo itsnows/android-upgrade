@@ -334,7 +334,7 @@ public class UpgradeService extends Service {
     /**
      * 开始
      */
-    public void start() {
+    private void start() {
         if (taskThread != null) {
             if (taskThread.isAlive() || taskThread.isInterrupted()) {
                 status = SATUS_CANCEL;
@@ -510,7 +510,7 @@ public class UpgradeService extends Service {
                     return;
                 }
 
-                if ((endLength = length(upgradeOption.getUrl())) == -1) {
+                if ((endLength = readLength(upgradeOption.getUrl())) == -1) {
                     downloadHandler.sendEmptyMessage(SATUS_ERROR);
                     return;
                 }
@@ -544,12 +544,12 @@ public class UpgradeService extends Service {
         }
 
         /**
-         * 下载文件长度
+         * 读取下载文件长度
          *
          * @param url 下载文件地址
          * @return
          */
-        private long length(String url) {
+        private long readLength(String url) {
             HttpURLConnection readConnection = null;
             try {
                 readConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -788,26 +788,22 @@ public class UpgradeService extends Service {
                 NetworkInfo dataNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
                 if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    // WIFI已连接
-                    // 移动数据已连接
+                    // WIFI已连接，移动数据已连接
                     if (status == SATUS_PAUSE) {
                         start();
                     }
                 } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
-                    // WIFI已连接
-                    // 移动数据已断开
+                    // WIFI已连接，移动数据已断开
                     if (status == SATUS_PAUSE) {
                         start();
                     }
                 } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    // WIFI已断开
-                    // 移动数据已连接
+                    // WIFI已断开，移动数据已连接
                     if (status == SATUS_PAUSE) {
                         start();
                     }
                 } else {
-                    // WIFI已断开
-                    // 移动数据已断开
+                    // WIFI已断开，移动数据已断开
                     pause();
                 }
             }

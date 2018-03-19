@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dialog_upgrade_background_color">#FFFFFF</color>
-    <color name="dialog_upgrade_accent_color">#6889ff</color>
+    <color name="dialog_upgrade_accent_color">#FF4081</color>
     <color name="dialog_upgrade_text_light_color">#FFFFFF</color>
     <color name="dialog_upgrade_text_dark_color">#222222</color>
     <color name="dialog_upgrade_button_light_color">@color/dialog_upgrade_accent_color</color>

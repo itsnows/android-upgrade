@@ -1,11 +1,9 @@
 package com.upgradelibrary;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -29,9 +27,8 @@ import com.upgradelibrary.service.UpgradeService;
  * UpgradeDialog
  */
 
-public class UpgradeDialog extends AlertDialog implements View.OnClickListener, ServiceConnection {
+public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeServiceManager.OnBinderUpgradeServiceLisenter {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
-    private Activity activity;
     private AppCompatTextView tvTitle;
     private AppCompatTextView tvDate;
     private AppCompatTextView tvVersions;
@@ -39,10 +36,16 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     private AppCompatButton btnNegative;
     private AppCompatButton btnNeutral;
     private AppCompatButton btnPositive;
-    private UpgradeService upgradeService;
+
+    private Activity activity;
 
     @NonNull
     private Upgrade upgrade;
+
+    @NonNull
+    private UpgradeOptions upgradeOptions;
+
+    private UpgradeServiceManager upgradeServiceManager;
 
     private UpgradeDialog(@NonNull Context context) {
         super(context);
@@ -64,10 +67,12 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
      * @param upgrade  更新实体
      * @return
      */
-    public static UpgradeDialog newInstance(@NonNull Activity activity, @NonNull Upgrade upgrade) {
+    @SuppressLint("RestrictedApi")
+    public static UpgradeDialog newInstance(@NonNull Activity activity, @NonNull Upgrade upgrade, UpgradeOptions upgradeOptions) {
         Preconditions.checkNotNull(upgrade);
+        Preconditions.checkNotNull(upgradeOptions);
         UpgradeDialog upgradeDialog = new UpgradeDialog(activity);
-        upgradeDialog.initArgs(upgrade);
+        upgradeDialog.initArgs(upgrade, upgradeOptions);
         return upgradeDialog;
     }
 
@@ -78,8 +83,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         initView();
     }
 
-    private void initArgs(Upgrade upgrade) {
+    private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
+        this.upgradeOptions = upgradeOptions;
+        this.upgradeServiceManager = new UpgradeServiceManager(activity, upgradeOptions);
     }
 
     private void initView() {
@@ -127,15 +134,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         Historical.setIgnoreVersion(getContext(), upgrade.getVersionCode());
     }
 
-    private void executeUpgrade() {
-        UpgradeService.start(getContext(), new UpgradeOptions.Builder()
-                .setUrl(upgrade.getDowanloadUrl())
-                .setMd5(upgrade.getMd5())
-                .setMutiThreadEnabled(false)
-                .setMaxThreadPools(10)
-                .build(), this);
-    }
-
     @Override
     public void show() {
         super.show();
@@ -143,9 +141,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     @Override
     public void dismiss() {
-        if (upgradeService != null) {
-            getContext().unbindService(this);
-        }
+        upgradeServiceManager.binder();
         super.dismiss();
     }
 
@@ -165,7 +161,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
         if (id == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(activity)) {
-                executeUpgrade();
+                upgradeServiceManager.binder();
                 if (upgrade.getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                 }
@@ -174,8 +170,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     }
 
     @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        upgradeService = ((UpgradeService.UpgradeServiceBinder) service).getUpgradeService();
+    public void onBinder(UpgradeService upgradeService) {
         upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
 
             @Override
@@ -213,8 +208,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     }
 
     @Override
-    public void onServiceDisconnected(ComponentName name) {
-        upgradeService = null;
+    public void onUnbinder() {
+        Log.d(TAG, "onUnbinder");
     }
-
 }

@@ -83,7 +83,7 @@ public class Upgrade implements Parcelable {
     public Upgrade() {
     }
 
-    public Upgrade(List<String> device, String date, Integer mode, List<String> logs, Integer versionCode, String versionName, String dowanloadUrl, String md5) {
+    public Upgrade(List<String> device, String date, int mode, List<String> logs, int versionCode, String versionName, String dowanloadUrl, String md5) {
         this.device = device;
         this.date = date;
         this.mode = mode;
@@ -199,11 +199,11 @@ public class Upgrade implements Parcelable {
         this.date = date;
     }
 
-    public Integer getMode() {
+    public int getMode() {
         return mode;
     }
 
-    public void setMode(Integer mode) {
+    public void setMode(int mode) {
         this.mode = mode;
     }
 
@@ -215,11 +215,11 @@ public class Upgrade implements Parcelable {
         this.logs = logs;
     }
 
-    public Integer getVersionCode() {
+    public int getVersionCode() {
         return versionCode;
     }
 
-    public void setVersionCode(Integer versionCode) {
+    public void setVersionCode(int versionCode) {
         this.versionCode = versionCode;
     }
 
