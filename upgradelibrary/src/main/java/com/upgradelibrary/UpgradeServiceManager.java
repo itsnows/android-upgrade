@@ -18,11 +18,12 @@ import com.upgradelibrary.service.UpgradeService;
 public class UpgradeServiceManager {
     private Activity activity;
     private UpgradeOptions upgradeOptions;
+    private UpgradeService upgradeService;
     private OnBinderUpgradeServiceLisenter onBinderUpgradeServiceLisenter;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            UpgradeService upgradeService = ((UpgradeService.UpgradeServiceBinder) service).getUpgradeService();
+            upgradeService = ((UpgradeService.UpgradeServiceBinder) service).getUpgradeService();
             if (upgradeService != null) {
                 onBinderUpgradeServiceLisenter.onBinder(upgradeService);
             }
@@ -46,13 +47,11 @@ public class UpgradeServiceManager {
     }
 
     public void binder() {
-        if (activity != null) {
-            UpgradeService.start(activity, upgradeOptions, serviceConnection);
-        }
+        UpgradeService.start(activity, upgradeOptions, serviceConnection);
     }
 
     public void unbinder() {
-        if (activity != null) {
+        if (upgradeService != null) {
             activity.unbindService(serviceConnection);
         }
     }

@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.upgradelibrary.UpgradeManager;
 import com.upgradelibrary.UpgradeServiceManager;
+import com.upgradelibrary.Util;
 import com.upgradelibrary.bean.Upgrade;
 import com.upgradelibrary.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
@@ -18,6 +20,7 @@ import com.upgradelibrary.service.UpgradeService;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +32,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 manager.checkForUpdates(new UpgradeOptions.Builder()
                         .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                        // 通知栏标题（可选）
                         .setTitle("腾讯QQ")
+                        // 通知栏描述（可选）
                         .setDescription("更新通知栏")
+                        // 下载链接或更新文档链接
                         .setUrl("http://www.rainen.cn/test/app-update.xml")
+                        // 下载文件存储路径（可选）
                         .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                        // 是否支持多线性下载（可选）
                         .setMutiThreadEnabled(true)
+                        // 线程池大小（可选）
                         .setMaxThreadPools(1)
+                        // 文件MD5（可选）
                         .setMd5(null)
                         .build(), false);
             }
@@ -54,53 +64,8 @@ public class MainActivity extends AppCompatActivity {
                         .setMd5(null)
                         .build(), new UpgradeManager.OnUpgradeListener() {
                     @Override
-                    public void onUpdateAvailable(Upgrade upgrade, final UpgradeServiceManager manager) {
-                        StringBuffer logs = new StringBuffer();
-                        for (int i = 0; i < upgrade.getLogs().size(); i++) {
-                            logs.append(upgrade.getLogs().get(i));
-                            logs.append(i < upgrade.getLogs().size() - 1 ? "\n" : "");
-                        }
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("发现新版本 v" + upgrade.getVersionName() + " - " + upgrade.getDate())
-                                .setMessage(logs.toString())
-                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceManager.OnBinderUpgradeServiceLisenter() {
-                                    @Override
-                                    public void onBinder(UpgradeService upgradeService) {
-                                        upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
-                                            @Override
-                                            public void onProgress(long progress, long maxProgress) {
-
-                                            }
-
-                                            @Override
-                                            public void onError() {
-
-                                            }
-
-                                            @Override
-                                            public void onComplete() {
-
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onUnbinder() {
-
-                                    }
-                                });
-                                manager.binder();
-                            }
-                        }).show();
+                    public void onUpdateAvailable(Upgrade upgrade, UpgradeServiceManager manager) {
+                        showUpgradeDialog(upgrade, manager);
                     }
 
                     @Override
@@ -118,4 +83,86 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * 显示更新提示（自定义提示）
+     *
+     * @param upgrade Upgrade
+     * @param manager UpgradeServiceManager
+     */
+    private void showUpgradeDialog(Upgrade upgrade, final UpgradeServiceManager manager) {
+        StringBuffer logs = new StringBuffer();
+        for (int i = 0; i < upgrade.getLogs().size(); i++) {
+            logs.append(upgrade.getLogs().get(i));
+            logs.append(i < upgrade.getLogs().size() - 1 ? "\n" : "");
+        }
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("发现新版本 v" + upgrade.getVersionName())
+                .setMessage(logs.toString())
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                // 下载监听接口
+                manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceManager.OnBinderUpgradeServiceLisenter() {
+                    @Override
+                    public void onBinder(UpgradeService upgradeService) {
+                        upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
+
+                            @Override
+                            public void onStart() {
+                                super.onStart();
+                                Log.d(TAG, "onStart");
+                            }
+
+                            @Override
+                            public void onProgress(long progress, long maxProgress) {
+                                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
+                            }
+
+                            @Override
+                            public void onPause() {
+                                super.onPause();
+                                Log.d(TAG, "onPause");
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                super.onCancel();
+                                Log.d(TAG, "onCancel");
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.d(TAG, "onError");
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Log.d(TAG, "onComplete");
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onUnbinder() {
+                        Log.d(TAG, "onUnbinder");
+                    }
+                });
+                // 开始下载
+                manager.binder();
+            }
+        }).setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                manager.unbinder();
+            }
+        }).show();
+    }
+
 }
