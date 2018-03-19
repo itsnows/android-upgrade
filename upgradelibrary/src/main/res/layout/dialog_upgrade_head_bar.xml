@@ -7,6 +7,7 @@
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/tv_dialog_upgrade_title"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"

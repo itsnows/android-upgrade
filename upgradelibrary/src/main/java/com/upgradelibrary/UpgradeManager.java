@@ -149,7 +149,6 @@ public class UpgradeManager {
 
         @Override
         protected void onCancelled(Message message) {
-            Activity activity = reference.get();
             super.onCancelled(message);
         }
 

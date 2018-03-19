@@ -42,9 +42,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @NonNull
     private Upgrade upgrade;
 
-    @NonNull
-    private UpgradeOptions upgradeOptions;
-
     private UpgradeServiceManager upgradeServiceManager;
 
     private UpgradeDialog(@NonNull Context context) {
@@ -85,7 +82,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
-        this.upgradeOptions = upgradeOptions;
         this.upgradeServiceManager = new UpgradeServiceManager(activity, upgradeOptions);
     }
 
@@ -141,8 +137,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     @Override
     public void dismiss() {
-        upgradeServiceManager.binder();
         super.dismiss();
+        upgradeServiceManager.unbinder();
     }
 
     @Override
@@ -150,17 +146,12 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         int id = v.getId();
         if (id == R.id.btn_dialog_upgrade_negative) {
             dismiss();
-            return;
-        }
-
-        if (id == R.id.btn_dialog_upgrade_neutral) {
+        } else if (id == R.id.btn_dialog_upgrade_neutral) {
             ignoreUpgrade();
             dismiss();
-            return;
-        }
-
-        if (id == R.id.btn_dialog_upgrade_positive) {
+        } else if (id == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(activity)) {
+                upgradeServiceManager.setOnBinderUpgradeServiceLisenter(this);
                 upgradeServiceManager.binder();
                 if (upgrade.getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();

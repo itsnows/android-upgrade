@@ -781,37 +781,32 @@ public class UpgradeService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-            } else {
-                NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo dataNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-
-                if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    // WIFI已连接，移动数据已连接
-                    if (status == SATUS_PAUSE) {
-                        start();
-                    }
-                } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
-                    // WIFI已连接，移动数据已断开
-                    if (status == SATUS_PAUSE) {
-                        start();
-                    }
-                } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                    // WIFI已断开，移动数据已连接
-                    if (status == SATUS_PAUSE) {
-                        start();
-                    }
-                } else {
-                    // WIFI已断开，移动数据已断开
-                    pause();
+            NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            NetworkInfo dataNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
+                // WIFI已连接，移动数据已连接
+                if (status == SATUS_PAUSE) {
+                    start();
                 }
+            } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
+                // WIFI已连接，移动数据已断开
+                if (status == SATUS_PAUSE) {
+                    start();
+                }
+            } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
+                // WIFI已断开，移动数据已连接
+                if (status == SATUS_PAUSE) {
+                    start();
+                }
+            } else {
+                // WIFI已断开，移动数据已断开
+                pause();
             }
         }
 
         public void registerReceiver(Context context) {
             IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction((ConnectivityManager.CONNECTIVITY_ACTION));
+            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
             context.registerReceiver(this, intentFilter);
         }
 
