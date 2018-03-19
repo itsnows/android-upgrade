@@ -24,7 +24,7 @@ public class UpgradeServiceManager {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             upgradeService = ((UpgradeService.UpgradeServiceBinder) service).getUpgradeService();
-            if (upgradeService != null) {
+            if (onBinderUpgradeServiceLisenter != null) {
                 onBinderUpgradeServiceLisenter.onBinder(upgradeService);
             }
         }
