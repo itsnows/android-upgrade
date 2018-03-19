@@ -481,6 +481,7 @@ public class UpgradeService extends Service {
         public void run() {
             super.run();
             try {
+                Thread.sleep(500);
                 downloadHandler.sendEmptyMessage(SATUS_START);
                 long startLength = 0;
                 long endLength = -1;
@@ -714,7 +715,6 @@ public class UpgradeService extends Service {
                 if (downloadConnection != null) {
                     downloadConnection.disconnect();
                 }
-
             }
         }
 

@@ -214,7 +214,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @Override
     public void onBinder(UpgradeService upgradeService) {
         UpgradeDialog.this.upgradeService = upgradeService;
-        showProgress();
         upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
 
             @Override
@@ -248,6 +247,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             @Override
             public void onCancel() {
                 dismiss();
+                btnProgress.setEnabled(true);
                 btnProgress.setTag("onCancel");
                 Log.d(TAG, "onCancel");
             }
@@ -266,6 +266,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
                 Log.d(TAG, "onComplete");
             }
         });
+        showProgress();
     }
 
     @Override
