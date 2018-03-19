@@ -19,6 +19,13 @@ import com.upgradelibrary.service.UpgradeService;
 
 import java.io.File;
 
+/**
+ * 支持：断点续传
+ * 支持：暂停、取消
+ * 支持：分流下载
+ * 支持：动态网络监听下载
+ * 支持：8.0 适配
+ */
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
