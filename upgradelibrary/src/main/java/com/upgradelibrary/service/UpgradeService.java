@@ -372,8 +372,8 @@ public class UpgradeService extends Service {
      */
     public void complete() {
         status = SATUS_COMPLETE;
-        stopSelf();
         install();
+        stopSelf();
     }
 
     /**

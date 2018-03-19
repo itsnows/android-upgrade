@@ -17,12 +17,12 @@
         <include
             android:id="@+id/v_dialog_upgrade_done_button"
             layout="@layout/dialog_upgrade_done_button"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <include
             android:id="@+id/v_dialog_upgrade_progress"
             layout="@layout/dialog_upgrade_progress"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
     </FrameLayout>
 
