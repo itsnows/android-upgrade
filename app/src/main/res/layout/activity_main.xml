@@ -7,10 +7,23 @@
     tools:context="com.upgrade.MainActivity">
 
     <Button
-        android:id="@+id/button_check_updates_default"
+        android:id="@+id/button_check_updates_default_common"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="默认检测更新" />
+        android:text="默认检测更新（普通升级）" />
+
+    <Button
+        android:id="@+id/button_check_updates_default_forced"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="默认检测更新（强制升级）" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:gravity="left"
+        android:text="默认检测更新（灰度升级 需要提供手机序列号，可自行测试）" />
 
     <Button
         android:id="@+id/button_check_updates_custom"

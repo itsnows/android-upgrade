@@ -25,7 +25,7 @@ import java.io.File;
  * 支持：分流下载
  * 支持：动态网络监听下载
  * 支持：8.0 适配
- *
+ * <p>
  * 更新文档模板路径：../android-upgrade/upgradelibrary/app-update.xml
  */
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final UpgradeManager manager = new UpgradeManager(this);
-        findViewById(R.id.button_check_updates_default).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_check_updates_default_common).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 manager.checkForUpdates(new UpgradeOptions.Builder()
@@ -46,7 +46,30 @@ public class MainActivity extends AppCompatActivity {
                         // 通知栏描述（可选）
                         .setDescription("更新通知栏")
                         // 下载链接或更新文档链接
-                        .setUrl("http://www.rainen.cn/test/app-update.xml")
+                        .setUrl("http://www.rainen.cn/test/app-update_common.xml")
+                        // 下载文件存储路径（可选）
+                        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                        // 是否支持多线性下载（可选）
+                        .setMutiThreadEnabled(true)
+                        // 线程池大小（可选）
+                        .setMaxThreadPools(1)
+                        // 文件MD5（可选）
+                        .setMd5(null)
+                        .build(), false);
+            }
+        });
+
+        findViewById(R.id.button_check_updates_default_forced).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                manager.checkForUpdates(new UpgradeOptions.Builder()
+                        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                        // 通知栏标题（可选）
+                        .setTitle("腾讯QQ")
+                        // 通知栏描述（可选）
+                        .setDescription("更新通知栏")
+                        // 下载链接或更新文档链接
+                        .setUrl("http://www.rainen.cn/test/app-update_forced.xml")
                         // 下载文件存储路径（可选）
                         .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                         // 是否支持多线性下载（可选）
