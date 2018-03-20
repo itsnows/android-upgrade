@@ -205,9 +205,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             } else if ("onPause".equals(tag) || "onError".equals(tag)) {
                 upgradeService.resume();
             } else if ("onComplete".equals(tag)) {
-                dismiss();
                 upgradeService.complete();
-//                android.os.Process.killProcess(android.os.Process.myPid());
             }
         }
     }

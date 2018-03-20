@@ -37,7 +37,7 @@ public class Historical {
      * @param versionCode 版本号
      * @return
      */
-    public static boolean isIgnoreVersion(Context context, int versionCode) {
+    public static synchronized boolean isIgnoreVersion(Context context, int versionCode) {
         try {
             Set<Integer> versions = new HashSet<>(0);
             String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
@@ -60,7 +60,7 @@ public class Historical {
      * @param context     Context
      * @param versionCode 版本号
      */
-    public static void setIgnoreVersion(Context context, int versionCode) {
+    public static synchronized void setIgnoreVersion(Context context, int versionCode) {
         try {
             String json = (String) get(context, KEY_IGNORE_VERSION, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
@@ -85,7 +85,7 @@ public class Historical {
      * @param downloadUrl 下载链接
      * @return
      */
-    public static UpgradeBuffer getUpgradeBuffer(Context context, String downloadUrl) {
+    public static synchronized UpgradeBuffer getUpgradeBuffer(Context context, String downloadUrl) {
         try {
             String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);
@@ -124,7 +124,7 @@ public class Historical {
      * @param context Context
      * @param buffer  缓存数据
      */
-    public static void setUpgradeBuffer(Context context, UpgradeBuffer buffer) {
+    public static synchronized void setUpgradeBuffer(Context context, UpgradeBuffer buffer) {
         try {
             String json = (String) get(context, KEY_DOWNLOAD_HISTORICAL, new JSONArray().toString());
             JSONArray jsonArray = new JSONArray(json);

@@ -67,7 +67,7 @@ public class UpgradeService extends Service {
     /**
      * 通知栏ID
      */
-    private static final int NOTIFY_ID = 0x1024;
+    private static final int NOTIFY_ID = 0x6710;
 
     /**
      * 升级进度通知栏
@@ -138,7 +138,7 @@ public class UpgradeService extends Service {
     /**
      * 开始
      *
-     * @param context
+     * @param context           Context
      * @param upgradeOption     升级选项
      * @param serviceConnection 升级服务连接
      */
@@ -196,7 +196,6 @@ public class UpgradeService extends Service {
         }
 
         if (status == SATUS_COMPLETE) {
-            clearNotify(NOTIFY_ID);
             complete();
             return super.onStartCommand(intent, flags, startId);
         }
@@ -319,8 +318,7 @@ public class UpgradeService extends Service {
      */
     public PendingIntent getDefalutIntent(int flags) {
         Intent intent = new Intent(this, UpgradeService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, flags);
-        return pendingIntent;
+        return PendingIntent.getService(this, 0, intent, flags);
     }
 
     /**
@@ -372,6 +370,7 @@ public class UpgradeService extends Service {
      */
     public void complete() {
         status = SATUS_COMPLETE;
+        clearNotify(NOTIFY_ID);
         install();
         stopSelf();
     }
@@ -379,7 +378,7 @@ public class UpgradeService extends Service {
     /**
      * 注入下载回调接口
      *
-     * @param onDownloadListener
+     * @param onDownloadListener OnDownloadListener
      */
     public void setOnDownloadListener(OnDownloadListener onDownloadListener) {
         this.onDownloadListener = onDownloadListener;
@@ -602,7 +601,7 @@ public class UpgradeService extends Service {
         private long startLength;
         private long endLength;
 
-        public DownloadThread(long startLength, long endLength) {
+        private DownloadThread(long startLength, long endLength) {
             this.startLength = startLength;
             this.endLength = endLength;
             init();
@@ -682,7 +681,9 @@ public class UpgradeService extends Service {
                     }
                     randomAccessFile.write(bytes, 0, temp);
                     startLength += temp;
-                    progress += temp;
+                    synchronized (UpgradeService.this) {
+                        progress += temp;
+                    }
                     int tempPercent = (int) (((float) progress / maxProgress) * 100);
                     if (tempPercent > percent) {
                         percent = tempPercent;

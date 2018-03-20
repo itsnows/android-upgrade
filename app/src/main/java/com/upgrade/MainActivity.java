@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         // 是否支持多线性下载（可选）
                         .setMutiThreadEnabled(true)
                         // 线程池大小（可选）
-                        .setMaxThreadPools(1)
+                        .setMaxThreadPools(10)
                         // 文件MD5（可选）
                         .setMd5(null)
                         .build(), false);

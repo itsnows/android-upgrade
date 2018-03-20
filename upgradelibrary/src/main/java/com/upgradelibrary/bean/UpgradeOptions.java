@@ -180,7 +180,7 @@ public final class UpgradeOptions implements Parcelable {
         }
 
         public Builder setMaxThreadPools(int maxThreadPools) {
-            this.maxThreadPools = maxThreadPools;
+            this.maxThreadPools = maxThreadPools <= 0 ? 1 : maxThreadPools;
             return this;
         }
 
