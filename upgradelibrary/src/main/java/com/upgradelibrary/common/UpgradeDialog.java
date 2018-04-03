@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.common;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.upgradelibrary.R;
+import com.upgradelibrary.Util;
 import com.upgradelibrary.bean.Upgrade;
 import com.upgradelibrary.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
@@ -109,8 +111,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         btnProgress = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_progress);
 
         tvTitle.setText(getString(R.string.dialog_upgrade_title));
-        tvDate.setText(getString(R.string.dialog_upgrade_date, upgrade.getDate()));
-        tvVersions.setText(getString(R.string.dialog_upgrade_versions, upgrade.getVersionName()));
+        tvDate.setText(getString(R.string.dialog_upgrade_date, getDate()));
+        tvVersions.setText(getString(R.string.dialog_upgrade_versions, getVersionName()));
         tvLogs.setText(getLogs());
         tvProgress.setText(getString(R.string.dialog_upgrade_progress, 0));
         btnProgress.setEnabled(false);
@@ -118,8 +120,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         btnNegative.setOnClickListener(this);
         btnPositive.setOnClickListener(this);
         btnProgress.setOnClickListener(this);
-
-        if (upgrade.getMode() == Upgrade.UPGRADE_MODE_FORCED) {
+        if (getMode() == Upgrade.UPGRADE_MODE_FORCED) {
             btnNeutral.setVisibility(View.GONE);
             btnNegative.setVisibility(View.GONE);
             setCancelable(false);
@@ -136,13 +137,53 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return getContext().getResources().getString(id, formatArgs);
     }
 
+    private String getDate() {
+        if (upgrade.getStable() != null) {
+            return upgrade.getStable().getDate();
+        }
+        if (upgrade.getBate() != null) {
+            return upgrade.getBate().getDate();
+        }
+        return "";
+    }
+
+    private int getMode() {
+        if (upgrade.getStable() != null) {
+            return upgrade.getStable().getMode();
+        }
+        if (upgrade.getBate() != null) {
+            return upgrade.getBate().getMode();
+        }
+        return Upgrade.UPGRADE_MODE_COMMON;
+    }
+
+    private String getVersionName() {
+        if (upgrade.getStable() != null) {
+            return upgrade.getStable().getVersionName();
+        }
+        if (upgrade.getBate() != null) {
+            return upgrade.getBate().getVersionName();
+        }
+        return "";
+    }
+
     private String getLogs() {
         StringBuilder logs = new StringBuilder();
-        for (int i = 0; i < this.upgrade.getLogs().size(); i++) {
-            logs.append(this.upgrade.getLogs().get(i));
-            logs.append(i < this.upgrade.getLogs().size() - 1 ? "\n" : "");
+        if (upgrade.getStable() != null) {
+            for (int i = 0; i < this.upgrade.getStable().getLogs().size(); i++) {
+                logs.append(this.upgrade.getStable().getLogs().get(i));
+                logs.append(i < this.upgrade.getStable().getLogs().size() - 1 ? "\n" : "");
+            }
+            return logs.toString();
         }
-        return logs.toString();
+        if (upgrade.getBate() != null) {
+            for (int i = 0; i < this.upgrade.getBate().getLogs().size(); i++) {
+                logs.append(this.upgrade.getBate().getLogs().get(i));
+                logs.append(i < this.upgrade.getBate().getLogs().size() - 1 ? "\n" : "");
+            }
+            return logs.toString();
+        }
+        return "";
     }
 
     private void showDoneButton() {
@@ -164,7 +205,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     }
 
     private void ignoreUpgrade() {
-        Historical.setIgnoreVersion(getContext(), upgrade.getVersionCode());
+        if (upgrade.getStable() != null) {
+            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getStable().getVersionCode());
+            return;
+        }
+        if (upgrade.getBate() != null) {
+            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getBate().getVersionCode());
+            return;
+        }
     }
 
     @Override
@@ -188,7 +236,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             ignoreUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(activity)) {
-                if (upgrade.getMode() != Upgrade.UPGRADE_MODE_FORCED) {
+                if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                     showProgress();
                 }
@@ -205,6 +253,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             } else if ("onPause".equals(tag) || "onError".equals(tag)) {
                 upgradeService.resume();
             } else if ("onComplete".equals(tag)) {
+                dismiss();
                 upgradeService.complete();
             }
         }

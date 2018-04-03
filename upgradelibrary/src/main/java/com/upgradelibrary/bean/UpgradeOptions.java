@@ -1,5 +1,7 @@
 package com.upgradelibrary.bean;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -58,7 +60,6 @@ public final class UpgradeOptions implements Parcelable {
      * 多线程下载线程池最大数量
      */
     private final int maxThreadPools;
-
 
     private UpgradeOptions(Builder builder) {
         this.icon = builder.icon;

@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.common;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -44,6 +44,10 @@ public class UpgradeServiceManager {
 
     public void setOnBinderUpgradeServiceLisenter(OnBinderUpgradeServiceLisenter onBinderUpgradeServiceLisenter) {
         this.onBinderUpgradeServiceLisenter = onBinderUpgradeServiceLisenter;
+    }
+
+    public void start() {
+        UpgradeService.start(activity, upgradeOptions);
     }
 
     public void binder() {

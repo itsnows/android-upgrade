@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.Historical;
+import com.upgradelibrary.common.UpgradeHistorical;
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
 import com.upgradelibrary.bean.UpgradeBuffer;
@@ -494,7 +494,7 @@ public class UpgradeService extends Service {
                     }
                 }
 
-                UpgradeBuffer upgradeBuffer = Historical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
+                UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
                 if (upgradeBuffer != null && exists) {
                     progress = upgradeBuffer.getBufferLength();
                     maxProgress = upgradeBuffer.getFileLength();
@@ -503,15 +503,18 @@ public class UpgradeService extends Service {
                         startLength = shuntParts.get(i).getStartLength();
                         endLength = shuntParts.get(i).getEndLength();
                         if (shuntParts.size() == 1) {
-                            if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
+                            if (maxProgress < file.length() || Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
                                 file.delete();
                                 startLength = 0;
                                 progress = startLength;
+                                continue;
                             }
                             if (startLength == file.length()) {
+                                status = SATUS_PROGRESS;
+                                downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
                                 status = SATUS_COMPLETE;
                                 downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
-                                break;
+                                return;
                             }
                             download(startLength, endLength);
                             return;
@@ -659,6 +662,10 @@ public class UpgradeService extends Service {
                             break;
                         }
 
+                        if (status == SATUS_COMPLETE) {
+                            break;
+                        }
+
                         if (TextUtils.isEmpty(upgradeOption.getMd5())) {
                             status = SATUS_COMPLETE;
                             downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
@@ -756,7 +763,7 @@ public class UpgradeService extends Service {
          * @param md5 下载文件效验
          */
         private void recordDownload(String url, String md5) {
-            UpgradeBuffer upgradeBuffer = Historical.getUpgradeBuffer(UpgradeService.this, url);
+            UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, url);
             if (upgradeBuffer == null) {
                 upgradeBuffer = new UpgradeBuffer();
                 upgradeBuffer.setDownloadUrl(url);
@@ -767,7 +774,7 @@ public class UpgradeService extends Service {
                 List<UpgradeBuffer.ShuntPart> shuntParts = new ArrayList<>(0);
                 shuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
                 upgradeBuffer.setShuntParts(shuntParts);
-                Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
+                UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                 return;
             }
             upgradeBuffer.setBufferLength(progress);
@@ -775,12 +782,12 @@ public class UpgradeService extends Service {
             for (UpgradeBuffer.ShuntPart shuntPart : oldShuntParts) {
                 if (shuntPart.getEndLength() == endLength) {
                     shuntPart.setStartLength(startLength);
-                    Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
+                    UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                     return;
                 }
             }
             oldShuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
-            Historical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
+            UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
         }
     }
 

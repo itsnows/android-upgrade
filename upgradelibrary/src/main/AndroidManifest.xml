@@ -38,13 +38,6 @@
             </intent-filter>
         </service>
 
-        <!--时间分发界面-->
-        <activity
-            android:name=".DispatchActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Translucent" />
-
     </application>
 
 </manifest>

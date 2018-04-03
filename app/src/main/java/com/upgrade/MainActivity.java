@@ -10,11 +10,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.upgradelibrary.UpgradeManager;
-import com.upgradelibrary.UpgradeServiceManager;
 import com.upgradelibrary.Util;
 import com.upgradelibrary.bean.Upgrade;
 import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.common.UpgradeManager;
+import com.upgradelibrary.common.UpgradeServiceManager;
 import com.upgradelibrary.service.UpgradeService;
 
 import java.io.File;
@@ -36,75 +36,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final UpgradeManager manager = new UpgradeManager(this);
+        updates(manager, true);
+
         findViewById(R.id.button_check_updates_default_common).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                manager.checkForUpdates(new UpgradeOptions.Builder()
-                        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                        // 通知栏标题（可选）
-                        .setTitle("腾讯QQ")
-                        // 通知栏描述（可选）
-                        .setDescription("更新通知栏")
-                        // 下载链接或更新文档链接
-                        .setUrl("http://www.rainen.cn/test/app-update_common.xml")
-                        // 下载文件存储路径（可选）
-                        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                        // 是否支持多线性下载（可选）
-                        .setMutiThreadEnabled(true)
-                        // 线程池大小（可选）
-                        .setMaxThreadPools(1)
-                        // 文件MD5（可选）
-                        .setMd5(null)
-                        .build(), false);
+                updates(manager, false);
             }
         });
 
         findViewById(R.id.button_check_updates_default_forced).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                manager.checkForUpdates(new UpgradeOptions.Builder()
-                        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                        // 通知栏标题（可选）
-                        .setTitle("腾讯QQ")
-                        // 通知栏描述（可选）
-                        .setDescription("更新通知栏")
-                        // 下载链接或更新文档链接
-                        .setUrl("http://www.rainen.cn/test/app-update_forced.xml")
-                        // 下载文件存储路径（可选）
-                        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                        // 是否支持多线性下载（可选）
-                        .setMutiThreadEnabled(true)
-                        // 线程池大小（可选）
-                        .setMaxThreadPools(10)
-                        // 文件MD5（可选）
-                        .setMd5(null)
-                        .build(), false);
+                forceUpdates(manager);
             }
         });
 
         findViewById(R.id.button_check_updates_custom).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                manager.checkForUpdates(new UpgradeOptions.Builder()
-                        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                        .setTitle("腾讯QQ")
-                        .setDescription("更新通知栏")
-                        .setUrl("http://www.rainen.cn/test/app-update.xml")
-                        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                        .setMutiThreadEnabled(true)
-                        .setMaxThreadPools(1)
-                        .setMd5(null)
-                        .build(), new UpgradeManager.OnUpgradeListener() {
-                    @Override
-                    public void onUpdateAvailable(Upgrade upgrade, UpgradeServiceManager manager) {
-                        showUpgradeDialog(upgrade, manager);
-                    }
-
-                    @Override
-                    public void onNoUpdateAvailable(String message) {
-                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                customerUpdates(manager);
             }
         });
 
@@ -116,20 +67,95 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void updates(UpgradeManager manager, boolean isAutocheck) {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update_common.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMutiThreadEnabled(true)
+                // 线程池大小（可选）
+                .setMaxThreadPools(1)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), isAutocheck);
+    }
+
+    private void forceUpdates(UpgradeManager manager) {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update_forced.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMutiThreadEnabled(true)
+                // 线程池大小（可选）
+                .setMaxThreadPools(1)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), false);
+
+    }
+
+    private void customerUpdates(UpgradeManager manager) {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                .setTitle("腾讯QQ")
+                .setDescription("更新通知栏")
+                .setUrl("http://www.rainen.cn/test/app-update.xml")
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setMutiThreadEnabled(true)
+                .setMaxThreadPools(1)
+                .setMd5(null)
+                .build(), new UpgradeManager.OnUpgradeListener() {
+
+            @Override
+            public void onUpdateAvailable(UpgradeServiceManager manager) {
+
+            }
+
+            @Override
+            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceManager manager) {
+                showUpgradeDialog(stable, manager);
+            }
+
+            @Override
+            public void onUpdateAvailable(Upgrade.Bate bate, UpgradeServiceManager manager) {
+
+            }
+
+            @Override
+            public void onNoUpdateAvailable(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     /**
      * 显示更新提示（自定义提示）
      *
-     * @param upgrade Upgrade
+     * @param stable  Upgrade.Stable
      * @param manager UpgradeServiceManager
      */
-    private void showUpgradeDialog(Upgrade upgrade, final UpgradeServiceManager manager) {
+    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeServiceManager manager) {
         StringBuffer logs = new StringBuffer();
-        for (int i = 0; i < upgrade.getLogs().size(); i++) {
-            logs.append(upgrade.getLogs().get(i));
-            logs.append(i < upgrade.getLogs().size() - 1 ? "\n" : "");
+        for (int i = 0; i < stable.getLogs().size(); i++) {
+            logs.append(stable.getLogs().get(i));
+            logs.append(i < stable.getLogs().size() - 1 ? "\n" : "");
         }
         new AlertDialog.Builder(MainActivity.this)
-                .setTitle("发现新版本 v" + upgrade.getVersionName())
+                .setTitle("发现新版本 v" + stable.getVersionName())
                 .setMessage(logs.toString())
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override

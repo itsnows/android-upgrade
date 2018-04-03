@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.upgradelibrary.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,11 +21,11 @@ import java.util.Set;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/10 23:55
  * <p>
- * Historical
+ * UpgradeHistorical
  */
 
-public class Historical {
-    private static final String TAG = Historical.class.getSimpleName();
+public class UpgradeHistorical {
+    private static final String TAG = UpgradeHistorical.class.getSimpleName();
     private static final String FILE_NAME = "upgrade";
     private static final String KEY_IGNORE_VERSION = "ignore_version";
     private static final String KEY_DOWNLOAD_HISTORICAL = "download_historical";
