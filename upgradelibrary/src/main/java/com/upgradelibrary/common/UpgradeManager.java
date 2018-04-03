@@ -184,7 +184,8 @@ public class UpgradeManager {
                         }
                     } else {
                         if (upgrade.getStable() != null && upgrade.getBate() != null) {
-                            if (!upgrade.getBate().getDevice().contains(Util.getSerial()) || upgrade.getStable().getVersionCode() >= upgrade.getBate().getVersionCode()) {
+                            if (!upgrade.getBate().getDevice().contains(Util.getSerial()) ||
+                                    upgrade.getStable().getVersionCode() >= upgrade.getBate().getVersionCode()) {
                                 if (message.obj instanceof Boolean) {
                                     boolean isAutoCheck = (boolean) message.obj;
                                     if (isAutoCheck) {
