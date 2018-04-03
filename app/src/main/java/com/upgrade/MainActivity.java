@@ -95,10 +95,10 @@ public class MainActivity extends AppCompatActivity {
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update_forced.xml")
+                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线性下载（可选）
+                // 是否支持多线程下载（可选）
                 .setMutiThreadEnabled(true)
                 // 线程池大小（可选）
                 .setMaxThreadPools(1)
