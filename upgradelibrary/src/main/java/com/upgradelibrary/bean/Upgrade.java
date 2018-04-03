@@ -26,8 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 
 public class Upgrade implements Parcelable {
-    private static final int CONNECT_TIMEOUT = 6 * 1000;
-    private static final int READ_TIMEOUT = 6 * 1000;
     /**
      * 更新模式 普通
      */
@@ -36,7 +34,19 @@ public class Upgrade implements Parcelable {
      * 更新模式 强制
      */
     public static final int UPGRADE_MODE_FORCED = 2;
+    public static final Creator<Upgrade> CREATOR = new Creator<Upgrade>() {
+        @Override
+        public Upgrade createFromParcel(Parcel in) {
+            return new Upgrade(in);
+        }
 
+        @Override
+        public Upgrade[] newArray(int size) {
+            return new Upgrade[size];
+        }
+    };
+    private static final int CONNECT_TIMEOUT = 6 * 1000;
+    private static final int READ_TIMEOUT = 6 * 1000;
     /**
      * 稳定版
      */
@@ -51,17 +61,13 @@ public class Upgrade implements Parcelable {
         bate = in.readParcelable(Bate.class.getClassLoader());
     }
 
-    public static final Creator<Upgrade> CREATOR = new Creator<Upgrade>() {
-        @Override
-        public Upgrade createFromParcel(Parcel in) {
-            return new Upgrade(in);
-        }
+    private Upgrade() {
+    }
 
-        @Override
-        public Upgrade[] newArray(int size) {
-            return new Upgrade[size];
-        }
-    };
+    public Upgrade(Stable stable, Bate bate) {
+        this.stable = stable;
+        this.bate = bate;
+    }
 
     /**
      * 解析更新文档
@@ -216,14 +222,6 @@ public class Upgrade implements Parcelable {
         return upgrade;
     }
 
-    private Upgrade() {
-    }
-
-    public Upgrade(Stable stable, Bate bate) {
-        this.stable = stable;
-        this.bate = bate;
-    }
-
     public Stable getStable() {
         return stable;
     }
@@ -264,6 +262,17 @@ public class Upgrade implements Parcelable {
      */
     public static class Stable implements Parcelable {
 
+        public static final Creator<Stable> CREATOR = new Creator<Stable>() {
+            @Override
+            public Stable createFromParcel(Parcel in) {
+                return new Stable(in);
+            }
+
+            @Override
+            public Stable[] newArray(int size) {
+                return new Stable[size];
+            }
+        };
         /**
          * 更新日期
          */
@@ -304,6 +313,16 @@ public class Upgrade implements Parcelable {
             this.versionName = versionName;
             this.dowanloadUrl = dowanloadUrl;
             this.md5 = md5;
+        }
+
+        protected Stable(Parcel in) {
+            date = in.readString();
+            mode = in.readInt();
+            logs = in.createStringArrayList();
+            versionCode = in.readInt();
+            versionName = in.readString();
+            dowanloadUrl = in.readString();
+            md5 = in.readString();
         }
 
         public String getDate() {
@@ -362,28 +381,6 @@ public class Upgrade implements Parcelable {
             this.md5 = md5;
         }
 
-        protected Stable(Parcel in) {
-            date = in.readString();
-            mode = in.readInt();
-            logs = in.createStringArrayList();
-            versionCode = in.readInt();
-            versionName = in.readString();
-            dowanloadUrl = in.readString();
-            md5 = in.readString();
-        }
-
-        public static final Creator<Stable> CREATOR = new Creator<Stable>() {
-            @Override
-            public Stable createFromParcel(Parcel in) {
-                return new Stable(in);
-            }
-
-            @Override
-            public Stable[] newArray(int size) {
-                return new Stable[size];
-            }
-        };
-
         @Override
         public int describeContents() {
             return 0;
@@ -418,6 +415,17 @@ public class Upgrade implements Parcelable {
      * 测试版
      */
     public static class Bate implements Parcelable {
+        public static final Creator<Bate> CREATOR = new Creator<Bate>() {
+            @Override
+            public Bate createFromParcel(Parcel in) {
+                return new Bate(in);
+            }
+
+            @Override
+            public Bate[] newArray(int size) {
+                return new Bate[size];
+            }
+        };
         /**
          * 测试版设备序列号
          */
@@ -454,6 +462,7 @@ public class Upgrade implements Parcelable {
         public Bate() {
         }
 
+
         public Bate(List<String> device, String date, int mode, List<String> logs, int versionCode, String versionName, String dowanloadUrl, String md5) {
             this.device = device;
             this.date = date;
@@ -465,6 +474,16 @@ public class Upgrade implements Parcelable {
             this.md5 = md5;
         }
 
+        protected Bate(Parcel in) {
+            device = in.createStringArrayList();
+            date = in.readString();
+            mode = in.readInt();
+            logs = in.createStringArrayList();
+            versionCode = in.readInt();
+            versionName = in.readString();
+            dowanloadUrl = in.readString();
+            md5 = in.readString();
+        }
 
         public List<String> getDevice() {
             return device;
@@ -530,17 +549,6 @@ public class Upgrade implements Parcelable {
             this.md5 = md5;
         }
 
-        protected Bate(Parcel in) {
-            device = in.createStringArrayList();
-            date = in.readString();
-            mode = in.readInt();
-            logs = in.createStringArrayList();
-            versionCode = in.readInt();
-            versionName = in.readString();
-            dowanloadUrl = in.readString();
-            md5 = in.readString();
-        }
-
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeStringList(device);
@@ -557,18 +565,6 @@ public class Upgrade implements Parcelable {
         public int describeContents() {
             return 0;
         }
-
-        public static final Creator<Bate> CREATOR = new Creator<Bate>() {
-            @Override
-            public Bate createFromParcel(Parcel in) {
-                return new Bate(in);
-            }
-
-            @Override
-            public Bate[] newArray(int size) {
-                return new Bate[size];
-            }
-        };
 
         @Override
         public String toString() {

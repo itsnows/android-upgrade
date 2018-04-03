@@ -1,7 +1,5 @@
 package com.upgradelibrary.bean;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
