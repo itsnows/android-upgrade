@@ -47,12 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.button_check_updates_custom).setOnClickListener(this);
         findViewById(R.id.button_check_updates_custom_download).setOnClickListener(this);
         findViewById(R.id.button_cancle).setOnClickListener(this);
+        autoCheckUpdates();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        autoCheckUpdates();
     }
 
     private void checkUpdates() {

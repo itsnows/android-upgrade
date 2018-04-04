@@ -532,7 +532,7 @@ public class UpgradeService extends Service {
                 progress = startLength;
                 maxProgress = endLength;
                 if (upgradeOption.isMultithreadEnabled()) {
-                    int part = 5 * 1024 * 1024;
+                    int part = 2 * 1024 * 1024;
                     int count = (int) (endLength / part);
                     if (count > upgradeOption.getMaxThreadPools()) {
                         count = upgradeOption.getMaxThreadPools();
@@ -563,7 +563,7 @@ public class UpgradeService extends Service {
          * @param url 下载文件地址
          * @return
          */
-        private long length(String url) {
+        private long length(String url) throws IOException {
             HttpURLConnection readConnection = null;
             try {
                 readConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -576,8 +576,6 @@ public class UpgradeService extends Service {
                 if (readConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     return readConnection.getContentLength();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             } finally {
                 if (readConnection != null) {
                     readConnection.disconnect();
@@ -688,7 +686,9 @@ public class UpgradeService extends Service {
                     }
                     randomAccessFile.write(bytes, 0, temp);
                     startLength += temp;
-                    progress += temp;
+                    synchronized (UpgradeService.this) {
+                        progress += temp;
+                    }
                     int tempPercent = (int) (((float) progress / maxProgress) * 100);
                     if (tempPercent > percent) {
                         percent = tempPercent;
