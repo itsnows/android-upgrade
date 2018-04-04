@@ -10,31 +10,37 @@
         android:id="@+id/button_check_updates_default_common"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="默认检测更新（普通升级）" />
+        android:text="@string/button_check_updates_default_common_text" />
 
     <Button
         android:id="@+id/button_check_updates_default_forced"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="默认检测更新（强制升级）" />
+        android:text="@string/button_check_updates_default_forced_text" />
 
     <Button
+        android:id="@+id/button_check_updates_default_bate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="false"
-        android:gravity="left"
-        android:text="默认检测更新（灰度升级 需要提供手机序列号，可自行测试）" />
+        android:text="@string/button_check_updates_default_beta_text" />
 
     <Button
         android:id="@+id/button_check_updates_custom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="自定义检测更新（自己实现更新提示）" />
+        android:text="@string/button_check_updates_custom_text" />
+
+    <Button
+        android:id="@+id/button_check_updates_custom_download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_check_updates_custom_download_text" />
 
     <Button
         android:id="@+id/button_cancle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="取消" />
+        android:text="@string/button_cancle_text" />
 
 </LinearLayout>

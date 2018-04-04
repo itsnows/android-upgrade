@@ -54,19 +54,19 @@ public class Upgrade implements Parcelable {
     /**
      * 测试版
      */
-    private Bate bate;
+    private Beta beta;
 
     protected Upgrade(Parcel in) {
         stable = in.readParcelable(Stable.class.getClassLoader());
-        bate = in.readParcelable(Bate.class.getClassLoader());
+        beta = in.readParcelable(Beta.class.getClassLoader());
     }
 
     private Upgrade() {
     }
 
-    public Upgrade(Stable stable, Bate bate) {
+    public Upgrade(Stable stable, Beta beta) {
         this.stable = stable;
-        this.bate = bate;
+        this.beta = beta;
     }
 
     /**
@@ -157,7 +157,7 @@ public class Upgrade implements Parcelable {
                                 }
                             }
                         } else if ("beta".equals(stableNode.getNodeName())) {
-                            upgrade.setBate(new Bate());
+                            upgrade.setBeta(new Beta());
                             NodeList betaNodeList = stableNode.getChildNodes();
                             for (int k = 0; k < betaNodeList.getLength(); k++) {
                                 Node childBetaNode = betaNodeList.item(k);
@@ -166,7 +166,7 @@ public class Upgrade implements Parcelable {
                                 }
                                 if ("device".equals(childBetaNode.getNodeName())) {
                                     NodeList deviceNodeList = childBetaNode.getChildNodes();
-                                    upgrade.getBate().setDevice(new ArrayList<String>(0));
+                                    upgrade.getBeta().setDevice(new ArrayList<String>(0));
                                     for (int l = 0; deviceNodeList != null && l < deviceNodeList.getLength(); l++) {
                                         Node deviceChildNode = deviceNodeList.item(l);
                                         if (deviceChildNode == null) {
@@ -174,18 +174,18 @@ public class Upgrade implements Parcelable {
                                         }
                                         if ("sn".equals(deviceChildNode.getNodeName())) {
                                             String text = deviceChildNode.getTextContent();
-                                            upgrade.getBate().getDevice().add(text == null ? text : text.trim());
+                                            upgrade.getBeta().getDevice().add(text == null ? text : text.trim());
                                         }
                                     }
                                 } else if ("date".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setDate(text == null ? text : text.trim());
+                                    upgrade.getBeta().setDate(text == null ? text : text.trim());
                                 } else if ("mode".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setMode(text == null ? 0 : Integer.parseInt(text.trim()));
+                                    upgrade.getBeta().setMode(text == null ? 0 : Integer.parseInt(text.trim()));
                                 } else if ("log".equals(childBetaNode.getNodeName())) {
                                     NodeList logNodeList = childBetaNode.getChildNodes();
-                                    upgrade.getBate().setLogs(new ArrayList<String>(0));
+                                    upgrade.getBeta().setLogs(new ArrayList<String>(0));
                                     for (int l = 0; logNodeList != null && l < logNodeList.getLength(); l++) {
                                         Node logChildNode = logNodeList.item(l);
                                         if (logChildNode == null) {
@@ -193,21 +193,21 @@ public class Upgrade implements Parcelable {
                                         }
                                         if ("item".equals(logChildNode.getNodeName())) {
                                             String text = logChildNode.getTextContent();
-                                            upgrade.getBate().getLogs().add(text == null ? text : text.trim());
+                                            upgrade.getBeta().getLogs().add(text == null ? text : text.trim());
                                         }
                                     }
                                 } else if ("versionCode".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setVersionCode(text == null ? 0 : Integer.parseInt(text.trim()));
+                                    upgrade.getBeta().setVersionCode(text == null ? 0 : Integer.parseInt(text.trim()));
                                 } else if ("versionName".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setVersionName(text == null ? text : text.trim());
+                                    upgrade.getBeta().setVersionName(text == null ? text : text.trim());
                                 } else if ("dowanloadUrl".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setDowanloadUrl(text == null ? text : text.trim());
+                                    upgrade.getBeta().setDowanloadUrl(text == null ? text : text.trim());
                                 } else if ("md5".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBate().setMd5(text == null ? text : text.trim());
+                                    upgrade.getBeta().setMd5(text == null ? text : text.trim());
                                 }
                             }
                         }
@@ -230,12 +230,12 @@ public class Upgrade implements Parcelable {
         this.stable = stable;
     }
 
-    public Bate getBate() {
-        return bate;
+    public Beta getBeta() {
+        return beta;
     }
 
-    public void setBate(Bate bate) {
-        this.bate = bate;
+    public void setBeta(Beta beta) {
+        this.beta = beta;
     }
 
     @Override
@@ -246,14 +246,14 @@ public class Upgrade implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(stable, flags);
-        dest.writeParcelable(bate, flags);
+        dest.writeParcelable(beta, flags);
     }
 
     @Override
     public String toString() {
         return "Upgrade{" +
                 "stable=" + stable +
-                ", bate=" + bate +
+                ", beta=" + beta +
                 '}';
     }
 
@@ -414,16 +414,16 @@ public class Upgrade implements Parcelable {
     /**
      * 测试版
      */
-    public static class Bate implements Parcelable {
-        public static final Creator<Bate> CREATOR = new Creator<Bate>() {
+    public static class Beta implements Parcelable {
+        public static final Creator<Beta> CREATOR = new Creator<Beta>() {
             @Override
-            public Bate createFromParcel(Parcel in) {
-                return new Bate(in);
+            public Beta createFromParcel(Parcel in) {
+                return new Beta(in);
             }
 
             @Override
-            public Bate[] newArray(int size) {
-                return new Bate[size];
+            public Beta[] newArray(int size) {
+                return new Beta[size];
             }
         };
         /**
@@ -459,11 +459,10 @@ public class Upgrade implements Parcelable {
          */
         private String md5;
 
-        public Bate() {
+        public Beta() {
         }
 
-
-        public Bate(List<String> device, String date, int mode, List<String> logs, int versionCode, String versionName, String dowanloadUrl, String md5) {
+        public Beta(List<String> device, String date, int mode, List<String> logs, int versionCode, String versionName, String dowanloadUrl, String md5) {
             this.device = device;
             this.date = date;
             this.mode = mode;
@@ -474,7 +473,7 @@ public class Upgrade implements Parcelable {
             this.md5 = md5;
         }
 
-        protected Bate(Parcel in) {
+        protected Beta(Parcel in) {
             device = in.createStringArrayList();
             date = in.readString();
             mode = in.readInt();
@@ -568,7 +567,7 @@ public class Upgrade implements Parcelable {
 
         @Override
         public String toString() {
-            return "Bate{" +
+            return "Beta{" +
                     "device=" + device +
                     ", date='" + date + '\'' +
                     ", mode=" + mode +

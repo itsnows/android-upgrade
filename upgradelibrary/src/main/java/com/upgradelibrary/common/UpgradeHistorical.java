@@ -165,7 +165,7 @@ public class UpgradeHistorical {
      * @param key
      * @param value
      */
-    public static void put(Context context, String key, Object value) {
+    private static void put(Context context, String key, Object value) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (value instanceof String) {

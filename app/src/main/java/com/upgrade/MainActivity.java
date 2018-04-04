@@ -28,46 +28,34 @@ import java.io.File;
  * <p>
  * 更新文档模板路径：../android-upgrade/upgradelibrary/app-update.xml
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private UpgradeManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final UpgradeManager manager = new UpgradeManager(this);
-        updates(manager, true);
-
-        findViewById(R.id.button_check_updates_default_common).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updates(manager, false);
-            }
-        });
-
-        findViewById(R.id.button_check_updates_default_forced).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                forceUpdates(manager);
-            }
-        });
-
-        findViewById(R.id.button_check_updates_custom).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customerUpdates(manager);
-            }
-        });
-
-        findViewById(R.id.button_cancle).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                manager.cancel();
-            }
-        });
+        manager = new UpgradeManager(this);
+        initView();
     }
 
-    private void updates(UpgradeManager manager, boolean isAutocheck) {
+    private void initView() {
+        findViewById(R.id.button_check_updates_default_common).setOnClickListener(this);
+        findViewById(R.id.button_check_updates_default_forced).setOnClickListener(this);
+        findViewById(R.id.button_check_updates_default_bate).setOnClickListener(this);
+        findViewById(R.id.button_check_updates_custom).setOnClickListener(this);
+        findViewById(R.id.button_check_updates_custom_download).setOnClickListener(this);
+        findViewById(R.id.button_cancle).setOnClickListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        autoCheckUpdates();
+    }
+
+    private void checkUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 // 通知栏标题（可选）
@@ -75,7 +63,27 @@ public class MainActivity extends AppCompatActivity {
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update_common.xml")
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMutiThreadEnabled(true)
+                // 线程池大小（可选）
+                .setMaxThreadPools(10)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), false);
+    }
+
+    private void autoCheckUpdates() {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -84,10 +92,10 @@ public class MainActivity extends AppCompatActivity {
                 .setMaxThreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
-                .build(), isAutocheck);
+                .build(), true);
     }
 
-    private void forceUpdates(UpgradeManager manager) {
+    private void forceCheckUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 // 通知栏标题（可选）
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+                .setUrl("http://www.rainen.cn/test/app-update-forced.xml")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）
@@ -105,15 +113,14 @@ public class MainActivity extends AppCompatActivity {
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);
-
     }
 
-    private void customerUpdates(UpgradeManager manager) {
+    private void customerCheckUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://www.rainen.cn/test/app-update.xml")
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMutiThreadEnabled(true)
                 .setMaxThreadPools(1)
@@ -131,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onUpdateAvailable(Upgrade.Bate bate, UpgradeServiceManager manager) {
+            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeServiceManager manager) {
 
             }
 
@@ -140,6 +147,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void customerDownloadUpdates() {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线程下载（可选）
+                .setMutiThreadEnabled(true)
+                // 线程池大小（可选）
+                .setMaxThreadPools(1)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), false);
     }
 
     /**
@@ -165,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
                 }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                // 下载监听接口
                 manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceManager.OnBinderUpgradeServiceLisenter() {
                     @Override
                     public void onBinder(UpgradeService upgradeService) {
@@ -201,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onComplete() {
+                                dialog.dismiss();
                                 Log.d(TAG, "onComplete");
                             }
                         });
@@ -223,4 +250,29 @@ public class MainActivity extends AppCompatActivity {
         }).show();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_check_updates_default_common:
+                checkUpdates();
+                break;
+            case R.id.button_check_updates_default_forced:
+                forceCheckUpdates();
+                break;
+            case R.id.button_check_updates_default_bate:
+                break;
+            case R.id.button_check_updates_custom:
+                customerCheckUpdates();
+                break;
+            case R.id.button_check_updates_custom_download:
+                customerDownloadUpdates();
+                break;
+            case R.id.button_cancle:
+                manager.cancel();
+                break;
+            default:
+                break;
+        }
+
+    }
 }

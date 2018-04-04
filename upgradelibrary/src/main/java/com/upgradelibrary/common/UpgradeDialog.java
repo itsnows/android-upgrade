@@ -141,8 +141,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         if (upgrade.getStable() != null) {
             return upgrade.getStable().getDate();
         }
-        if (upgrade.getBate() != null) {
-            return upgrade.getBate().getDate();
+        if (upgrade.getBeta() != null) {
+            return upgrade.getBeta().getDate();
         }
         return "";
     }
@@ -151,8 +151,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         if (upgrade.getStable() != null) {
             return upgrade.getStable().getMode();
         }
-        if (upgrade.getBate() != null) {
-            return upgrade.getBate().getMode();
+        if (upgrade.getBeta() != null) {
+            return upgrade.getBeta().getMode();
         }
         return Upgrade.UPGRADE_MODE_COMMON;
     }
@@ -161,8 +161,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         if (upgrade.getStable() != null) {
             return upgrade.getStable().getVersionName();
         }
-        if (upgrade.getBate() != null) {
-            return upgrade.getBate().getVersionName();
+        if (upgrade.getBeta() != null) {
+            return upgrade.getBeta().getVersionName();
         }
         return "";
     }
@@ -176,10 +176,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             }
             return logs.toString();
         }
-        if (upgrade.getBate() != null) {
-            for (int i = 0; i < this.upgrade.getBate().getLogs().size(); i++) {
-                logs.append(this.upgrade.getBate().getLogs().get(i));
-                logs.append(i < this.upgrade.getBate().getLogs().size() - 1 ? "\n" : "");
+        if (upgrade.getBeta() != null) {
+            for (int i = 0; i < this.upgrade.getBeta().getLogs().size(); i++) {
+                logs.append(this.upgrade.getBeta().getLogs().get(i));
+                logs.append(i < this.upgrade.getBeta().getLogs().size() - 1 ? "\n" : "");
             }
             return logs.toString();
         }
@@ -209,8 +209,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getStable().getVersionCode());
             return;
         }
-        if (upgrade.getBate() != null) {
-            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getBate().getVersionCode());
+        if (upgrade.getBeta() != null) {
+            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getBeta().getVersionCode());
             return;
         }
     }

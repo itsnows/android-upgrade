@@ -103,27 +103,27 @@ public class UpgradeService extends Service {
     /**
      * 状态
      */
-    private int status;
+    private volatile int status;
 
     /**
      * 双击取消标记
      */
-    private boolean isCancel;
+    private volatile boolean isCancel;
 
     /**
      * 下载最大进度
      */
-    private long maxProgress;
+    private volatile long maxProgress;
 
     /**
      * 下载进度
      */
-    private long progress;
+    private volatile long progress;
 
     /**
      * 下载进度百分比
      */
-    private int percent;
+    private volatile int percent;
 
     /**
      * 开始
@@ -324,14 +324,14 @@ public class UpgradeService extends Service {
     /**
      * 安装
      */
-    private void install() {
+    private synchronized void install() {
         Util.installApk(this, upgradeOption.getStorage().getPath());
     }
 
     /**
      * 开始
      */
-    private void start() {
+    private synchronized void start() {
         if (taskThread != null) {
             if (taskThread.isAlive() || taskThread.isInterrupted()) {
                 status = SATUS_CANCEL;
@@ -346,14 +346,14 @@ public class UpgradeService extends Service {
     /**
      * 暂停
      */
-    public void pause() {
+    public synchronized void pause() {
         status = SATUS_PAUSE;
     }
 
     /**
      * 继续
      */
-    public void resume() {
+    public synchronized void resume() {
         status = SATUS_START;
         start();
     }
@@ -361,14 +361,14 @@ public class UpgradeService extends Service {
     /**
      * 取消
      */
-    public void cancel() {
+    public synchronized void cancel() {
         status = SATUS_CANCEL;
     }
 
     /**
      * 完成
      */
-    public void complete() {
+    public synchronized void complete() {
         status = SATUS_COMPLETE;
         clearNotify(NOTIFY_ID);
         install();
@@ -524,7 +524,7 @@ public class UpgradeService extends Service {
                     return;
                 }
 
-                if ((endLength = readLength(upgradeOption.getUrl())) == -1) {
+                if ((endLength = length(upgradeOption.getUrl())) == -1) {
                     downloadHandler.sendEmptyMessage(SATUS_ERROR);
                     return;
                 }
@@ -558,12 +558,12 @@ public class UpgradeService extends Service {
         }
 
         /**
-         * 读取下载文件长度
+         * 下载文件长度
          *
          * @param url 下载文件地址
          * @return
          */
-        private long readLength(String url) {
+        private long length(String url) {
             HttpURLConnection readConnection = null;
             try {
                 readConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -688,9 +688,7 @@ public class UpgradeService extends Service {
                     }
                     randomAccessFile.write(bytes, 0, temp);
                     startLength += temp;
-                    synchronized (UpgradeService.this) {
-                        progress += temp;
-                    }
+                    progress += temp;
                     int tempPercent = (int) (((float) progress / maxProgress) * 100);
                     if (tempPercent > percent) {
                         percent = tempPercent;
@@ -727,36 +725,6 @@ public class UpgradeService extends Service {
         }
 
         /**
-         * 检测文件完整性
-         *
-         * @param path 文件路径
-         * @param md5  文件Md5
-         * @return
-         */
-        private boolean checkCompleteness(String path, String md5) throws IOException {
-            MessageDigest messageDigest = null;
-            FileInputStream fileInputStream = null;
-            try {
-                fileInputStream = new FileInputStream(new File(path));
-                messageDigest = MessageDigest.getInstance("MD5");
-                byte[] buffer = new byte[1024];
-                int temp = -1;
-                while ((temp = fileInputStream.read(buffer, 0, 1024)) != -1) {
-                    messageDigest.update(buffer, 0, temp);
-                }
-                BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
-                return TextUtils.equals(bigInteger.toString(), md5);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
-                }
-            }
-            return false;
-        }
-
-        /**
          * 记录下载位置
          *
          * @param url 下载链接
@@ -788,6 +756,36 @@ public class UpgradeService extends Service {
             }
             oldShuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
             UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
+        }
+
+        /**
+         * 检测文件完整性
+         *
+         * @param path 文件路径
+         * @param md5  文件Md5
+         * @return
+         */
+        private boolean checkCompleteness(String path, String md5) throws IOException {
+            MessageDigest messageDigest = null;
+            FileInputStream fileInputStream = null;
+            try {
+                fileInputStream = new FileInputStream(new File(path));
+                messageDigest = MessageDigest.getInstance("MD5");
+                byte[] buffer = new byte[1024];
+                int temp = -1;
+                while ((temp = fileInputStream.read(buffer, 0, 1024)) != -1) {
+                    messageDigest.update(buffer, 0, temp);
+                }
+                BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
+                return TextUtils.equals(bigInteger.toString(), md5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+            }
+            return false;
         }
     }
 
