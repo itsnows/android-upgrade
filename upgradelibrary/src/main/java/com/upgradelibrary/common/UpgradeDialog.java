@@ -287,6 +287,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             @Override
             public void onPause() {
                 super.onPause();
+                btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
                 btnProgress.setTag("onPause");
                 Log.d(TAG, "onPause");

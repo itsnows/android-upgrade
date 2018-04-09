@@ -485,42 +485,38 @@ public class UpgradeService extends Service {
                 downloadHandler.sendEmptyMessage(SATUS_START);
                 long startLength = 0;
                 long endLength = -1;
-                File file = upgradeOption.getStorage();
-                if (file.exists()) {
+                File apkFile = upgradeOption.getStorage();
+                if (apkFile.exists()) {
                     UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
-                    if (upgradeBuffer != null && upgradeBuffer.getFileLength() == file.length()) {
+                    long apkFileLen = apkFile.length();
+                    if (upgradeBuffer != null && upgradeBuffer.getBufferLength() <= apkFileLen) {
                         progress = upgradeBuffer.getBufferLength();
                         maxProgress = upgradeBuffer.getFileLength();
-                        List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
-                        for (int i = 0; i < shuntParts.size(); i++) {
-                            startLength = shuntParts.get(i).getStartLength();
-                            endLength = shuntParts.get(i).getEndLength();
-                            if (shuntParts.size() == 1) {
-                                if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
-                                    file.delete();
-                                    startLength = 0;
-                                    progress = startLength;
-                                    continue;
-                                }
-                                if (startLength == file.length()) {
-                                    status = SATUS_PROGRESS;
-                                    downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
-                                    status = SATUS_COMPLETE;
-                                    downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
-                                    return;
-                                }
-                                download(startLength, endLength);
+                        if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) <= UpgradeBuffer.EXPIRY_DATE) {
+                            if (upgradeBuffer.getFileLength() == apkFile.length()) {
+                                status = SATUS_PROGRESS;
+                                downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
+                                status = SATUS_COMPLETE;
+                                downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
                                 return;
                             }
-                            download(startLength, endLength);
+                            List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
+                            for (int i = 0; i < shuntParts.size(); i++) {
+                                startLength = shuntParts.get(i).getStartLength();
+                                endLength = shuntParts.get(i).getEndLength();
+                                download(startLength, endLength);
+                            }
+                            return;
                         }
-                        return;
                     }
-                    file.delete();
+                    apkFile.delete();
+                    startLength = 0;
+                    progress = startLength;
                 }
-                File parentFile = new File(file.getPath().substring(0, file.getPath().lastIndexOf(File.separator)));
-                if (!parentFile.exists()) {
-                    parentFile.mkdirs();
+
+                File folder = new File(apkFile.getPath().substring(0, apkFile.getPath().lastIndexOf(File.separator)));
+                if (!folder.exists()) {
+                    folder.mkdirs();
                 }
                 if ((endLength = length(upgradeOption.getUrl())) == -1) {
                     downloadHandler.sendEmptyMessage(SATUS_ERROR);
@@ -645,7 +641,6 @@ public class UpgradeService extends Service {
                         downloadHandler.sendEmptyMessage(SATUS_CANCEL);
                         break;
                     }
-
                     if (status == SATUS_PAUSE) {
                         downloadHandler.sendEmptyMessage(SATUS_PAUSE);
                         break;
@@ -661,7 +656,7 @@ public class UpgradeService extends Service {
                             break;
                         }
 
-                        if (checkCompleteness(upgradeOption.getStorage().getPath(), upgradeOption.getMd5())) {
+                        if (checkCompleteness()) {
                             status = SATUS_COMPLETE;
                             downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
                             break;
@@ -684,7 +679,7 @@ public class UpgradeService extends Service {
                     if (tempPercent > percent) {
                         percent = tempPercent;
                         downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
-                        recordDownload(upgradeOption.getUrl(), upgradeOption.getMd5());
+                        recordDownload();
                     }
                     Log.d(TAG, "Thread：" + getName() + " Position：" + startLength + "-" + endLength + " Download：" + percent + "% " + progress + "Byte/" + maxProgress + "Byte");
                 } while (true);
@@ -717,16 +712,13 @@ public class UpgradeService extends Service {
 
         /**
          * 记录下载位置
-         *
-         * @param url 下载链接
-         * @param md5 下载文件效验
          */
-        private void recordDownload(String url, String md5) {
-            UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, url);
+        private void recordDownload() {
+            UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
             if (upgradeBuffer == null) {
                 upgradeBuffer = new UpgradeBuffer();
-                upgradeBuffer.setDownloadUrl(url);
-                upgradeBuffer.setFileMd5(md5);
+                upgradeBuffer.setDownloadUrl(upgradeOption.getUrl());
+                upgradeBuffer.setFileMd5(upgradeOption.getMd5());
                 upgradeBuffer.setBufferLength(progress);
                 upgradeBuffer.setFileLength(maxProgress);
                 upgradeBuffer.setLastModified(System.currentTimeMillis());
@@ -752,34 +744,32 @@ public class UpgradeService extends Service {
         /**
          * 检测文件完整性
          *
-         * @param path 文件路径
-         * @param md5  文件Md5
          * @return
          */
-        private boolean checkCompleteness(String path, String md5) throws IOException {
-            if (TextUtils.isEmpty(upgradeOption.getMd5())) {
-                return true;
-            }
-            MessageDigest messageDigest = null;
-            FileInputStream fileInputStream = null;
-            try {
-                fileInputStream = new FileInputStream(new File(path));
-                messageDigest = MessageDigest.getInstance("MD5");
-                byte[] buffer = new byte[1024];
-                int temp = -1;
-                while ((temp = fileInputStream.read(buffer)) != -1) {
-                    messageDigest.update(buffer, 0, temp);
+        private boolean checkCompleteness() throws IOException {
+            if (!TextUtils.isEmpty(upgradeOption.getMd5())) {
+                MessageDigest messageDigest = null;
+                FileInputStream fileInputStream = null;
+                try {
+                    fileInputStream = new FileInputStream(upgradeOption.getStorage());
+                    messageDigest = MessageDigest.getInstance("MD5");
+                    byte[] buffer = new byte[1024];
+                    int temp = -1;
+                    while ((temp = fileInputStream.read(buffer, 0, 1024)) != -1) {
+                        messageDigest.update(buffer, 0, temp);
+                    }
+                    BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
+                    return TextUtils.equals(bigInteger.toString(), upgradeOption.getMd5());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (fileInputStream != null) {
+                        fileInputStream.close();
+                    }
                 }
-                BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
-                return TextUtils.equals(bigInteger.toString(), md5);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
-                }
+                return false;
             }
-            return false;
+            return true;
         }
     }
 

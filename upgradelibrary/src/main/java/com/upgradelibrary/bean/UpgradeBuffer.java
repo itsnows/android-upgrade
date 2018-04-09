@@ -15,7 +15,7 @@ import java.util.List;
 
 public class UpgradeBuffer implements Parcelable {
     /**
-     * 升级缓存有效期
+     * 缓存有效期
      */
     public static final int EXPIRY_DATE = 7 * 24 * 60 * 60 * 1000;
     public static final Creator<UpgradeBuffer> CREATOR = new Creator<UpgradeBuffer>() {
