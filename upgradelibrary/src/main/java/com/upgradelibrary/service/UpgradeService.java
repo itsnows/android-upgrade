@@ -476,6 +476,7 @@ public class UpgradeService extends Service {
      */
     private class TaskThread extends Thread {
 
+        @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         public void run() {
             super.run();
@@ -484,51 +485,47 @@ public class UpgradeService extends Service {
                 downloadHandler.sendEmptyMessage(SATUS_START);
                 long startLength = 0;
                 long endLength = -1;
-
                 File file = upgradeOption.getStorage();
-                boolean exists = file.exists();
-                if (!exists) {
-                    File folder = new File(file.getPath().substring(0, file.getPath().lastIndexOf(File.separator)));
-                    if (!folder.exists()) {
-                        folder.mkdirs();
-                    }
-                }
-
-                UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
-                if (upgradeBuffer != null && exists) {
-                    progress = upgradeBuffer.getBufferLength();
-                    maxProgress = upgradeBuffer.getFileLength();
-                    List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
-                    for (int i = 0; i < shuntParts.size(); i++) {
-                        startLength = shuntParts.get(i).getStartLength();
-                        endLength = shuntParts.get(i).getEndLength();
-                        if (shuntParts.size() == 1) {
-                            if (maxProgress < file.length() || Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
-                                file.delete();
-                                startLength = 0;
-                                progress = startLength;
-                                continue;
-                            }
-                            if (startLength == file.length()) {
-                                status = SATUS_PROGRESS;
-                                downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
-                                status = SATUS_COMPLETE;
-                                downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
+                if (file.exists()) {
+                    UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
+                    if (upgradeBuffer != null && upgradeBuffer.getFileLength() == file.length()) {
+                        progress = upgradeBuffer.getBufferLength();
+                        maxProgress = upgradeBuffer.getFileLength();
+                        List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
+                        for (int i = 0; i < shuntParts.size(); i++) {
+                            startLength = shuntParts.get(i).getStartLength();
+                            endLength = shuntParts.get(i).getEndLength();
+                            if (shuntParts.size() == 1) {
+                                if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) > UpgradeBuffer.EXPIRY_DATE) {
+                                    file.delete();
+                                    startLength = 0;
+                                    progress = startLength;
+                                    continue;
+                                }
+                                if (startLength == file.length()) {
+                                    status = SATUS_PROGRESS;
+                                    downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
+                                    status = SATUS_COMPLETE;
+                                    downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
+                                    return;
+                                }
+                                download(startLength, endLength);
                                 return;
                             }
                             download(startLength, endLength);
-                            return;
                         }
-                        download(startLength, endLength);
+                        return;
                     }
-                    return;
+                    file.delete();
                 }
-
+                File parentFile = new File(file.getPath().substring(0, file.getPath().lastIndexOf(File.separator)));
+                if (!parentFile.exists()) {
+                    parentFile.mkdirs();
+                }
                 if ((endLength = length(upgradeOption.getUrl())) == -1) {
                     downloadHandler.sendEmptyMessage(SATUS_ERROR);
                     return;
                 }
-
                 progress = startLength;
                 maxProgress = endLength;
                 if (upgradeOption.isMultithreadEnabled()) {
