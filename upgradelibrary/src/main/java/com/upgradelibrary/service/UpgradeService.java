@@ -488,12 +488,11 @@ public class UpgradeService extends Service {
                 File apkFile = upgradeOption.getStorage();
                 if (apkFile.exists()) {
                     UpgradeBuffer upgradeBuffer = UpgradeHistorical.getUpgradeBuffer(UpgradeService.this, upgradeOption.getUrl());
-                    long apkFileLen = apkFile.length();
-                    if (upgradeBuffer != null && upgradeBuffer.getBufferLength() <= apkFileLen) {
+                    if (upgradeBuffer != null && upgradeBuffer.getBufferLength() <= apkFile.length()) {
                         progress = upgradeBuffer.getBufferLength();
                         maxProgress = upgradeBuffer.getFileLength();
                         if (Math.abs(System.currentTimeMillis() - upgradeBuffer.getLastModified()) <= UpgradeBuffer.EXPIRY_DATE) {
-                            if (upgradeBuffer.getFileLength() == apkFile.length()) {
+                            if (upgradeBuffer.getBufferLength() == upgradeBuffer.getFileLength()) {
                                 status = SATUS_PROGRESS;
                                 downloadHandler.sendEmptyMessage(SATUS_PROGRESS);
                                 status = SATUS_COMPLETE;
