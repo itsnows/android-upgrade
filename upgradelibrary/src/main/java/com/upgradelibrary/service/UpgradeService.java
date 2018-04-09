@@ -661,12 +661,6 @@ public class UpgradeService extends Service {
                             break;
                         }
 
-                        if (TextUtils.isEmpty(upgradeOption.getMd5())) {
-                            status = SATUS_COMPLETE;
-                            downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
-                            break;
-                        }
-
                         if (checkCompleteness(upgradeOption.getStorage().getPath(), upgradeOption.getMd5())) {
                             status = SATUS_COMPLETE;
                             downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
@@ -763,6 +757,9 @@ public class UpgradeService extends Service {
          * @return
          */
         private boolean checkCompleteness(String path, String md5) throws IOException {
+            if (TextUtils.isEmpty(upgradeOption.getMd5())) {
+                return true;
+            }
             MessageDigest messageDigest = null;
             FileInputStream fileInputStream = null;
             try {
@@ -770,7 +767,7 @@ public class UpgradeService extends Service {
                 messageDigest = MessageDigest.getInstance("MD5");
                 byte[] buffer = new byte[1024];
                 int temp = -1;
-                while ((temp = fileInputStream.read(buffer, 0, 1024)) != -1) {
+                while ((temp = fileInputStream.read(buffer)) != -1) {
                     messageDigest.update(buffer, 0, temp);
                 }
                 BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
