@@ -179,7 +179,7 @@ public class Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Uri contentUri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+            Uri contentUri = FileProvider.getUriForFile(context, context.getPackageName() + ".FileProvider", file);
             intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
         } else {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
