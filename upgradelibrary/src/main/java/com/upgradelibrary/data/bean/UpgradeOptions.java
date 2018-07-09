@@ -57,7 +57,7 @@ public final class UpgradeOptions implements Parcelable {
     /**
      * 多线程下载线程池最大数量
      */
-    private final int maxThreadPools;
+    private final int multithreadPools;
 
     private UpgradeOptions(Builder builder) {
         this.icon = builder.icon;
@@ -66,8 +66,8 @@ public final class UpgradeOptions implements Parcelable {
         this.storage = builder.storage;
         this.url = builder.url;
         this.md5 = builder.md5;
-        this.multithreadEnabled = builder.mutiThreadEnabled;
-        this.maxThreadPools = builder.maxThreadPools;
+        this.multithreadEnabled = builder.multithreadEnabled;
+        this.multithreadPools = builder.multithreadPools;
     }
 
     protected UpgradeOptions(Parcel in) {
@@ -78,7 +78,7 @@ public final class UpgradeOptions implements Parcelable {
         url = in.readString();
         md5 = in.readString();
         multithreadEnabled = in.readByte() != 0;
-        maxThreadPools = in.readInt();
+        multithreadPools = in.readInt();
     }
 
     @Override
@@ -90,7 +90,7 @@ public final class UpgradeOptions implements Parcelable {
         dest.writeString(url);
         dest.writeString(md5);
         dest.writeByte((byte) (multithreadEnabled ? 1 : 0));
-        dest.writeInt(maxThreadPools);
+        dest.writeInt(multithreadPools);
     }
 
     @Override
@@ -126,8 +126,8 @@ public final class UpgradeOptions implements Parcelable {
         return multithreadEnabled;
     }
 
-    public int getMaxThreadPools() {
-        return maxThreadPools;
+    public int getMultithreadPools() {
+        return multithreadPools;
     }
 
     public static class Builder {
@@ -137,8 +137,8 @@ public final class UpgradeOptions implements Parcelable {
         private File storage;
         private String url;
         private String md5;
-        private boolean mutiThreadEnabled;
-        private int maxThreadPools;
+        private boolean multithreadEnabled;
+        private int multithreadPools;
 
         public Builder() {
         }
@@ -173,13 +173,13 @@ public final class UpgradeOptions implements Parcelable {
             return this;
         }
 
-        public Builder setMutiThreadEnabled(boolean mutiThreadEnabled) {
-            this.mutiThreadEnabled = mutiThreadEnabled;
+        public Builder setMultithreadEnabled(boolean enabled) {
+            this.multithreadEnabled = enabled;
             return this;
         }
 
-        public Builder setMaxThreadPools(int maxThreadPools) {
-            this.maxThreadPools = maxThreadPools <= 0 ? 1 : maxThreadPools;
+        public Builder setMultithreadPools(int pools) {
+            this.multithreadPools = pools <= 0 ? 1 : pools;
             return this;
         }
 

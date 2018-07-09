@@ -13,9 +13,9 @@ import com.upgradelibrary.service.UpgradeService;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/3/19 11:09
  * <p>
- * UpgradeServiceManager
+ * UpgradeServiceClient
  */
-public class UpgradeServiceManager {
+public class UpgradeServiceClient {
     private Activity activity;
     private UpgradeOptions upgradeOptions;
     private UpgradeService upgradeService;
@@ -37,7 +37,7 @@ public class UpgradeServiceManager {
         }
     };
 
-    public UpgradeServiceManager(Activity activity, UpgradeOptions upgradeOptions) {
+    public UpgradeServiceClient(Activity activity, UpgradeOptions upgradeOptions) {
         this.activity = activity;
         this.upgradeOptions = upgradeOptions;
     }
@@ -47,11 +47,11 @@ public class UpgradeServiceManager {
     }
 
     public void start() {
-        UpgradeService.start(activity, upgradeOptions);
+        UpgradeService.launch(activity, upgradeOptions);
     }
 
     public void binder() {
-        UpgradeService.start(activity, upgradeOptions, serviceConnection);
+        UpgradeService.launch(activity, upgradeOptions, serviceConnection);
     }
 
     public void unbinder() {

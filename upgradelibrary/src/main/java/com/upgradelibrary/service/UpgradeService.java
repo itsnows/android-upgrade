@@ -25,9 +25,9 @@ import android.util.Log;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
+import com.upgradelibrary.common.UpgradeHistorical;
 import com.upgradelibrary.data.bean.UpgradeBuffer;
 import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.common.UpgradeHistorical;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -126,23 +126,23 @@ public class UpgradeService extends Service {
     private volatile int percent;
 
     /**
-     * 开始
+     * 启动
      *
      * @param context
      * @param upgradeOption 升级选项
      */
-    public static void start(Context context, UpgradeOptions upgradeOption) {
-        start(context, upgradeOption, null);
+    public static void launch(Context context, UpgradeOptions upgradeOption) {
+        launch(context, upgradeOption, null);
     }
 
     /**
-     * 开始
+     * 启动
      *
      * @param context           Context
      * @param upgradeOption     升级选项
      * @param serviceConnection 升级服务连接
      */
-    public static void start(Context context, UpgradeOptions upgradeOption, ServiceConnection serviceConnection) {
+    public static void launch(Context context, UpgradeOptions upgradeOption, ServiceConnection serviceConnection) {
         if (context == null) {
             throw new IllegalArgumentException("Context can not be null");
         }
@@ -209,11 +209,11 @@ public class UpgradeService extends Service {
                     .setStorage(upgradeOptions.getStorage() == null ? new File(Environment.getExternalStorageDirectory(), getPackageName() + ".apk") : upgradeOptions.getStorage())
                     .setUrl(upgradeOptions.getUrl())
                     .setMd5(upgradeOptions.getMd5())
-                    .setMutiThreadEnabled(upgradeOptions.isMultithreadEnabled())
-                    .setMaxThreadPools(upgradeOptions.isMultithreadEnabled() ? upgradeOptions.getMaxThreadPools() == 0 ? 100 : upgradeOptions.getMaxThreadPools() : 0)
+                    .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
+                    .setMultithreadPools(upgradeOptions.isMultithreadEnabled() ? upgradeOptions.getMultithreadPools() == 0 ? 100 : upgradeOptions.getMultithreadPools() : 0)
                     .build();
             initNotify();
-            start();
+            launch();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -331,7 +331,7 @@ public class UpgradeService extends Service {
     /**
      * 开始
      */
-    private synchronized void start() {
+    private synchronized void launch() {
         if (taskThread != null) {
             if (taskThread.isAlive() || taskThread.isInterrupted()) {
                 status = SATUS_CANCEL;
@@ -355,7 +355,7 @@ public class UpgradeService extends Service {
      */
     public synchronized void resume() {
         status = SATUS_START;
-        start();
+        launch();
     }
 
     /**
@@ -526,8 +526,8 @@ public class UpgradeService extends Service {
                 if (upgradeOption.isMultithreadEnabled()) {
                     int part = 2 * 1024 * 1024;
                     int count = (int) (endLength / part);
-                    if (count > upgradeOption.getMaxThreadPools()) {
-                        count = upgradeOption.getMaxThreadPools();
+                    if (count > upgradeOption.getMultithreadPools()) {
+                        count = upgradeOption.getMultithreadPools();
                         part = (int) (endLength / count);
                     }
                     long tempStartLength = 0;
@@ -786,17 +786,17 @@ public class UpgradeService extends Service {
             if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
                 // WIFI已连接，移动数据已连接
                 if (status == SATUS_PAUSE) {
-                    start();
+                    launch();
                 }
             } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
                 // WIFI已连接，移动数据已断开
                 if (status == SATUS_PAUSE) {
-                    start();
+                    launch();
                 }
             } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
                 // WIFI已断开，移动数据已连接
                 if (status == SATUS_PAUSE) {
-                    start();
+                    launch();
                 }
             } else {
                 // WIFI已断开，移动数据已断开

@@ -14,7 +14,7 @@ import com.upgradelibrary.Util;
 import com.upgradelibrary.data.bean.Upgrade;
 import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.common.UpgradeManager;
-import com.upgradelibrary.common.UpgradeServiceManager;
+import com.upgradelibrary.common.UpgradeServiceClient;
 import com.upgradelibrary.service.UpgradeService;
 
 import java.io.File;
@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
-                .setMutiThreadEnabled(true)
+                .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMaxThreadPools(10)
+                .setMultithreadPools(10)
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
-                .setMutiThreadEnabled(true)
+                .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMaxThreadPools(1)
+                .setMultithreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), true);
@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）
-                .setMutiThreadEnabled(true)
+                .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMaxThreadPools(1)
+                .setMultithreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);
@@ -122,23 +122,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setDescription("更新通知栏")
                 .setUrl("http://www.rainen.cn/test/app-update-common.xml")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                .setMutiThreadEnabled(true)
-                .setMaxThreadPools(1)
+                .setMultithreadEnabled(true)
+                .setMultithreadPools(1)
                 .setMd5(null)
                 .build(), new UpgradeManager.OnUpgradeListener() {
 
             @Override
-            public void onUpdateAvailable(UpgradeServiceManager manager) {
+            public void onUpdateAvailable(UpgradeServiceClient manager) {
 
             }
 
             @Override
-            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceManager manager) {
+            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceClient manager) {
                 showUpgradeDialog(stable, manager);
             }
 
             @Override
-            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeServiceManager manager) {
+            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeServiceClient manager) {
 
             }
 
@@ -161,9 +161,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）
-                .setMutiThreadEnabled(true)
+                .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMaxThreadPools(1)
+                .setMultithreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param stable  Upgrade.Stable
      * @param manager UpgradeServiceManager
      */
-    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeServiceManager manager) {
+    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeServiceClient manager) {
         StringBuffer logs = new StringBuffer();
         for (int i = 0; i < stable.getLogs().size(); i++) {
             logs.append(stable.getLogs().get(i));
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceManager.OnBinderUpgradeServiceLisenter() {
+                manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceClient.OnBinderUpgradeServiceLisenter() {
                     @Override
                     public void onBinder(UpgradeService upgradeService) {
                         upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {

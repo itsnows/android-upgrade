@@ -30,7 +30,7 @@ import com.upgradelibrary.service.UpgradeService;
  * UpgradeDialog
  */
 
-public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeServiceManager.OnBinderUpgradeServiceLisenter {
+public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeServiceClient.OnBinderUpgradeServiceLisenter {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
     private AppCompatTextView tvTitle;
     private AppCompatTextView tvDate;
@@ -51,7 +51,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @NonNull
     private Upgrade upgrade;
     private UpgradeService upgradeService;
-    private UpgradeServiceManager upgradeServiceManager;
+    private UpgradeServiceClient upgradeServiceClient;
 
     private UpgradeDialog(@NonNull Context context) {
         super(context);
@@ -91,7 +91,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
-        this.upgradeServiceManager = new UpgradeServiceManager(activity, upgradeOptions);
+        this.upgradeServiceClient = new UpgradeServiceClient(activity, upgradeOptions);
     }
 
     private void initView() {
@@ -204,7 +204,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
     }
 
-    private void ignoreUpgrade() {
+    private void ignoredUpgrade() {
         if (upgrade.getStable() != null) {
             UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getStable().getVersionCode());
             return;
@@ -223,7 +223,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @Override
     public void dismiss() {
         super.dismiss();
-        upgradeServiceManager.unbinder();
+        upgradeServiceClient.unbinder();
     }
 
     @Override
@@ -233,15 +233,15 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             dismiss();
         } else if (id == R.id.btn_dialog_upgrade_neutral) {
             dismiss();
-            ignoreUpgrade();
+            ignoredUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_positive) {
             if (Util.mayRequestExternalStorage(activity, true)) {
                 if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                     showProgress();
                 }
-                upgradeServiceManager.setOnBinderUpgradeServiceLisenter(this);
-                upgradeServiceManager.binder();
+                upgradeServiceClient.setOnBinderUpgradeServiceLisenter(this);
+                upgradeServiceClient.binder();
             }
         } else if (id == R.id.btn_dialog_upgrade_progress) {
             if (upgradeService == null) {

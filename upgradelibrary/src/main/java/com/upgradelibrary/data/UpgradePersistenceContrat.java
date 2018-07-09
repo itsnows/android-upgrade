@@ -3,20 +3,20 @@ package com.upgradelibrary.data;
 /**
  * Author: SXF
  * E-mail: xue.com.fei@outlook.com
- * CreatedTime: 2018/7/6 22:26
+ * CreatedTime: 2018/2/6 22:26
  * <p>
  * UpgradePersistenceContrat
  */
 public class UpgradePersistenceContrat {
 
-    public static abstract class IgnoredEntry {
-        public static final String TABLE_NAME = "ignored";
+    public static abstract class UpgradeVersionEntry {
+        public static final String TABLE_NAME = "upgrade_version";
         public static final String COLUMN_NAME_VERSION = "version";
         public static final String COLUMN_NAME_IS_IGNORED = "is_ignored";
     }
 
-    public static abstract class BufferEntry {
-        public static final String TABLE_NAME = "buffer";
+    public static abstract class UpgradeBufferEntry {
+        public static final String TABLE_NAME = "upgrade_buffer";
         public static final String COLUMN_NAME_DOWNLOAD_URL = "download_url";
         public static final String COLUMN_NAME_FILE_MD5 = "file_md5";
         public static final String COLUMN_NAME_FILE_LENGTH = "file_length";
