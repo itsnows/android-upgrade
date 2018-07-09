@@ -13,8 +13,8 @@ import android.widget.Toast;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
-import com.upgradelibrary.bean.Upgrade;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 
 import java.lang.ref.WeakReference;
 

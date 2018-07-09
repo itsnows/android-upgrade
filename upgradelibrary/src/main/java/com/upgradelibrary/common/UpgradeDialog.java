@@ -18,8 +18,8 @@ import android.widget.ProgressBar;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
-import com.upgradelibrary.bean.Upgrade;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
 
 /**
@@ -235,7 +235,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             dismiss();
             ignoreUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_positive) {
-            if (Util.mayRequestExternalStorage(activity)) {
+            if (Util.mayRequestExternalStorage(activity, true)) {
                 if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                     showProgress();

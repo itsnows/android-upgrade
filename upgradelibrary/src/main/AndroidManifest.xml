@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
 
-        <!-- 应用更新服务 -->
+        <!-- UpgradeService -->
         <service
             android:name=".service.UpgradeService"
             android:enabled="true"
@@ -37,6 +37,17 @@
                 <action android:name="com.upgradelibrary.UpgradeService" />
             </intent-filter>
         </service>
+
+        <!-- FileProvider -->
+        <provider
+            android:name=".provider.UpgradeFileProvider"
+            android:authorities="${applicationId}.UpgradeFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.bean.UpgradeBuffer;
+import com.upgradelibrary.data.bean.UpgradeBuffer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,15 +99,15 @@ public class UpgradeHistorical {
                     buffer.setFileLength(jsonObject.optLong("file_length"));
                     buffer.setBufferLength(jsonObject.optLong("buffer_length"));
                     JSONArray childJsonArray = jsonObject.optJSONArray("shunt_part");
-                    List<UpgradeBuffer.ShuntPart> shuntParts = new ArrayList<>(0);
+                    List<UpgradeBuffer.BufferPart> bufferParts = new ArrayList<>(0);
                     for (int j = 0; j < childJsonArray.length(); j++) {
                         JSONObject childJSONObject = childJsonArray.getJSONObject(j);
-                        UpgradeBuffer.ShuntPart shuntPart = new UpgradeBuffer.ShuntPart();
-                        shuntPart.setStartLength(childJSONObject.optLong("start_length"));
-                        shuntPart.setEndLength(childJSONObject.optLong("end_length"));
-                        shuntParts.add(shuntPart);
+                        UpgradeBuffer.BufferPart bufferPart = new UpgradeBuffer.BufferPart();
+                        bufferPart.setStartLength(childJSONObject.optLong("start_length"));
+                        bufferPart.setEndLength(childJSONObject.optLong("end_length"));
+                        bufferParts.add(bufferPart);
                     }
-                    buffer.setShuntParts(shuntParts);
+                    buffer.setBufferParts(bufferParts);
                     buffer.setLastModified(jsonObject.optLong("last_modified"));
                     return buffer;
                 }
@@ -143,10 +143,10 @@ public class UpgradeHistorical {
             jsonObject.put("file_length", buffer.getFileLength());
             jsonObject.put("buffer_length", buffer.getBufferLength());
             JSONArray childJSONArray = new JSONArray();
-            for (UpgradeBuffer.ShuntPart shuntPart : buffer.getShuntParts()) {
+            for (UpgradeBuffer.BufferPart bufferPart : buffer.getBufferParts()) {
                 JSONObject childJSONObject = new JSONObject();
-                childJSONObject.put("start_length", shuntPart.getStartLength());
-                childJSONObject.put("end_length", shuntPart.getEndLength());
+                childJSONObject.put("start_length", bufferPart.getStartLength());
+                childJSONObject.put("end_length", bufferPart.getEndLength());
                 childJSONArray.put(childJSONObject);
             }
             jsonObject.put("shunt_part", childJSONArray);

@@ -36,23 +36,27 @@ public class Util {
     /**
      * 外部存储卡权限
      */
-    public static final int REQUEST_CODE_MARK_WRITE_EXTERNAL_STORAGE = 0x1024;
+    public static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0x1024;
 
     /**
      * 判断申请外部存储所需权限
      *
      * @param context
+     * @param isActivate
      * @return
      */
-    public static boolean mayRequestExternalStorage(Context context) {
+    public static boolean mayRequestExternalStorage(Context context, boolean isActivate) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
-
-        ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_MARK_WRITE_EXTERNAL_STORAGE);
+        if (isActivate) {
+            ActivityCompat.requestPermissions((Activity) context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+        }
         return false;
     }
 
@@ -85,6 +89,9 @@ public class Util {
 
     /**
      * 获取应用程序名称
+     *
+     * @param context
+     * @return
      */
     public static String getAppName(Context context) {
         try {
@@ -142,19 +149,16 @@ public class Util {
         if (kiloByte < 1) {
             return "Byte";
         }
-
         double megaByte = kiloByte / 1024;
         if (megaByte < 1) {
             BigDecimal result1 = new BigDecimal(Double.toString(kiloByte));
             return result1.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "KB";
         }
-
         double gigaByte = megaByte / 1024;
         if (gigaByte < 1) {
             BigDecimal result2 = new BigDecimal(Double.toString(megaByte));
             return result2.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "MB";
         }
-
         double teraBytes = gigaByte / 1024;
         if (teraBytes < 1) {
             BigDecimal result3 = new BigDecimal(Double.toString(gigaByte));
@@ -175,16 +179,18 @@ public class Util {
         if (!file.exists()) {
             return;
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Uri contentUri = FileProvider.getUriForFile(context, context.getPackageName() + ".FileProvider", file);
-            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
-        } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setDataAndType(Uri.parse("file://" + file.toString()), "application/vnd.android.package-archive");
+            Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".UpgradeFileProvider", file);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            context.startActivity(intent);
+            return;
         }
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.parse("file://" + file.toString()), "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
 

@@ -25,8 +25,8 @@ import android.util.Log;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
-import com.upgradelibrary.bean.UpgradeBuffer;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.UpgradeBuffer;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.common.UpgradeHistorical;
 
 import java.io.File;
@@ -499,10 +499,10 @@ public class UpgradeService extends Service {
                                 downloadHandler.sendEmptyMessage(SATUS_COMPLETE);
                                 return;
                             }
-                            List<UpgradeBuffer.ShuntPart> shuntParts = upgradeBuffer.getShuntParts();
-                            for (int i = 0; i < shuntParts.size(); i++) {
-                                startLength = shuntParts.get(i).getStartLength();
-                                endLength = shuntParts.get(i).getEndLength();
+                            List<UpgradeBuffer.BufferPart> bufferParts = upgradeBuffer.getBufferParts();
+                            for (int i = 0; i < bufferParts.size(); i++) {
+                                startLength = bufferParts.get(i).getStartLength();
+                                endLength = bufferParts.get(i).getEndLength();
                                 download(startLength, endLength);
                             }
                             return;
@@ -721,22 +721,22 @@ public class UpgradeService extends Service {
                 upgradeBuffer.setBufferLength(progress);
                 upgradeBuffer.setFileLength(maxProgress);
                 upgradeBuffer.setLastModified(System.currentTimeMillis());
-                List<UpgradeBuffer.ShuntPart> shuntParts = new ArrayList<>(0);
-                shuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
-                upgradeBuffer.setShuntParts(shuntParts);
+                List<UpgradeBuffer.BufferPart> bufferParts = new ArrayList<>(0);
+                bufferParts.add(new UpgradeBuffer.BufferPart(startLength, endLength));
+                upgradeBuffer.setBufferParts(bufferParts);
                 UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                 return;
             }
             upgradeBuffer.setBufferLength(progress);
-            List<UpgradeBuffer.ShuntPart> oldShuntParts = upgradeBuffer.getShuntParts();
-            for (UpgradeBuffer.ShuntPart shuntPart : oldShuntParts) {
-                if (shuntPart.getEndLength() == endLength) {
-                    shuntPart.setStartLength(startLength);
+            List<UpgradeBuffer.BufferPart> oldBufferParts = upgradeBuffer.getBufferParts();
+            for (UpgradeBuffer.BufferPart bufferPart : oldBufferParts) {
+                if (bufferPart.getEndLength() == endLength) {
+                    bufferPart.setStartLength(startLength);
                     UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
                     return;
                 }
             }
-            oldShuntParts.add(new UpgradeBuffer.ShuntPart(startLength, endLength));
+            oldBufferParts.add(new UpgradeBuffer.BufferPart(startLength, endLength));
             UpgradeHistorical.setUpgradeBuffer(UpgradeService.this, upgradeBuffer);
         }
 

@@ -1,4 +1,4 @@
-package com.upgradelibrary.bean;
+package com.upgradelibrary.data.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -48,7 +48,7 @@ public class UpgradeBuffer implements Parcelable {
     /**
      * 分流段部分
      */
-    private List<ShuntPart> shuntParts;
+    private List<BufferPart> bufferParts;
     /**
      * 最后修改时间
      */
@@ -57,12 +57,12 @@ public class UpgradeBuffer implements Parcelable {
     public UpgradeBuffer() {
     }
 
-    public UpgradeBuffer(String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<ShuntPart> shuntParts, long lastModified) {
+    public UpgradeBuffer( String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<BufferPart> bufferParts, long lastModified) {
         this.downloadUrl = downloadUrl;
         this.fileMd5 = fileMd5;
         this.fileLength = fileLength;
         this.bufferLength = bufferLength;
-        this.shuntParts = shuntParts;
+        this.bufferParts = bufferParts;
         this.lastModified = lastModified;
     }
 
@@ -71,7 +71,7 @@ public class UpgradeBuffer implements Parcelable {
         fileMd5 = in.readString();
         fileLength = in.readLong();
         bufferLength = in.readLong();
-        shuntParts = in.createTypedArrayList(ShuntPart.CREATOR);
+        bufferParts = in.createTypedArrayList(BufferPart.CREATOR);
         lastModified = in.readLong();
     }
 
@@ -81,7 +81,7 @@ public class UpgradeBuffer implements Parcelable {
         dest.writeString(fileMd5);
         dest.writeLong(fileLength);
         dest.writeLong(bufferLength);
-        dest.writeTypedList(shuntParts);
+        dest.writeTypedList(bufferParts);
         dest.writeLong(lastModified);
     }
 
@@ -122,12 +122,12 @@ public class UpgradeBuffer implements Parcelable {
         this.bufferLength = bufferLength;
     }
 
-    public List<ShuntPart> getShuntParts() {
-        return shuntParts;
+    public List<BufferPart> getBufferParts() {
+        return bufferParts;
     }
 
-    public void setShuntParts(List<ShuntPart> shuntParts) {
-        this.shuntParts = shuntParts;
+    public void setBufferParts(List<BufferPart> bufferParts) {
+        this.bufferParts = bufferParts;
     }
 
     public long getLastModified() {
@@ -145,35 +145,35 @@ public class UpgradeBuffer implements Parcelable {
                 ", fileMd5='" + fileMd5 + '\'' +
                 ", fileLength=" + fileLength +
                 ", bufferLength=" + bufferLength +
-                ", shuntParts=" + shuntParts +
+                ", shuntParts=" + bufferParts +
                 ", lastModified=" + lastModified +
                 '}';
     }
 
-    public static class ShuntPart implements Parcelable {
-        public static final Creator<ShuntPart> CREATOR = new Creator<ShuntPart>() {
+    public static class BufferPart implements Parcelable {
+        public static final Creator<BufferPart> CREATOR = new Creator<BufferPart>() {
             @Override
-            public ShuntPart createFromParcel(Parcel in) {
-                return new ShuntPart(in);
+            public BufferPart createFromParcel(Parcel in) {
+                return new BufferPart(in);
             }
 
             @Override
-            public ShuntPart[] newArray(int size) {
-                return new ShuntPart[size];
+            public BufferPart[] newArray(int size) {
+                return new BufferPart[size];
             }
         };
         private long startLength;
         private long endLength;
 
-        public ShuntPart() {
+        public BufferPart() {
         }
 
-        public ShuntPart(long startLength, long endLength) {
+        public BufferPart(long startLength, long endLength) {
             this.startLength = startLength;
             this.endLength = endLength;
         }
 
-        protected ShuntPart(Parcel in) {
+        protected BufferPart(Parcel in) {
             startLength = in.readLong();
             endLength = in.readLong();
         }
@@ -207,7 +207,7 @@ public class UpgradeBuffer implements Parcelable {
 
         @Override
         public String toString() {
-            return "ShuntPart{" +
+            return "BufferPart{" +
                     "startLength=" + startLength +
                     ", endLength=" + endLength +
                     '}';

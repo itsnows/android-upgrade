@@ -11,8 +11,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.upgradelibrary.Util;
-import com.upgradelibrary.bean.Upgrade;
-import com.upgradelibrary.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.common.UpgradeManager;
 import com.upgradelibrary.common.UpgradeServiceManager;
 import com.upgradelibrary.service.UpgradeService;
