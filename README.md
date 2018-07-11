@@ -1,13 +1,17 @@
 # android-upgrade
 这是一个安卓软件升级库。<br>
 
-功能：
+简介：
 ====
 1.升级模式支持普通升级、强制升级、灰度升级。<br>
 2.安装包下载支持 断点续传，分流下载，动态网络监听下载。<br>
 3.支持更新模板或自定义更新模板或下载链接<br>
 4.支持通知栏显示和对话框显示<br>
 5.支持Android 4.2以上所有设备<br>
+
+![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297395.png)
+![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297414.png) 
+![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297723.png)
 
 依赖：
 ====
