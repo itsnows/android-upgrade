@@ -16,7 +16,7 @@ Add it in your root build.gradle at the end of repositories:<br>
 allprojects {<br>
 repositories {<br>
 	...<br>
-	maven { <br>
+	maven {<br>
 			url 'https://jitpack.io'<br>
 	}<br>
 }<br>
@@ -28,19 +28,19 @@ dependencies {<br>
   
 Or Maven:<br>
 Add the JitPack repository to your build file<br>
-<repositories><br>
-		<repository><br>
-		    <id>jitpack.io</id><br>
-		    <url>https://jitpack.io</url><br>
+\<repositories><br>
+		\<repository><br>
+		    \<id>jitpack.io\</id><br>
+		    \<url>https://jitpack.io\</url><br>
 		</repository><br>
-	</repositories><br>
+	\</repositories><br>
    
 Add the dependency<br>
-<dependency><br>
-	    <groupId>com.github.itsnows</groupId><br>
-	    <artifactId>android-upgrade</artifactId><br>
-	    <version>1.1.4</version><br>
-</dependency><br>
+\<dependency><br>
+	    \<groupId>com.github.itsnows\</groupId><br>
+	    \<artifactId>android-upgrade\</artifactId><br>
+	    \<version>1.1.4\</version><br>
+\</dependency><br>
 
 
 
