@@ -14,34 +14,40 @@
 
 Or use Gradle:<br>
 Add it in your root build.gradle at the end of repositories:<br>
-allprojects {<br>
-repositories {<br>
-	...<br>
-	maven {<br>
-			url 'https://jitpack.io'<br>
-	}<br>
-}<br>
+```groovy
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
 
 Add the dependency<br>
-dependencies {<br>
-	  compile 'com.github.itsnows:android-upgrade:1.1.4'<br>
-	}<br>
-  
+```groovy
+dependencies {
+	        compile 'com.github.itsnows:android-upgrade:1.1.4'
+	}
+```
 Or Maven:<br>
 Add the JitPack repository to your build file<br>
-\<repositories><br>
-		\<repository><br>
-		    \<id>jitpack.io\</id><br>
-		    \<url>https://jitpack.io\</url><br>
-		\</repository><br>
-	\</repositories><br>
+```groovy
+<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
    
 Add the dependency<br>
-\<dependency><br>
-	    \<groupId>com.github.itsnows\</groupId><br>
-	    \<artifactId>android-upgrade\</artifactId><br>
-	    \<version>1.1.4\</version><br>
-\</dependency><br>
+```groovy
+<dependency>
+	    <groupId>com.github.itsnows</groupId>
+	    <artifactId>android-upgrade</artifactId>
+	    <version>1.1.4</version>
+	</dependency>
+```
 
 使用：
 ====
