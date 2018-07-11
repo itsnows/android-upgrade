@@ -47,6 +47,7 @@ Add the dependency<br>
 ====
 
 1.更新文档<br>
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android>
 
@@ -115,6 +116,7 @@ Add the dependency<br>
     </beta>
 
 </android>
+```
 
 1.自动检测更新<br>
 ```java
