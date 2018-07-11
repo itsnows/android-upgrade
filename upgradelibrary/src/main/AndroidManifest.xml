@@ -38,7 +38,7 @@
             </intent-filter>
         </service>
 
-        <!-- FileProvider -->
+        <!-- UpgradeFileProvider -->
         <provider
             android:name=".provider.UpgradeFileProvider"
             android:authorities="${applicationId}.UpgradeFileProvider"

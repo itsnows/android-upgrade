@@ -29,19 +29,18 @@ public class UpgradeRepositoryTest {
     private static final String TAG = UpgradeRepositoryTest.class.getSimpleName();
     private UpgradeRepository repository;
 
-
     @Before
-    void attach() {
+    public void attach() {
         repository = new UpgradeRepository(InstrumentationRegistry.getContext());
     }
 
     @After
-    void detach() {
+    public void detach() {
         repository = null;
     }
 
     @Test
-    void testGetUpgradeVersion() {
+    public void testGetUpgradeVersion() {
         UpgradeVersion upgradeVersion = repository.getUpgradeVersion(1);
         if (upgradeVersion == null || upgradeVersion.isIgnored()) {
             Log.i(TAG, "未忽略的版本");
@@ -51,13 +50,13 @@ public class UpgradeRepositoryTest {
     }
 
     @Test
-    void testPetUpgradeVersion() {
+    public void testPetUpgradeVersion() {
         UpgradeVersion upgradeVersion = new UpgradeVersion(1, false);
         repository.putUpgradeVersion(upgradeVersion);
     }
 
     @Test
-    void testGetUpgradeBuffer() {
+    public void testGetUpgradeBuffer() {
         UpgradeBuffer upgradeBuffer = repository.getUpgradeBuffer("http://www.baidu.com");
         if (upgradeBuffer == null) {
             Log.i(TAG, "未缓存的版本");
@@ -67,7 +66,7 @@ public class UpgradeRepositoryTest {
     }
 
     @Test
-    void testPutUpgradeBuffer() {
+    public void testPutUpgradeBuffer() {
         UpgradeBuffer upgradeBuffer = new UpgradeBuffer("http://www.baidu.com",
                 null,
                 1024L,

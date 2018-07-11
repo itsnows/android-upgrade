@@ -1,4 +1,4 @@
-package com.upgrade.temp;
+package com.upgrade;
 
 import android.Manifest;
 import android.app.Activity;

@@ -2,6 +2,7 @@ package com.upgradelibrary;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -22,6 +23,7 @@ import android.support.v4.content.FileProvider;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Author: SXF
@@ -166,6 +168,24 @@ public class Util {
         }
         BigDecimal result4 = new BigDecimal(teraBytes);
         return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "TB";
+    }
+
+    /**
+     * 服务是否运行
+     *
+     * @param context
+     * @param serviceName
+     * @return
+     */
+    public static boolean isServiceRunning(Context context, String serviceName) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> list = am.getRunningServices(100);
+        for (ActivityManager.RunningServiceInfo info : list) {
+            if (info.service.getClassName().equals(serviceName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

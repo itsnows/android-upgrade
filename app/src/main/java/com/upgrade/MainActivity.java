@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 是否支持多线程下载（可选）
                 .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMultithreadPools(1)
+                .setMultithreadPools(10)
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);

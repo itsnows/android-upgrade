@@ -18,8 +18,10 @@ import android.widget.ProgressBar;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
+import com.upgradelibrary.data.UpgradeRepository;
 import com.upgradelibrary.data.bean.Upgrade;
 import com.upgradelibrary.data.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.UpgradeVersion;
 import com.upgradelibrary.service.UpgradeService;
 
 /**
@@ -52,6 +54,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     private Upgrade upgrade;
     private UpgradeService upgradeService;
     private UpgradeServiceClient upgradeServiceClient;
+    private boolean isRequestPermission;
 
     private UpgradeDialog(@NonNull Context context) {
         super(context);
@@ -80,6 +83,15 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         UpgradeDialog upgradeDialog = new UpgradeDialog(activity);
         upgradeDialog.initArgs(upgrade, upgradeOptions);
         return upgradeDialog;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (isRequestPermission && Util.mayRequestExternalStorage(activity, false)) {
+            isRequestPermission = false;
+            executeUpgrade();
+        }
     }
 
     @Override
@@ -127,6 +139,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
 
         showDoneButton();
+
+        if (Util.isServiceRunning(getContext(), UpgradeService.class.getName())) {
+            executeUpgrade();
+        }
     }
 
     private String getString(@StringRes int id) {
@@ -137,16 +153,11 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return getContext().getResources().getString(id, formatArgs);
     }
 
-    private String getDate() {
-        if (upgrade.getStable() != null) {
-            return upgrade.getStable().getDate();
-        }
-        if (upgrade.getBeta() != null) {
-            return upgrade.getBeta().getDate();
-        }
-        return "";
-    }
-
+    /**
+     * 获取更新模式
+     *
+     * @return
+     */
     private int getMode() {
         if (upgrade.getStable() != null) {
             return upgrade.getStable().getMode();
@@ -157,6 +168,26 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return Upgrade.UPGRADE_MODE_COMMON;
     }
 
+    /**
+     * 获取更新日期
+     *
+     * @return
+     */
+    private String getDate() {
+        if (upgrade.getStable() != null) {
+            return upgrade.getStable().getDate();
+        }
+        if (upgrade.getBeta() != null) {
+            return upgrade.getBeta().getDate();
+        }
+        return "";
+    }
+
+    /**
+     * 获取更新版本名称
+     *
+     * @return
+     */
     private String getVersionName() {
         if (upgrade.getStable() != null) {
             return upgrade.getStable().getVersionName();
@@ -167,6 +198,11 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return "";
     }
 
+    /**
+     * 获取更新日志
+     *
+     * @return
+     */
     private String getLogs() {
         StringBuilder logs = new StringBuilder();
         if (upgrade.getStable() != null) {
@@ -186,6 +222,9 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return "";
     }
 
+    /**
+     * 显示完成按钮
+     */
     private void showDoneButton() {
         if (vProgress.getVisibility() == View.VISIBLE) {
             vProgress.setVisibility(View.GONE);
@@ -195,6 +234,9 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
     }
 
+    /**
+     * 显示下载进度
+     */
     private void showProgress() {
         if (vDoneButton.getVisibility() == View.VISIBLE) {
             vDoneButton.setVisibility(View.GONE);
@@ -204,15 +246,34 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
     }
 
-    private void ignoredUpgrade() {
+    /**
+     * 忽略升级
+     */
+    private void ignoreUpgrade() {
+        UpgradeRepository repository = new UpgradeRepository(activity);
         if (upgrade.getStable() != null) {
-            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getStable().getVersionCode());
+            UpgradeVersion upgradeVersion = new UpgradeVersion();
+            upgradeVersion.setVersion(upgrade.getStable().getVersionCode());
+            upgradeVersion.setIgnored(true);
+            repository.putUpgradeVersion(upgradeVersion);
             return;
         }
         if (upgrade.getBeta() != null) {
-            UpgradeHistorical.setIgnoreVersion(getContext(), upgrade.getBeta().getVersionCode());
+            UpgradeVersion upgradeVersion = new UpgradeVersion();
+            upgradeVersion.setVersion(upgrade.getBeta().getVersionCode());
+            upgradeVersion.setIgnored(true);
+            repository.putUpgradeVersion(upgradeVersion);
             return;
         }
+        Log.i(TAG, "Execute ignore upgrade failure");
+    }
+
+    /**
+     * 执行升级
+     */
+    private void executeUpgrade() {
+        upgradeServiceClient.setOnBinderUpgradeServiceLisenter(this);
+        upgradeServiceClient.binder();
     }
 
     @Override
@@ -233,16 +294,13 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             dismiss();
         } else if (id == R.id.btn_dialog_upgrade_neutral) {
             dismiss();
-            ignoredUpgrade();
+            ignoreUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_positive) {
-            if (Util.mayRequestExternalStorage(activity, true)) {
-                if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
-                    dismiss();
-                    showProgress();
-                }
-                upgradeServiceClient.setOnBinderUpgradeServiceLisenter(this);
-                upgradeServiceClient.binder();
+            if (!Util.mayRequestExternalStorage(activity, true)) {
+                isRequestPermission = true;
+                return;
             }
+            executeUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_progress) {
             if (upgradeService == null) {
                 return;
@@ -280,6 +338,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
                     tvProgress.setText(getString(R.string.dialog_upgrade_progress, tempProgress > 100 ? 100 : tempProgress));
                     pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
                 }
+                btnProgress.setEnabled(true);
                 btnProgress.setTag("onProgress");
                 Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
             }

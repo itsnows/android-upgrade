@@ -13,8 +13,10 @@ import android.widget.Toast;
 
 import com.upgradelibrary.R;
 import com.upgradelibrary.Util;
+import com.upgradelibrary.data.UpgradeRepository;
 import com.upgradelibrary.data.bean.Upgrade;
 import com.upgradelibrary.data.bean.UpgradeOptions;
+import com.upgradelibrary.data.bean.UpgradeVersion;
 
 import java.lang.ref.WeakReference;
 
@@ -92,9 +94,9 @@ public class UpgradeManager {
 
         void onUpdateAvailable(UpgradeServiceClient manager);
 
-        void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceClient manager);
+        void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceClient client);
 
-        void onUpdateAvailable(Upgrade.Beta bate, UpgradeServiceClient manager);
+        void onUpdateAvailable(Upgrade.Beta bate, UpgradeServiceClient client);
 
         void onNoUpdateAvailable(String message);
 
@@ -187,7 +189,9 @@ public class UpgradeManager {
                                     upgrade.getStable().getVersionCode() >= upgrade.getBeta().getVersionCode()) {
                                 if (message.obj instanceof Boolean) {
                                     boolean isAutoCheck = (boolean) message.obj;
-                                    if (isAutoCheck && UpgradeHistorical.isIgnoreVersion(activity, upgrade.getStable().getVersionCode())) {
+                                    UpgradeRepository repository = new UpgradeRepository(activity);
+                                    UpgradeVersion version = repository.getUpgradeVersion(upgrade.getStable().getVersionCode());
+                                    if (isAutoCheck && version != null && version.isIgnored()) {
                                         return;
                                     }
                                     if (upgrade.getStable().getVersionCode() <= Util.getVersionCode(activity)) {
@@ -207,7 +211,9 @@ public class UpgradeManager {
                                         return;
                                     }
                                     OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                                    if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getStable().getVersionCode())) {
+                                    UpgradeRepository repository = new UpgradeRepository(activity);
+                                    UpgradeVersion version = repository.getUpgradeVersion(upgrade.getStable().getVersionCode());
+                                    if (version != null && version.isIgnored()) {
                                         onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                         return;
                                     }
@@ -225,7 +231,9 @@ public class UpgradeManager {
                             }
                             if (message.obj instanceof Boolean) {
                                 boolean isAutoCheck = (boolean) message.obj;
-                                if (isAutoCheck && UpgradeHistorical.isIgnoreVersion(activity, upgrade.getBeta().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getBeta().getVersionCode());
+                                if (isAutoCheck && version != null && version.isIgnored()) {
                                     return;
                                 }
                                 if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
@@ -245,7 +253,9 @@ public class UpgradeManager {
                                     return;
                                 }
                                 OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                                if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getBeta().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getBeta().getVersionCode());
+                                if (version != null && version.isIgnored()) {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
@@ -264,7 +274,9 @@ public class UpgradeManager {
                         if (upgrade.getBeta() != null) {
                             if (message.obj instanceof Boolean) {
                                 boolean isAutoCheck = (boolean) message.obj;
-                                if (isAutoCheck && UpgradeHistorical.isIgnoreVersion(activity, upgrade.getBeta().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getBeta().getVersionCode());
+                                if (isAutoCheck && version != null && version.isIgnored()) {
                                     return;
                                 }
                                 if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
@@ -290,7 +302,9 @@ public class UpgradeManager {
                                     return;
                                 }
                                 OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                                if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getBeta().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getBeta().getVersionCode());
+                                if (version != null && version.isIgnored()) {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
@@ -312,7 +326,9 @@ public class UpgradeManager {
                         if (upgrade.getStable() != null) {
                             if (message.obj instanceof Boolean) {
                                 boolean isAutoCheck = (boolean) message.obj;
-                                if (isAutoCheck && UpgradeHistorical.isIgnoreVersion(activity, upgrade.getStable().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getStable().getVersionCode());
+                                if (isAutoCheck && version != null && version.isIgnored()) {
                                     return;
                                 }
                                 UpgradeDialog.newInstance(activity, upgrade, builder
@@ -324,7 +340,9 @@ public class UpgradeManager {
                                     return;
                                 }
                                 OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                                if (UpgradeHistorical.isIgnoreVersion(activity, upgrade.getStable().getVersionCode())) {
+                                UpgradeRepository repository = new UpgradeRepository(activity);
+                                UpgradeVersion version = repository.getUpgradeVersion(upgrade.getStable().getVersionCode());
+                                if (version != null && version.isIgnored()) {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
@@ -359,6 +377,7 @@ public class UpgradeManager {
                     break;
             }
         }
+
     }
 
 }

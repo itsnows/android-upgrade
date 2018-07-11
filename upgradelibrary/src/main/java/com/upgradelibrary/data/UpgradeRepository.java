@@ -9,6 +9,7 @@ import com.upgradelibrary.data.bean.UpgradeBuffer;
 import com.upgradelibrary.data.bean.UpgradeVersion;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -40,8 +41,8 @@ public class UpgradeRepository implements UpgradeDataSource {
             cursor = db.rawQuery(sql, selectionArgs);
             while (cursor.moveToNext()) {
                 UpgradeVersion upgradeVersion = new UpgradeVersion();
-                upgradeVersion.setVersion(cursor.getColumnIndex(UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION));
-                upgradeVersion.setIgnored(cursor.getInt(cursor.getColumnIndex(UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION)) == 1);
+                upgradeVersion.setVersion(cursor.getInt(cursor.getColumnIndex(UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION)));
+                upgradeVersion.setIgnored(cursor.getInt(cursor.getColumnIndex(UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED)) == 1);
                 return upgradeVersion;
             }
         } catch (Exception e) {
@@ -62,9 +63,12 @@ public class UpgradeRepository implements UpgradeDataSource {
         SQLiteDatabase db = helper.getWritableDatabase();
         String sql = "INSERT OR REPLACE INTO " +
                 UpgradePersistenceContrat.UpgradeVersionEntry.TABLE_NAME + "(" +
-                UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION + ")VALUES(?)";
+                UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION + "," +
+                UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
         try {
-            Object[] bindArgs = new Object[]{upgradeVersion.getVersion()};
+            Object[] bindArgs = new Object[]{
+                    upgradeVersion.getVersion(),
+                    upgradeVersion.isIgnored()};
             db.execSQL(sql, bindArgs);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -128,11 +132,26 @@ public class UpgradeRepository implements UpgradeDataSource {
                 UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + "," +
                 UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + "," +
                 UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
+
+        JSONArray ja = new JSONArray();
+        List<UpgradeBuffer.BufferPart> bufferParts = upgradeBuffer.getBufferParts();
+        for (int index = 0; index < bufferParts.size(); index++) {
+            JSONObject jo = new JSONObject();
+            try {
+                jo.put("start_length", bufferParts.get(index).getStartLength());
+                jo.put("end_length", bufferParts.get(index).getEndLength());
+                ja.put(index, jo);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         Object[] bindArgs = new Object[]{
                 upgradeBuffer.getDownloadUrl(),
                 upgradeBuffer.getFileMd5(),
                 upgradeBuffer.getFileLength(),
                 upgradeBuffer.getBufferLength(),
+                ja.toString(),
                 upgradeBuffer.getLastModified(),
         };
         try {
@@ -141,7 +160,7 @@ public class UpgradeRepository implements UpgradeDataSource {
             e.printStackTrace();
         } finally {
             if (db != null) {
-                db.close();
+                // db.close();
             }
         }
 
