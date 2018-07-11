@@ -363,18 +363,9 @@ public class UpgradeService extends Service {
 
     /**
      * 清除通知栏
-     *
-     * @param notifyId
      */
-    public void clearNotify(int notifyId) {
-        notificationManager.cancel(notifyId);
-    }
-
-    /**
-     * 清除全部通知栏
-     */
-    public void clearAllNotify() {
-        notificationManager.cancelAll();
+    public void clearNotify() {
+        notificationManager.cancel(NOTIFY_ID);
     }
 
     /**
@@ -437,7 +428,7 @@ public class UpgradeService extends Service {
      */
     public void complete() {
         status = STATUS_COMPLETE;
-        clearNotify(NOTIFY_ID);
+        clearNotify();
         install();
         stopSelf();
     }
@@ -662,7 +653,6 @@ public class UpgradeService extends Service {
         private int id;
         private long startLength;
         private long endLength;
-        private UpgradeBuffer.BufferPart bufferPart;
 
         public DownloadThread(int id, long startLength, long endLength) {
             this.id = id;
@@ -792,15 +782,18 @@ public class UpgradeService extends Service {
             }
             upgradeBuffer.setBufferLength(progress.get());
             upgradeBuffer.setLastModified(System.currentTimeMillis());
-            if (bufferPart == null) {
-                bufferPart = new UpgradeBuffer.BufferPart(startLength, endLength);
-            } else {
-                bufferPart.setStartLength(startLength);
-                bufferPart.setEndLength(endLength);
+            int index = -1;
+            for (int i = 0; i < upgradeBuffer.getBufferParts().size(); i++) {
+                if (upgradeBuffer.getBufferParts().get(i).getEndLength() == endLength) {
+                    index = i;
+                    break;
+                }
             }
-            List<UpgradeBuffer.BufferPart> bufferParts = upgradeBuffer.getBufferParts();
-            if (!bufferParts.contains(bufferPart)) {
-                bufferParts.add(bufferPart);
+            UpgradeBuffer.BufferPart bufferPart = new UpgradeBuffer.BufferPart(startLength, endLength);
+            if (index == -1) {
+                upgradeBuffer.getBufferParts().add(bufferPart);
+            } else {
+                upgradeBuffer.getBufferParts().set(index, bufferPart);
             }
             repository.putUpgradeBuffer(upgradeBuffer);
         }

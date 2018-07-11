@@ -3,7 +3,7 @@
     <item android:id="@android:id/background">
         <shape>
             <solid android:color="@color/dialog_upgrade_progress_background_color" />
-            <corners android:radius="2dp" />
+            <corners android:radius="@dimen/dialog_upgrade_corner_radius" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
@@ -13,7 +13,7 @@
                     android:centerColor="@color/dialog_upgrade_progress_background_start_center"
                     android:endColor="@color/dialog_upgrade_progress_background_start_end"
                     android:startColor="@color/dialog_upgrade_progress_background_start_color" />
-                <corners android:radius="2dp" />
+                <corners android:radius="@dimen/dialog_upgrade_corner_radius" />
             </shape>
         </clip>
     </item>

@@ -3,16 +3,25 @@ package com.upgradelibrary.common;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.StyleRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Preconditions;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -34,6 +43,7 @@ import com.upgradelibrary.service.UpgradeService;
 
 public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeServiceClient.OnBinderUpgradeServiceLisenter {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
+    private LinearLayoutCompat llHeadBar;
     private AppCompatTextView tvTitle;
     private AppCompatTextView tvDate;
     private AppCompatTextView tvVersions;
@@ -88,10 +98,20 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (isRequestPermission && Util.mayRequestExternalStorage(activity, false)) {
-            isRequestPermission = false;
-            executeUpgrade();
+        if (!hasFocus) {
+            return;
         }
+
+        if (!isRequestPermission) {
+            return;
+        }
+
+        if (!Util.mayRequestExternalStorage(activity, false)) {
+            return;
+        }
+
+        executeUpgrade();
+        isRequestPermission = false;
     }
 
     @Override
@@ -107,6 +127,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     }
 
     private void initView() {
+        llHeadBar = findViewById(R.id.ll_dialog_upgrade_head_bar);
         tvTitle = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_title);
         tvDate = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_date);
         tvVersions = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_version);
@@ -122,11 +143,16 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         pbProgressBar = (ProgressBar) findViewById(R.id.pb_dialog_upgrade_progressbar);
         btnProgress = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_progress);
 
+        llHeadBar.setBackground(getHeadDrawable());
+        pbProgressBar.setProgressDrawable(getProgressDrawable());
         tvTitle.setText(getString(R.string.dialog_upgrade_title));
         tvDate.setText(getString(R.string.dialog_upgrade_date, getDate()));
         tvVersions.setText(getString(R.string.dialog_upgrade_versions, getVersionName()));
         tvLogs.setText(getLogs());
         tvProgress.setText(getString(R.string.dialog_upgrade_progress, 0));
+        tvProgress.setTextColor(getColorAccent());
+        btnPositive.setTextColor(getColorAccent());
+        btnProgress.setTextColor(getColorAccent());
         btnProgress.setEnabled(false);
         btnNeutral.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
@@ -151,6 +177,62 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     private String getString(@StringRes int id, Object... formatArgs) {
         return getContext().getResources().getString(id, formatArgs);
+    }
+
+    private int getColorPrimary() {
+        TypedValue typedValue = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        return typedValue.data;
+    }
+
+    private int getColorAccent() {
+        TypedValue typedValue = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
+        return typedValue.data;
+    }
+
+    private Drawable getHeadDrawable() {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setShape(GradientDrawable.RECTANGLE);
+        gd.setColor(getColorAccent());
+        gd.setCornerRadii(new float[]{
+                getContext().getResources().
+                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().
+                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().
+                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().
+                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                0, 0, 0, 0});
+        return gd;
+    }
+
+    private Drawable getProgressDrawable() {
+        GradientDrawable gd1 = new GradientDrawable();
+        gd1.setShape(GradientDrawable.RECTANGLE);
+        gd1.setColor(ContextCompat.getColor(getContext(),
+                R.color.dialog_upgrade_progress_background_color));
+        gd1.setCornerRadius(getContext().getResources().
+                getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius));
+
+        int color = getColorAccent();
+        int alpha = (color & 0xff000000) >>> 24;
+        int red = (color & 0x00ff0000) >> 16;
+        int green = (color & 0x0000ff00) >> 8;
+        int blue = (color & 0x000000ff);
+        int[] colors = new int[]{
+                Color.argb(0x42, red, green, blue),
+                Color.argb(0x8a, red, green, blue),
+                Color.argb(alpha, red, green, blue)};
+        GradientDrawable gd2 = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
+        gd2.setCornerRadius(getContext().getResources().
+                getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius));
+        ClipDrawable cd2 = new ClipDrawable(gd2, Gravity.START, ClipDrawable.HORIZONTAL);
+        LayerDrawable ld1 = new LayerDrawable(new Drawable[]{gd1, cd2});
+        ld1.setId(0, android.R.id.background);
+        ld1.setId(1, android.R.id.progress);
+        return ld1;
     }
 
     /**
