@@ -117,6 +117,7 @@ Add the dependency<br>
 </android>
 
 1.自动检测更新<br>
+```java
 UpgradeManager manager = new UpgradeManager(this);
 manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
@@ -135,6 +136,7 @@ manager.checkForUpdates(new UpgradeOptions.Builder()
                 // 文件MD5（可选）
                 .setMd5(null)
                 .build(), false);
+```
 
 
 
