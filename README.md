@@ -129,20 +129,13 @@ Add the dependency<br>
 UpgradeManager manager = new UpgradeManager(this);
 manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                // 通知栏标题（可选）
-                .setTitle("腾讯QQ")
-                // 通知栏描述（可选）
-                .setDescription("更新通知栏")
-                // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
-                // 下载文件存储路径（可选）
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线性下载（可选）
-                .setMultithreadEnabled(true)
-                // 线程池大小（可选）
-                .setMultithreadPools(10)
-                // 文件MD5（可选）
-                .setMd5(null)
+                .setTitle("腾讯QQ")// 通知栏标题（可选）
+                .setDescription("更新通知栏")// 通知栏描述（可选）
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")// 下载链接或更新文档链接
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))// 下载文件存储路径（可选）
+                .setMultithreadEnabled(true)// 是否支持多线性下载（可选）
+                .setMultithreadPools(10) // 线程池大小（可选）
+                .setMd5(null)// 文件MD5（可选）
                 .build(), false);
 ```
 
