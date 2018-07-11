@@ -6,7 +6,8 @@
 1.升级模式支持普通升级、强制升级、灰度升级。<br>
 2.安装包下载支持 断点续传，分流下载，动态网络监听下载。<br>
 3.支持更新模板或自定义更新模板或下载链接<br>
-4.支持Android 4.2以上所有设备<br>
+4.支持通知栏显示和对话框显示<br>
+5.支持Android 4.2以上所有设备<br>
 
 依赖：
 ====
@@ -32,7 +33,7 @@ Add the JitPack repository to your build file<br>
 		\<repository><br>
 		    \<id>jitpack.io\</id><br>
 		    \<url>https://jitpack.io\</url><br>
-		</repository><br>
+		\</repository><br>
 	\</repositories><br>
    
 Add the dependency<br>
