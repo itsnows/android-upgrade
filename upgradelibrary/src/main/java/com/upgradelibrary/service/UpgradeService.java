@@ -480,15 +480,15 @@ public class UpgradeService extends Service {
      * 下载处理
      */
     private static class DownloadHandler extends Handler {
-        private final SoftReference<UpgradeService> softReference;
+        private SoftReference<UpgradeService> reference;
 
-        private DownloadHandler(UpgradeService upgradeService) {
-            this.softReference = new SoftReference<>(upgradeService);
+        public DownloadHandler(UpgradeService upgradeService) {
+            reference = new SoftReference<>(upgradeService);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            UpgradeService upgradeService = softReference.get();
+            UpgradeService upgradeService = reference.get();
             if (upgradeService == null) {
                 return;
             }
@@ -535,7 +535,6 @@ public class UpgradeService extends Service {
             }
             super.handleMessage(msg);
         }
-
     }
 
     /**
