@@ -98,8 +98,8 @@ public class UpgradeRepository implements UpgradeDataSource {
                 String bufferPart = cursor.getString(cursor.getColumnIndex(UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART));
                 List<UpgradeBuffer.BufferPart> bufferParts = new CopyOnWriteArrayList<>();
                 JSONArray ja = new JSONArray(bufferPart);
-                for (int j = 0; j < ja.length(); j++) {
-                    JSONObject jo = ja.getJSONObject(j);
+                for (int index = 0; index < ja.length(); index++) {
+                    JSONObject jo = ja.getJSONObject(index);
                     long startLength = jo.optLong("start_length");
                     long endLength = jo.optLong("end_length");
                     bufferParts.add(new UpgradeBuffer.BufferPart(startLength, endLength));

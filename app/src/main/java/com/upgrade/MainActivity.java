@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onUpdateAvailable(Upgrade.Beta beta, UpgradeServiceClient manager) {
-
             }
 
             @Override
