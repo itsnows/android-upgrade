@@ -9,9 +9,9 @@
 4.支持通知栏显示和对话框显示<br>
 5.支持Android 4.2以上所有设备<br>
 
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297395.png)
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297414.png) 
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297723.png)
+![](https://github.com/itsnows/android-upgrade/tree/master/gif/Screenshot_1531297395.png)
+![](https://github.com/itsnows/android-upgrade/tree/master/gif/Screenshot_1531297414.png) 
+![](https://github.com/itsnows/android-upgrade/tree/master/gif/Screenshot_1531297723.png)
 
 依赖：
 ====
