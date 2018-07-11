@@ -14,11 +14,12 @@
 Or use Gradle:<br>
 Add it in your root build.gradle at the end of repositories:<br>
 allprojects {<br>
-		repositories {<br>
-			...<br>
-			maven { url 'https://jitpack.io' }<br>
-		}<br>
+repositories {<br>
+	...<br>
+	maven { <br>
+			url 'https://jitpack.io'<br>
 	}<br>
+}<br>
 
 Add the dependency<br>
 dependencies {<br>
