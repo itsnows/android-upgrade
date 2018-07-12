@@ -182,7 +182,6 @@ public class UpgradeManager {
                             }
                             OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
                             onUpgradeListener.onUpdateAvailable(new UpgradeServiceClient(activity, builder.build()));
-
                         }
                     } else {
                         if (upgrade.getStable() != null && upgrade.getBeta() != null) {
@@ -223,7 +222,7 @@ public class UpgradeManager {
                                         return;
                                     }
                                     upgrade.setBeta(null);
-                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
+                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeServiceClient(activity, builder.build()));
                                 }
                                 return;
                             }
@@ -262,7 +261,7 @@ public class UpgradeManager {
                                     return;
                                 }
                                 upgrade.setStable(null);
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
@@ -311,7 +310,7 @@ public class UpgradeManager {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
@@ -342,7 +341,7 @@ public class UpgradeManager {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
