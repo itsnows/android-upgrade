@@ -223,10 +223,7 @@ public class UpgradeManager {
                                         return;
                                     }
                                     upgrade.setBeta(null);
-                                    UpgradeDialog.newInstance(activity, upgrade, builder
-                                            .setUrl(upgrade.getStable().getDowanloadUrl())
-                                            .setMd5(upgrade.getStable().getMd5())
-                                            .build()).show();
+                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
                                 }
                                 return;
                             }
@@ -265,10 +262,7 @@ public class UpgradeManager {
                                     return;
                                 }
                                 upgrade.setStable(null);
-                                UpgradeDialog.newInstance(activity, upgrade, builder
-                                        .setUrl(upgrade.getBeta().getDowanloadUrl())
-                                        .setMd5(upgrade.getBeta().getMd5())
-                                        .build()).show();
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
@@ -317,10 +311,7 @@ public class UpgradeManager {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), new UpgradeServiceClient(activity, builder
-                                        .setUrl(upgrade.getBeta().getDowanloadUrl())
-                                        .setMd5(upgrade.getBeta().getMd5())
-                                        .build()));
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
@@ -351,10 +342,7 @@ public class UpgradeManager {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeServiceClient(activity, builder
-                                        .setUrl(upgrade.getStable().getDowanloadUrl())
-                                        .setMd5(upgrade.getStable().getMd5())
-                                        .build()));
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(),new UpgradeServiceClient(activity, builder.build()));
                             }
                             return;
                         }
