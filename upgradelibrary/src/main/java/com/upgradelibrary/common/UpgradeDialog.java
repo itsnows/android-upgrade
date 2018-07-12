@@ -332,7 +332,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
      * 忽略升级
      */
     private void ignoreUpgrade() {
-        UpgradeRepository repository = new UpgradeRepository(activity);
+        UpgradeRepository repository = UpgradeRepository.getInstance(getContext());
         if (upgrade.getStable() != null) {
             UpgradeVersion upgradeVersion = new UpgradeVersion();
             upgradeVersion.setVersion(upgrade.getStable().getVersionCode());

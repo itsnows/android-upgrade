@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -118,34 +118,34 @@ public class UpgradeService extends Service {
     private UpgradeOptions upgradeOption;
 
     /**
-     * 下载缓存
+     * 升级缓存
      */
     private UpgradeBuffer upgradeBuffer;
 
     /**
-     * 下载升级仓库
+     * 升级仓库
      */
     private UpgradeRepository repository;
 
     /**
-     * 任务线程
+     * 调度线程
      */
     private ScheduleThread scheduleThread;
 
     /**
-     * 下载处理
+     * 消息处理
      */
-    private DownloadHandler downloadHandler;
-
-    /**
-     * 下载回调接口
-     */
-    private OnDownloadListener onDownloadListener;
+    private MessageHandler messageHandler;
 
     /**
      * 网络状态变化广播
      */
     private NetWorkStateReceiver netWorkStateReceiver;
+
+    /**
+     * 下载回调接口
+     */
+    private OnDownloadListener onDownloadListener;
 
     /**
      * 状态
@@ -211,8 +211,8 @@ public class UpgradeService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (downloadHandler == null) {
-            downloadHandler = new DownloadHandler(this);
+        if (messageHandler == null) {
+            messageHandler = new MessageHandler(this);
         }
 
         if (netWorkStateReceiver == null) {
@@ -221,7 +221,7 @@ public class UpgradeService extends Service {
         }
 
         if (repository == null) {
-            repository = new UpgradeRepository(this);
+            repository = UpgradeRepository.getInstance(this);
         }
 
     }
@@ -285,7 +285,7 @@ public class UpgradeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        downloadHandler.removeCallbacksAndMessages(null);
+        messageHandler.removeCallbacksAndMessages(null);
         netWorkStateReceiver.unregisterReceiver(this);
     }
 
@@ -301,8 +301,18 @@ public class UpgradeService extends Service {
     }
 
     @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        messageHandler.sendEmptyMessage(STATUS_PROGRESS);
+        Message msg = Message.obtain();
+        msg.what = status;
+        msg.arg1 = -1;
+        messageHandler.sendMessage(msg);
+    }
+
+    @Override
     public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
+        return true;
     }
 
     /**
@@ -468,13 +478,13 @@ public class UpgradeService extends Service {
     }
 
     /**
-     * 下载处理
+     * 消息处理
      */
-    private static class DownloadHandler extends Handler {
-        private SoftReference<UpgradeService> reference;
+    private static class MessageHandler extends Handler {
+        private WeakReference<UpgradeService> reference;
 
-        public DownloadHandler(UpgradeService upgradeService) {
-            reference = new SoftReference<>(upgradeService);
+        private MessageHandler(UpgradeService upgradeService) {
+            reference = new WeakReference<>(upgradeService);
         }
 
         @Override
@@ -516,9 +526,11 @@ public class UpgradeService extends Service {
                     break;
                 case STATUS_COMPLETE:
                     upgradeService.setNotify(upgradeService.getString(R.string.download_complete));
-                    upgradeService.install();
                     if (upgradeService.onDownloadListener != null) {
                         upgradeService.onDownloadListener.onComplete();
+                    }
+                    if (msg.arg1 == 0) {
+                        upgradeService.install();
                     }
                     break;
                 default:
@@ -529,17 +541,18 @@ public class UpgradeService extends Service {
     }
 
     /**
-     * 任务线程
+     * 调度线程
      */
     private class ScheduleThread extends Thread {
+        private static final int DELAY = 500;
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         public void run() {
             super.run();
             try {
-                Thread.sleep(500);
-                downloadHandler.sendEmptyMessage(STATUS_START);
+                Thread.sleep(DELAY);
+                messageHandler.sendEmptyMessage(STATUS_START);
                 long startLength = 0;
                 long endLength = -1;
                 File targetFile = upgradeOption.getStorage();
@@ -552,10 +565,10 @@ public class UpgradeService extends Service {
                         if (expiryDate <= UpgradeBuffer.EXPIRY_DATE) {
                             if (upgradeBuffer.getBufferLength() == upgradeBuffer.getFileLength()) {
                                 status = STATUS_PROGRESS;
-                                downloadHandler.sendEmptyMessage(STATUS_PROGRESS);
+                                messageHandler.sendEmptyMessage(STATUS_PROGRESS);
 
                                 status = STATUS_COMPLETE;
-                                downloadHandler.sendEmptyMessage(STATUS_COMPLETE);
+                                messageHandler.sendEmptyMessage(STATUS_COMPLETE);
                                 return;
                             }
                             List<UpgradeBuffer.BufferPart> bufferParts = upgradeBuffer.getBufferParts();
@@ -575,7 +588,7 @@ public class UpgradeService extends Service {
                     parentFile.mkdirs();
                 }
                 if ((endLength = length(upgradeOption.getUrl())) == -1) {
-                    downloadHandler.sendEmptyMessage(STATUS_ERROR);
+                    messageHandler.sendEmptyMessage(STATUS_ERROR);
                     return;
                 }
                 progress = new AtomicLong(startLength);
@@ -602,7 +615,7 @@ public class UpgradeService extends Service {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                downloadHandler.sendEmptyMessage(STATUS_ERROR);
+                messageHandler.sendEmptyMessage(STATUS_ERROR);
             }
         }
 
@@ -654,7 +667,7 @@ public class UpgradeService extends Service {
         private long startLength;
         private long endLength;
 
-        public DownloadThread(int id, long startLength, long endLength) {
+        private DownloadThread(int id, long startLength, long endLength) {
             this.id = id;
             this.startLength = startLength;
             this.endLength = endLength;
@@ -683,7 +696,7 @@ public class UpgradeService extends Service {
 
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_PARTIAL) {
                     status = STATUS_ERROR;
-                    downloadHandler.sendEmptyMessage(STATUS_ERROR);
+                    messageHandler.sendEmptyMessage(STATUS_ERROR);
                     return;
                 }
 
@@ -695,12 +708,12 @@ public class UpgradeService extends Service {
                 int tempOffset = 0;
                 do {
                     if (status == STATUS_CANCEL) {
-                        downloadHandler.sendEmptyMessage(STATUS_CANCEL);
+                        messageHandler.sendEmptyMessage(STATUS_CANCEL);
                         break;
                     }
 
                     if (status == STATUS_PAUSE) {
-                        downloadHandler.sendEmptyMessage(STATUS_PAUSE);
+                        messageHandler.sendEmptyMessage(STATUS_PAUSE);
                         break;
                     }
 
@@ -716,12 +729,12 @@ public class UpgradeService extends Service {
 
                         if (!check()) {
                             status = STATUS_ERROR;
-                            downloadHandler.sendEmptyMessage(STATUS_ERROR);
+                            messageHandler.sendEmptyMessage(STATUS_ERROR);
                             break;
                         }
 
                         status = STATUS_COMPLETE;
-                        downloadHandler.sendEmptyMessage(STATUS_COMPLETE);
+                        messageHandler.sendEmptyMessage(STATUS_COMPLETE);
                         break;
                     }
 
@@ -735,7 +748,7 @@ public class UpgradeService extends Service {
                     tempOffset = (int) (((float) progress.get() / maxProgress) * 100);
                     if (tempOffset > offset) {
                         offset = tempOffset;
-                        downloadHandler.sendEmptyMessage(STATUS_PROGRESS);
+                        messageHandler.sendEmptyMessage(STATUS_PROGRESS);
                         mark();
                         Log.d(TAG, "Thread：" + getName() + " Position：" + startLength + "-" + endLength + " Download：" + offset + "% " + progress + "Byte/" + maxProgress + "Byte");
                     }
@@ -743,7 +756,7 @@ public class UpgradeService extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
                 status = STATUS_ERROR;
-                downloadHandler.sendEmptyMessage(STATUS_ERROR);
+                messageHandler.sendEmptyMessage(STATUS_ERROR);
             } finally {
                 if (randomAccessFile != null) {
                     try {

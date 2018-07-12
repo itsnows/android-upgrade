@@ -23,9 +23,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * UpgradeDataManager
  */
 public class UpgradeRepository implements UpgradeDataSource {
+    private static UpgradeRepository instance;
     private UpgradeSQLiteOpenHelper helper;
 
-    public UpgradeRepository(Context context) {
+    public static UpgradeRepository getInstance(Context context) {
+        if (instance == null) {
+            instance = new UpgradeRepository(context);
+        }
+        return instance;
+    }
+
+    private UpgradeRepository(Context context) {
         helper = new UpgradeSQLiteOpenHelper(context);
     }
 
