@@ -1,9 +1,11 @@
 package com.upgrade;
 
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,10 +13,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.upgradelibrary.Util;
-import com.upgradelibrary.data.bean.Upgrade;
-import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.common.UpgradeManager;
 import com.upgradelibrary.common.UpgradeServiceClient;
+import com.upgradelibrary.data.bean.Upgrade;
+import com.upgradelibrary.data.bean.UpgradeOptions;
 import com.upgradelibrary.service.UpgradeService;
 
 import java.io.File;
@@ -250,6 +252,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Util.REQUEST_CODE_WRITE_EXTERNAL_STORAGE ||
+                grantResults.length == 1 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            customerDownloadUpdates();
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_check_updates_default_common:
@@ -264,7 +276,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 customerCheckUpdates();
                 break;
             case R.id.button_check_updates_custom_download:
-                customerDownloadUpdates();
+                if (Util.mayRequestExternalStorage(this, true)) {
+                    customerDownloadUpdates();
+                }
                 break;
             case R.id.button_cancle:
                 manager.cancel();
