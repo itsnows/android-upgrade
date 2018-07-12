@@ -9,9 +9,9 @@
 4.支持通知栏显示和对话框显示<br>
 5.支持Android 4.2以上所有设备<br>
 
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297395.png)
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297414.png) 
-![](https://github.com/itsnows/android-upgrade/gif/Screenshot_1531297723.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297395.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297414.png) 
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297723.png)
 
 依赖：
 ====
@@ -94,18 +94,8 @@ Add the dependency<br>
     <beta>
         <!--device：测试版设备序列号-->
         <device>
-            <sn>JGB9K17928918126</sn>
-            <sn>BTFDU17113013878</sn>
-            <sn>RSIZAINFYSFASKCE</sn>
-            <sn>3a2c55a</sn>
-            <sn>RV8G303QPPD</sn>
-            <sn>AYKNW17C13006681</sn>
-            <sn>f4e3d8e9</sn>
-            <sn>73ead6d60804</sn>
-            <sn>621QEDQ93W5JA</sn>
-            <sn>7eb8859</sn>
-            <sn>LKX7N18105004066</sn>
-            <sn>08776ae70703</sn>
+            <sn>HGS847299SQSF4123</sn>
+            <sn>BGTE8567201292312</sn>
         </device>
         <!--date：更新日期-->
         <date>2018-02-09</date>
@@ -128,19 +118,66 @@ Add the dependency<br>
 </android>
 ```
 
-1.自动检测更新<br>
+2.代码调用<br>
 ```java
+// 自动检测更新
 UpgradeManager manager = new UpgradeManager(this);
 manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                .setTitle("腾讯QQ")// 通知栏标题（可选）
-                .setDescription("更新通知栏")// 通知栏描述（可选）
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")// 下载链接或更新文档链接
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))// 下载文件存储路径（可选）
-                .setMultithreadEnabled(true)// 是否支持多线性下载（可选）
-                .setMultithreadPools(10) // 线程池大小（可选）
-                .setMd5(null)// 文件MD5（可选）
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMultithreadEnabled(true)
+                // 线程池大小（可选）
+                .setMultithreadPools(10)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), true);
+		
+// 手动检测更新
+manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMultithreadEnabled(true)
+                // 线程池大小（可选）
+                .setMultithreadPools(10)
+                // 文件MD5（可选）
+                .setMd5(null)
                 .build(), false);
+		
+// 直接调用下载安装包（无需更新文档）
+ manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线程下载（可选）
+                .setMultithreadEnabled(true)
+                // 线程池大小（可选）
+                .setMultithreadPools(1)
+                // 文件MD5（可选）
+                .setMd5(null)
+                .build(), false);
+
 ```
 
 
