@@ -182,6 +182,7 @@ public class UpgradeManager {
                             }
                             OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
                             onUpgradeListener.onUpdateAvailable(new UpgradeServiceClient(activity, builder.build()));
+
                         }
                     } else {
                         if (upgrade.getStable() != null && upgrade.getBeta() != null) {
