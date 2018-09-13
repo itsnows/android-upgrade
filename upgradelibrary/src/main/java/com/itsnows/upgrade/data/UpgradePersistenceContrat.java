@@ -1,4 +1,4 @@
-package com.upgradelibrary.data;
+package com.itsnows.upgrade.data;
 
 /**
  * Author: SXF

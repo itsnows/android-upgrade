@@ -1,4 +1,4 @@
-package com.upgradelibrary.common;
+package com.itsnows.upgrade.common;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -25,13 +25,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.upgradelibrary.R;
-import com.upgradelibrary.Util;
-import com.upgradelibrary.data.UpgradeRepository;
-import com.upgradelibrary.data.bean.Upgrade;
-import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.data.bean.UpgradeVersion;
-import com.upgradelibrary.service.UpgradeService;
+import com.itsnows.upgrade.R;
+import com.itsnows.upgrade.Util;
+import com.itsnows.upgrade.data.UpgradeRepository;
+import com.itsnows.upgrade.data.bean.Upgrade;
+import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.service.UpgradeService;
 
 /**
  * Author: SXF
@@ -41,7 +41,7 @@ import com.upgradelibrary.service.UpgradeService;
  * UpgradeDialog
  */
 
-public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeServiceClient.OnBinderUpgradeServiceLisenter {
+public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeClient.OnBinderServiceLisenter {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
     private LinearLayoutCompat llHeadBar;
     private AppCompatTextView tvTitle;
@@ -63,7 +63,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @NonNull
     private Upgrade upgrade;
     private UpgradeService upgradeService;
-    private UpgradeServiceClient upgradeServiceClient;
+    private UpgradeClient upgradeClient;
     private boolean isRequestPermission;
 
     private UpgradeDialog(@NonNull Context context) {
@@ -123,7 +123,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
-        this.upgradeServiceClient = new UpgradeServiceClient(activity, upgradeOptions);
+        this.upgradeClient = new UpgradeClient(activity, upgradeOptions);
     }
 
     private void initView() {
@@ -196,14 +196,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         gd.setShape(GradientDrawable.RECTANGLE);
         gd.setColor(getColorAccent());
         gd.setCornerRadii(new float[]{
-                getContext().getResources().
-                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
-                getContext().getResources().
-                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
-                getContext().getResources().
-                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
-                getContext().getResources().
-                        getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
+                getContext().getResources().getDimensionPixelOffset(R.dimen.dialog_upgrade_corner_radius),
                 0, 0, 0, 0});
         return gd;
     }
@@ -337,14 +333,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             UpgradeVersion upgradeVersion = new UpgradeVersion();
             upgradeVersion.setVersion(upgrade.getStable().getVersionCode());
             upgradeVersion.setIgnored(true);
-            repository.putUpgradeVersion(upgradeVersion);
+            repository.setUpgradeVersion(upgradeVersion);
             return;
         }
         if (upgrade.getBeta() != null) {
             UpgradeVersion upgradeVersion = new UpgradeVersion();
             upgradeVersion.setVersion(upgrade.getBeta().getVersionCode());
             upgradeVersion.setIgnored(true);
-            repository.putUpgradeVersion(upgradeVersion);
+            repository.setUpgradeVersion(upgradeVersion);
             return;
         }
         Log.i(TAG, "Execute ignore upgrade failure");
@@ -354,8 +350,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
      * 执行升级
      */
     private void executeUpgrade() {
-        upgradeServiceClient.setOnBinderUpgradeServiceLisenter(this);
-        upgradeServiceClient.binder();
+        upgradeClient.setOnBinderServiceLisenter(this);
+        upgradeClient.binder();
     }
 
     @Override
@@ -366,7 +362,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @Override
     public void dismiss() {
         super.dismiss();
-        upgradeServiceClient.unbinder();
+        upgradeClient.unbinder();
     }
 
     @Override
@@ -414,15 +410,15 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             }
 
             @Override
-            public void onProgress(long progress, long maxProgress) {
-                int tempProgress = (int) ((float) progress / maxProgress * 100);
+            public void onProgress(long max, long progress) {
+                int tempProgress = (int) ((float) progress / max * 100);
                 if (tempProgress > pbProgressBar.getProgress()) {
                     tvProgress.setText(getString(R.string.dialog_upgrade_progress, tempProgress > 100 ? 100 : tempProgress));
                     pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
                 }
                 btnProgress.setEnabled(true);
                 btnProgress.setTag("onProgress");
-                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
+                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(max));
             }
 
             @Override

@@ -1,4 +1,4 @@
-package com.upgradelibrary;
+package com.itsnows.upgrade;
 
 import android.Manifest;
 import android.app.Activity;

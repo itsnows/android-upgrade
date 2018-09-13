@@ -1,4 +1,4 @@
-package com.upgradelibrary.data.bean;
+package com.itsnows.upgrade.data.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -57,7 +57,7 @@ public class UpgradeBuffer implements Parcelable {
     public UpgradeBuffer() {
     }
 
-    public UpgradeBuffer( String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<BufferPart> bufferParts, long lastModified) {
+    public UpgradeBuffer(String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<BufferPart> bufferParts, long lastModified) {
         this.downloadUrl = downloadUrl;
         this.fileMd5 = fileMd5;
         this.fileLength = fileLength;

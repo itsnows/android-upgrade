@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="com.upgradelibrary">
+    package="com.itsnows.upgrade">
 
     <!--允许程序写入外部存储-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -34,7 +34,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.upgradelibrary.UpgradeService" />
+                <action android:name="com.itsnows.upgrade.service.UpgradeService" />
             </intent-filter>
         </service>
 

@@ -1,4 +1,4 @@
-package com.upgradelibrary.data.bean;
+package com.itsnows.upgrade.data.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;

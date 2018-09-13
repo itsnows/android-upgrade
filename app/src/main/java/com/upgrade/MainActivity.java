@@ -12,12 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.upgradelibrary.Util;
-import com.upgradelibrary.common.UpgradeManager;
-import com.upgradelibrary.common.UpgradeServiceClient;
-import com.upgradelibrary.data.bean.Upgrade;
-import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.service.UpgradeService;
+import com.itsnows.upgrade.Util;
+import com.itsnows.upgrade.common.UpgradeClient;
+import com.itsnows.upgrade.common.UpgradeManager;
+import com.itsnows.upgrade.data.bean.Upgrade;
+import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.service.UpgradeService;
 
 import java.io.File;
 
@@ -130,17 +130,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build(), new UpgradeManager.OnUpgradeListener() {
 
             @Override
-            public void onUpdateAvailable(UpgradeServiceClient manager) {
+            public void onUpdateAvailable(UpgradeClient manager) {
 
             }
 
             @Override
-            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeServiceClient manager) {
-                showUpgradeDialog(stable, manager);
+            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client) {
+                showUpgradeDialog(stable, client);
             }
 
             @Override
-            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeServiceClient manager) {
+            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeClient client) {
             }
 
             @Override
@@ -174,9 +174,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 显示更新提示（自定义提示）
      *
      * @param stable  Upgrade.Stable
-     * @param manager UpgradeServiceManager
+     * @param client UpgradeClient
      */
-    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeServiceClient manager) {
+    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeClient client) {
         StringBuffer logs = new StringBuffer();
         for (int i = 0; i < stable.getLogs().size(); i++) {
             logs.append(stable.getLogs().get(i));
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                manager.setOnBinderUpgradeServiceLisenter(new UpgradeServiceClient.OnBinderUpgradeServiceLisenter() {
+                client.setOnBinderServiceLisenter(new UpgradeClient.OnBinderServiceLisenter() {
                     @Override
                     public void onBinder(UpgradeService upgradeService) {
                         upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
@@ -205,8 +205,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
 
                             @Override
-                            public void onProgress(long progress, long maxProgress) {
-                                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(maxProgress));
+                            public void onProgress(long max, long progress) {
+                                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(max));
                             }
 
                             @Override
@@ -241,12 +241,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 // 开始下载
-                manager.binder();
+                client.binder();
             }
         }).setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                manager.unbinder();
+                client.unbinder();
             }
         }).show();
     }

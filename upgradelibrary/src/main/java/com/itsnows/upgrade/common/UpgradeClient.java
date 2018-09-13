@@ -1,49 +1,49 @@
-package com.upgradelibrary.common;
+package com.itsnows.upgrade.common;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.upgradelibrary.data.bean.UpgradeOptions;
-import com.upgradelibrary.service.UpgradeService;
+import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.service.UpgradeService;
 
 /**
  * Author: SXF
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/3/19 11:09
  * <p>
- * UpgradeServiceClient
+ * UpgradeClient
  */
-public class UpgradeServiceClient {
+public class UpgradeClient {
     private Activity activity;
     private UpgradeOptions upgradeOptions;
     private UpgradeService upgradeService;
-    private OnBinderUpgradeServiceLisenter onBinderUpgradeServiceLisenter;
+    private OnBinderServiceLisenter onBinderServiceLisenter;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             upgradeService = ((UpgradeService.UpgradeServiceBinder) service).getUpgradeService();
-            if (onBinderUpgradeServiceLisenter != null) {
-                onBinderUpgradeServiceLisenter.onBinder(upgradeService);
+            if (onBinderServiceLisenter != null) {
+                onBinderServiceLisenter.onBinder(upgradeService);
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            if (onBinderUpgradeServiceLisenter != null) {
-                onBinderUpgradeServiceLisenter.onUnbinder();
+            if (onBinderServiceLisenter != null) {
+                onBinderServiceLisenter.onUnbinder();
             }
         }
     };
 
-    public UpgradeServiceClient(Activity activity, UpgradeOptions upgradeOptions) {
+    public UpgradeClient(Activity activity, UpgradeOptions upgradeOptions) {
         this.activity = activity;
         this.upgradeOptions = upgradeOptions;
     }
 
-    public void setOnBinderUpgradeServiceLisenter(OnBinderUpgradeServiceLisenter onBinderUpgradeServiceLisenter) {
-        this.onBinderUpgradeServiceLisenter = onBinderUpgradeServiceLisenter;
+    public void setOnBinderServiceLisenter(OnBinderServiceLisenter onBinderServiceLisenter) {
+        this.onBinderServiceLisenter = onBinderServiceLisenter;
     }
 
     public void start() {
@@ -60,7 +60,7 @@ public class UpgradeServiceClient {
         }
     }
 
-    public interface OnBinderUpgradeServiceLisenter {
+    public interface OnBinderServiceLisenter {
 
         void onBinder(UpgradeService upgradeService);
 

@@ -1,4 +1,4 @@
-package com.upgradelibrary.data;
+package com.itsnows.upgrade.data;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
@@ -10,9 +10,9 @@ import android.database.sqlite.SQLiteOpenHelper;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 22:21
  * <p>
- * UpgradeSQLiteOpenHelper
+ * UpgradeDBHelper
  */
-public class UpgradeSQLiteOpenHelper extends SQLiteOpenHelper {
+public class UpgradeDBHelper extends SQLiteOpenHelper {
 
     /**
      * 数据库名称
@@ -46,15 +46,15 @@ public class UpgradeSQLiteOpenHelper extends SQLiteOpenHelper {
             UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + " INTEGER,PRIMARY KEY(" +
             UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "))";
 
-    public UpgradeSQLiteOpenHelper(Context context) {
+    public UpgradeDBHelper(Context context) {
         this(context, DB_NAME, null, DB_VERSION);
     }
 
-    public UpgradeSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public UpgradeDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         this(context, name, factory, version, null);
     }
 
-    public UpgradeSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
+    public UpgradeDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
         super(context, name, factory, version, errorHandler);
     }
 

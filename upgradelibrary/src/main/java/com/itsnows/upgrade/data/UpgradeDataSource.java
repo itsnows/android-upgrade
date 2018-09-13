@@ -1,14 +1,14 @@
-package com.upgradelibrary.data;
+package com.itsnows.upgrade.data;
 
-import com.upgradelibrary.data.bean.UpgradeBuffer;
-import com.upgradelibrary.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.data.bean.UpgradeBuffer;
+import com.itsnows.upgrade.data.bean.UpgradeVersion;
 
 /**
  * Author: SXF
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 20:41
  * <p>
- * DataSource
+ * UpgradeDataSource
  */
 public interface UpgradeDataSource {
 
@@ -23,9 +23,9 @@ public interface UpgradeDataSource {
     /**
      * 忽略版本
      *
-     * @param upgradeVersion
+     * @param version
      */
-    void putUpgradeVersion(UpgradeVersion upgradeVersion);
+    void setUpgradeVersion(UpgradeVersion version);
 
     /**
      * 获取升级缓存
@@ -38,8 +38,8 @@ public interface UpgradeDataSource {
     /**
      * 设置升级缓存
      *
-     * @param upgradeBuffer
+     * @param buffer
      */
-    void putUpgradeBuffer(UpgradeBuffer upgradeBuffer);
+    void setUpgradeBuffer(UpgradeBuffer buffer);
 
 }

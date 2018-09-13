@@ -1,4 +1,4 @@
-package com.upgradelibrary.provider;
+package com.itsnows.upgrade.provider;
 
 import android.support.v4.content.FileProvider;
 

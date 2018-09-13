@@ -1,13 +1,13 @@
-package com.upgradelibrary;
+package com.itsnows;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.upgradelibrary.data.UpgradeRepository;
-import com.upgradelibrary.data.bean.UpgradeBuffer;
-import com.upgradelibrary.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.data.UpgradeRepository;
+import com.itsnows.upgrade.data.bean.UpgradeBuffer;
+import com.itsnows.upgrade.data.bean.UpgradeVersion;
 
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class UpgradeRepositoryTest {
 
     @Before
     public void attach() {
-        repository = new UpgradeRepository(InstrumentationRegistry.getContext());
+        repository = UpgradeRepository.getInstance(InstrumentationRegistry.getContext());
     }
 
     @After
@@ -52,7 +52,7 @@ public class UpgradeRepositoryTest {
     @Test
     public void testPetUpgradeVersion() {
         UpgradeVersion upgradeVersion = new UpgradeVersion(1, false);
-        repository.putUpgradeVersion(upgradeVersion);
+        repository.setUpgradeVersion(upgradeVersion);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UpgradeRepositoryTest {
                 1024L,
                 new CopyOnWriteArrayList<UpgradeBuffer.BufferPart>(),
                 System.currentTimeMillis());
-        repository.putUpgradeBuffer(upgradeBuffer);
+        repository.setUpgradeBuffer(upgradeBuffer);
     }
 
 }

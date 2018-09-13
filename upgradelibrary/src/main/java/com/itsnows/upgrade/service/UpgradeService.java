@@ -1,4 +1,4 @@
-package com.upgradelibrary.service;
+package com.itsnows.upgrade.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -23,11 +23,11 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.upgradelibrary.R;
-import com.upgradelibrary.Util;
-import com.upgradelibrary.data.UpgradeRepository;
-import com.upgradelibrary.data.bean.UpgradeBuffer;
-import com.upgradelibrary.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.R;
+import com.itsnows.upgrade.Util;
+import com.itsnows.upgrade.data.UpgradeRepository;
+import com.itsnows.upgrade.data.bean.UpgradeBuffer;
+import com.itsnows.upgrade.data.bean.UpgradeOptions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -148,14 +148,14 @@ public class UpgradeService extends Service {
     private OnDownloadListener onDownloadListener;
 
     /**
+     * 双击取消标记
+     */
+    private boolean isCancel;
+
+    /**
      * 状态
      */
     private volatile int status;
-
-    /**
-     * 双击取消标记
-     */
-    private volatile boolean isCancel;
 
     /**
      * 下载偏移量
@@ -316,12 +316,13 @@ public class UpgradeService extends Service {
     }
 
     /**
-     * 初始化升级通知栏
+     * 初始化通知栏
      */
     private void initNotify() {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(String.valueOf(NOTIFY_ID), upgradeOption.getTitle(), NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(String.valueOf(NOTIFY_ID),
+                    upgradeOption.getTitle(), NotificationManager.IMPORTANCE_DEFAULT);
             channel.enableLights(true);
             channel.setLightColor(Color.GREEN);
             channel.setShowBadge(false);
@@ -461,7 +462,7 @@ public class UpgradeService extends Service {
 
         }
 
-        public abstract void onProgress(long progress, long maxProgress);
+        public abstract void onProgress(long max, long progress);
 
         public void onPause() {
 
@@ -503,7 +504,7 @@ public class UpgradeService extends Service {
                 case STATUS_PROGRESS:
                     upgradeService.setNotify(Util.formatByte(upgradeService.progress.get()) + "/" + Util.formatByte(upgradeService.maxProgress));
                     if (upgradeService.onDownloadListener != null) {
-                        upgradeService.onDownloadListener.onProgress(upgradeService.progress.get(), upgradeService.maxProgress);
+                        upgradeService.onDownloadListener.onProgress(upgradeService.maxProgress, upgradeService.progress.get());
                     }
                     break;
                 case STATUS_PAUSE:
@@ -808,7 +809,7 @@ public class UpgradeService extends Service {
             } else {
                 upgradeBuffer.getBufferParts().set(index, bufferPart);
             }
-            repository.putUpgradeBuffer(upgradeBuffer);
+            repository.setUpgradeBuffer(upgradeBuffer);
         }
 
         /**

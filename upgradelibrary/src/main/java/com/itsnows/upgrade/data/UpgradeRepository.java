@@ -1,12 +1,12 @@
-package com.upgradelibrary.data;
+package com.itsnows.upgrade.data;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.upgradelibrary.data.bean.UpgradeBuffer;
-import com.upgradelibrary.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.data.bean.UpgradeBuffer;
+import com.itsnows.upgrade.data.bean.UpgradeVersion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,21 +20,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 20:55
  * <p>
- * UpgradeDataManager
+ * UpgradeRepository
  */
 public class UpgradeRepository implements UpgradeDataSource {
     private static UpgradeRepository instance;
-    private UpgradeSQLiteOpenHelper helper;
+    private UpgradeDBHelper helper;
 
     public static UpgradeRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new UpgradeRepository(context);
+            synchronized (UpgradeRepository.class) {
+                if (instance == null) {
+                    instance = new UpgradeRepository(context);
+                }
+            }
         }
         return instance;
     }
 
     private UpgradeRepository(Context context) {
-        helper = new UpgradeSQLiteOpenHelper(context);
+        helper = new UpgradeDBHelper(context);
     }
 
     @Override
@@ -67,7 +71,7 @@ public class UpgradeRepository implements UpgradeDataSource {
     }
 
     @Override
-    public void putUpgradeVersion(UpgradeVersion upgradeVersion) {
+    public void setUpgradeVersion(UpgradeVersion version) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String sql = "INSERT OR REPLACE INTO " +
                 UpgradePersistenceContrat.UpgradeVersionEntry.TABLE_NAME + "(" +
@@ -75,8 +79,8 @@ public class UpgradeRepository implements UpgradeDataSource {
                 UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
         try {
             Object[] bindArgs = new Object[]{
-                    upgradeVersion.getVersion(),
-                    upgradeVersion.isIgnored()};
+                    version.getVersion(),
+                    version.isIgnored()};
             db.execSQL(sql, bindArgs);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,7 +134,7 @@ public class UpgradeRepository implements UpgradeDataSource {
     }
 
     @Override
-    public void putUpgradeBuffer(UpgradeBuffer upgradeBuffer) {
+    public void setUpgradeBuffer(UpgradeBuffer buffer) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String sql = "INSERT OR REPLACE INTO " +
                 UpgradePersistenceContrat.UpgradeBufferEntry.TABLE_NAME + "(" +
@@ -142,7 +146,7 @@ public class UpgradeRepository implements UpgradeDataSource {
                 UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
 
         JSONArray ja = new JSONArray();
-        List<UpgradeBuffer.BufferPart> bufferParts = upgradeBuffer.getBufferParts();
+        List<UpgradeBuffer.BufferPart> bufferParts = buffer.getBufferParts();
         for (int index = 0; index < bufferParts.size(); index++) {
             JSONObject jo = new JSONObject();
             try {
@@ -155,12 +159,12 @@ public class UpgradeRepository implements UpgradeDataSource {
         }
 
         Object[] bindArgs = new Object[]{
-                upgradeBuffer.getDownloadUrl(),
-                upgradeBuffer.getFileMd5(),
-                upgradeBuffer.getFileLength(),
-                upgradeBuffer.getBufferLength(),
+                buffer.getDownloadUrl(),
+                buffer.getFileMd5(),
+                buffer.getFileLength(),
+                buffer.getBufferLength(),
                 ja.toString(),
-                upgradeBuffer.getLastModified(),
+                buffer.getLastModified(),
         };
         try {
             db.execSQL(sql, bindArgs);
