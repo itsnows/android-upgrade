@@ -1,12 +1,12 @@
-package com.itsnows.upgrade.data;
+package com.itsnows.upgrade.model;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.itsnows.upgrade.data.bean.UpgradeBuffer;
-import com.itsnows.upgrade.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.model.bean.UpgradeBuffer;
+import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 import org.json.JSONArray;
 import org.json.JSONException;

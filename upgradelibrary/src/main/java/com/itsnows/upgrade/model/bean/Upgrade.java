@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.data.bean;
+package com.itsnows.upgrade.model.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;

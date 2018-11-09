@@ -5,7 +5,7 @@ import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.model.bean.UpgradeOptions;
 import com.itsnows.upgrade.service.UpgradeService;
 
 /**

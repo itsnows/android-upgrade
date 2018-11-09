@@ -5,9 +5,9 @@ import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.itsnows.upgrade.data.UpgradeRepository;
-import com.itsnows.upgrade.data.bean.UpgradeBuffer;
-import com.itsnows.upgrade.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.model.UpgradeRepository;
+import com.itsnows.upgrade.model.bean.UpgradeBuffer;
+import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 import org.junit.After;
 import org.junit.Before;

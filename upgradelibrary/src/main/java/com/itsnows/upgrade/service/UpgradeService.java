@@ -25,9 +25,9 @@ import android.util.Log;
 
 import com.itsnows.upgrade.R;
 import com.itsnows.upgrade.Util;
-import com.itsnows.upgrade.data.UpgradeRepository;
-import com.itsnows.upgrade.data.bean.UpgradeBuffer;
-import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.model.UpgradeRepository;
+import com.itsnows.upgrade.model.bean.UpgradeBuffer;
+import com.itsnows.upgrade.model.bean.UpgradeOptions;
 
 import java.io.File;
 import java.io.FileInputStream;

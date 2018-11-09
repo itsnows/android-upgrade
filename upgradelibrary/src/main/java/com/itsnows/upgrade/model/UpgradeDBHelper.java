@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.data;
+package com.itsnows.upgrade.model;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;

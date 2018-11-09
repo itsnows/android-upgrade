@@ -4,7 +4,7 @@
     <external-path
         name="beta_external_path"
         path="Download/" />
-    <!--/storage/emulated/0/Android/data/com.xxx.xxx/files/apk/-->
+    <!--/storage/emulated/0/Android/model/com.xxx.xxx/files/apk/-->
     <external-path
         name="beta_external_files_path"
         path="Android/data/" />

@@ -15,8 +15,8 @@ import android.widget.Toast;
 import com.itsnows.upgrade.Util;
 import com.itsnows.upgrade.common.UpgradeClient;
 import com.itsnows.upgrade.common.UpgradeManager;
-import com.itsnows.upgrade.data.bean.Upgrade;
-import com.itsnows.upgrade.data.bean.UpgradeOptions;
+import com.itsnows.upgrade.model.bean.Upgrade;
+import com.itsnows.upgrade.model.bean.UpgradeOptions;
 import com.itsnows.upgrade.service.UpgradeService;
 
 import java.io.File;
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+                .setUrl("http://gdown.baidu.com/model/wisegame/16f98e07f392294b/QQ_794.apk")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）

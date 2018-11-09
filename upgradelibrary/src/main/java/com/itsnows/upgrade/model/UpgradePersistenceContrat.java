@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.data;
+package com.itsnows.upgrade.model;
 
 /**
  * Author: SXF

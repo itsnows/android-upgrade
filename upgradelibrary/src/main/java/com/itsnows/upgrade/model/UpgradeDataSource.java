@@ -1,7 +1,7 @@
-package com.itsnows.upgrade.data;
+package com.itsnows.upgrade.model;
 
-import com.itsnows.upgrade.data.bean.UpgradeBuffer;
-import com.itsnows.upgrade.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.model.bean.UpgradeBuffer;
+import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 /**
  * Author: SXF

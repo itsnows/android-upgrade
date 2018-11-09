@@ -27,10 +27,10 @@ import android.widget.ProgressBar;
 
 import com.itsnows.upgrade.R;
 import com.itsnows.upgrade.Util;
-import com.itsnows.upgrade.data.UpgradeRepository;
-import com.itsnows.upgrade.data.bean.Upgrade;
-import com.itsnows.upgrade.data.bean.UpgradeOptions;
-import com.itsnows.upgrade.data.bean.UpgradeVersion;
+import com.itsnows.upgrade.model.UpgradeRepository;
+import com.itsnows.upgrade.model.bean.Upgrade;
+import com.itsnows.upgrade.model.bean.UpgradeOptions;
+import com.itsnows.upgrade.model.bean.UpgradeVersion;
 import com.itsnows.upgrade.service.UpgradeService;
 
 /**
