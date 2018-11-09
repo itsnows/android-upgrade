@@ -599,7 +599,10 @@ public class UpgradeService extends Service {
                     return;
                 }
                 int part = 5 * 1024 * 1024;
-                int pools = (int) (endLength / part);
+                int pools = 1;
+                if (endLength >= part) {
+                    pools = (int) (endLength / part);
+                }
                 if (pools > upgradeOption.getMultithreadPools()) {
                     pools = upgradeOption.getMultithreadPools();
                     part = (int) (endLength / pools);
