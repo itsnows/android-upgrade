@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.0'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.upgrade"
         minSdkVersion 17
@@ -20,7 +20,18 @@ android {
             debuggable true
         }
     }
+    flavorDimensions("main")
     productFlavors {
+        beta {
+            applicationIdSuffix ".beta"
+            versionNameSuffix "-beta"
+            dimension "main"
+        }
+
+        stable {
+            applicationIdSuffix ".stable"
+            dimension "main"
+        }
     }
 }
 
@@ -29,7 +40,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation project(':upgradelibrary')
-//    implementation 'com.github.itsnows:android-upgrade:1.0.8'
+//    implementation 'com.github.itsnows:android-upgrade:1.0.6'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

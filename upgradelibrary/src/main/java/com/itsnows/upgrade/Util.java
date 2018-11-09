@@ -203,7 +203,7 @@ public class Util {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".UpgradeFileProvider", file);
+            Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".UpgradeFileProvider", file);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
             context.startActivity(intent);
             return;
