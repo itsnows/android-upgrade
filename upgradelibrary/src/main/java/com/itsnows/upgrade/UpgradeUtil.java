@@ -3,6 +3,7 @@ package com.itsnows.upgrade;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -19,21 +20,28 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 
+import com.itsnows.upgrade.provider.UpgradeFileProvider;
+
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/10 19:44
  * <p>
  * Util
  */
 
-public class Util {
+public class UpgradeUtil {
+    private static final String TAG = UpgradeUtil.class.getSimpleName();
 
     /**
      * 外部存储卡权限
@@ -189,7 +197,26 @@ public class Util {
     }
 
     /**
-     * 安装文件
+     * 判断当前活动是否为栈顶
+     *
+     * @param context
+     * @param packageName
+     * @return
+     */
+    public static boolean isActivityTop(Context context, String packageName) {
+        ActivityManager am = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+            if (cn != null && cn.getPackageName() != null) {
+                return packageName.equals(cn.getPackageName());
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 安装程序
      *
      * @param context
      * @param path
@@ -203,15 +230,109 @@ public class Util {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".UpgradeFileProvider", file);
+            Uri uri = FileProvider.getUriForFile(context,
+                    String.format(UpgradeFileProvider.AUTHORITY, context.getPackageName()), file);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
             context.startActivity(intent);
             return;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setDataAndType(Uri.parse("file://" + file.toString()), "application/vnd.android.package-archive");
+        intent.setDataAndType(Uri.parse("file://" + file.toString()),
+                "application/vnd.android.package-archive");
         context.startActivity(intent);
+    }
+
+    /**
+     * 安装程序
+     *
+     * @param path
+     */
+    public static boolean installApk(String path) {
+        if (path == null || !path.endsWith(".apk")) {
+            return false;
+        }
+
+        File apk = new File(path);
+        if (!apk.exists()) {
+            return false;
+        }
+        int result = cmd("chmod 777 " + apk.getPath() + " \n" +
+                "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install -r " + apk.getPath() + " \n");
+        if (result == 0) {
+            Log.d(TAG, "Install apk：Install successfully");
+            return true;
+        } else if (result == 1) {
+            Log.d(TAG, "Install apk：Installation failed");
+            return false;
+        } else {
+            Log.d(TAG, "Install apk：Unknown");
+            return false;
+        }
+    }
+
+    /**
+     * 启动程序
+     */
+    public static void launch(Context context, String className) {
+        cmd("am start -S  " + context.getPackageName() + "/" + className + " \n");
+    }
+
+    /**
+     * 是否有Root权限
+     *
+     * @return
+     */
+    public static boolean isRooted() {
+        boolean result = false;
+        try {
+            result = new File("/system/bin/su").exists()
+                    || new File("/system/xbin/su").exists();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 执行命令
+     */
+    public static int cmd(String cmd) {
+        if (cmd == null || cmd.length() == 0) {
+            return -1;
+        }
+        Process process = null;
+        DataOutputStream dos = null;
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            process = runtime.exec("su");
+            OutputStream os = process.getOutputStream();
+            dos = new DataOutputStream(os);
+            dos.writeBytes(cmd);
+            dos.writeBytes("exit \n");
+            dos.flush();
+            return process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (dos != null) {
+                try {
+                    dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (process != null) {
+                try {
+                    process.destroy();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        return -1;
     }
 
 }

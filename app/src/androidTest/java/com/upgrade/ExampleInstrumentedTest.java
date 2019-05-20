@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Instrumentation test, which will launch on an Android device.
+ * Instrumentation test, which will start on an Android device.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */

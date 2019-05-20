@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.common;
+package com.itsnows.upgrade;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -11,8 +11,6 @@ import android.support.v4.util.Preconditions;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.itsnows.upgrade.R;
-import com.itsnows.upgrade.Util;
 import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.Upgrade;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
@@ -21,7 +19,7 @@ import com.itsnows.upgrade.model.bean.UpgradeVersion;
 import java.lang.ref.WeakReference;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/28 11:24
  * <p>
@@ -85,21 +83,6 @@ public class UpgradeManager {
             task.cancel(false);
         }
         Log.d(TAG, "cancel checked updates");
-    }
-
-    /**
-     * 更新监听回调接口
-     */
-    public interface OnUpgradeListener {
-
-        void onUpdateAvailable(UpgradeClient manager);
-
-        void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client);
-
-        void onUpdateAvailable(Upgrade.Beta bate, UpgradeClient client);
-
-        void onNoUpdateAvailable(String message);
-
     }
 
     /**
@@ -170,22 +153,24 @@ public class UpgradeManager {
                     .setUrl(upgradeOptions.getUrl())
                     .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
                     .setMultithreadPools(upgradeOptions.getMultithreadPools())
+                    .setAutomountEnabled(upgradeOptions.isAutomountEnabled())
+                    .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
                     .setMd5(upgradeOptions.getMd5());
             switch (message.what) {
                 case RESULT_CODE_TRUE:
                     if (upgrade == null) {
                         if (message.obj instanceof Boolean) {
-                            new UpgradeClient(activity, builder.build()).start();
+                            UpgradeClient.add(activity, builder.build());
                         } else {
                             if (message.obj == null) {
                                 return;
                             }
                             OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                            onUpgradeListener.onUpdateAvailable(new UpgradeClient(activity, builder.build()));
+                            onUpgradeListener.onUpdateAvailable(UpgradeClient.add(activity, builder.build()));
                         }
                     } else {
                         if (upgrade.getStable() != null && upgrade.getBeta() != null) {
-                            if (!upgrade.getBeta().getDevice().contains(Util.getSerial()) ||
+                            if (!upgrade.getBeta().getDevice().contains(UpgradeUtil.getSerial()) ||
                                     upgrade.getStable().getVersionCode() >= upgrade.getBeta().getVersionCode()) {
                                 if (message.obj instanceof Boolean) {
                                     boolean isAutoCheck = (boolean) message.obj;
@@ -194,9 +179,9 @@ public class UpgradeManager {
                                     if (isAutoCheck && version != null && version.isIgnored()) {
                                         return;
                                     }
-                                    if (upgrade.getStable().getVersionCode() <= Util.getVersionCode(activity)) {
+                                    if (upgrade.getStable().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
                                         if (!isAutoCheck) {
-                                            Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(activity, activity.getString(R.string.message_check_for_update_not_found), Toast.LENGTH_SHORT).show();
                                             return;
                                         }
                                         return;
@@ -214,15 +199,15 @@ public class UpgradeManager {
                                     UpgradeVersion version = UpgradeRepository.getInstance(activity)
                                             .getUpgradeVersion(upgrade.getStable().getVersionCode());
                                     if (version != null && version.isIgnored()) {
-                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                         return;
                                     }
-                                    if (upgrade.getStable().getVersionCode() <= Util.getVersionCode(activity)) {
-                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                    if (upgrade.getStable().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                         return;
                                     }
                                     upgrade.setBeta(null);
-                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeClient(activity, builder
+                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
                                             .setUrl(upgrade.getStable().getDowanloadUrl())
                                             .setMd5(upgrade.getStable().getMd5())
                                             .build()));
@@ -236,9 +221,9 @@ public class UpgradeManager {
                                 if (isAutoCheck && version != null && version.isIgnored()) {
                                     return;
                                 }
-                                if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
+                                if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
                                     if (!isAutoCheck) {
-                                        Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(activity, activity.getString(R.string.message_check_for_update_not_found), Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                     return;
@@ -256,15 +241,15 @@ public class UpgradeManager {
                                 UpgradeVersion version = UpgradeRepository.getInstance(activity)
                                         .getUpgradeVersion(upgrade.getBeta().getVersionCode());
                                 if (version != null && version.isIgnored()) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
                                 upgrade.setStable(null);
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeClient(activity, builder
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
                                         .setUrl(upgrade.getStable().getDowanloadUrl())
                                         .setMd5(upgrade.getStable().getMd5())
                                         .build()));
@@ -279,16 +264,16 @@ public class UpgradeManager {
                                 if (isAutoCheck && version != null && version.isIgnored()) {
                                     return;
                                 }
-                                if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
+                                if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
                                     if (!isAutoCheck) {
-                                        Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(activity, activity.getString(R.string.message_check_for_update_not_found), Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                     return;
                                 }
-                                if (!upgrade.getBeta().getDevice().contains(Util.getSerial())) {
+                                if (!upgrade.getBeta().getDevice().contains(UpgradeUtil.getSerial())) {
                                     if (!isAutoCheck) {
-                                        Toast.makeText(activity, activity.getString(R.string.check_for_update_notfound), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(activity, activity.getString(R.string.message_check_for_update_not_found), Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                     return;
@@ -305,18 +290,18 @@ public class UpgradeManager {
                                 UpgradeVersion version = UpgradeRepository.getInstance(activity)
                                         .getUpgradeVersion(upgrade.getBeta().getVersionCode());
                                 if (version != null && version.isIgnored()) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                if (!upgrade.getBeta().getDevice().contains(Util.getSerial())) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                if (!upgrade.getBeta().getDevice().contains(UpgradeUtil.getSerial())) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                if (upgrade.getBeta().getVersionCode() <= Util.getVersionCode(activity)) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeClient(activity, builder
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
                                         .setUrl(upgrade.getStable().getDowanloadUrl())
                                         .setMd5(upgrade.getStable().getMd5())
                                         .build()));
@@ -343,14 +328,14 @@ public class UpgradeManager {
                                 UpgradeVersion version = UpgradeRepository.getInstance(activity)
                                         .getUpgradeVersion(upgrade.getStable().getVersionCode());
                                 if (version != null && version.isIgnored()) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                if (upgrade.getStable().getVersionCode() <= Util.getVersionCode(activity)) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_notfound));
+                                if (upgrade.getStable().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_not_found));
                                     return;
                                 }
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), new UpgradeClient(activity, builder
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
                                         .setUrl(upgrade.getStable().getDowanloadUrl())
                                         .setMd5(upgrade.getStable().getMd5())
                                         .build()));
@@ -363,13 +348,13 @@ public class UpgradeManager {
                     if (message.obj instanceof Boolean) {
                         boolean isAutoCheck = (boolean) message.obj;
                         if (!isAutoCheck) {
-                            Toast.makeText(activity, activity.getString(R.string.check_for_update_failure), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, activity.getString(R.string.message_check_for_update_failure), Toast.LENGTH_SHORT).show();
                             return;
                         }
                     } else {
                         OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
                         if (onUpgradeListener != null) {
-                            onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.check_for_update_failure));
+                            onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_failure));
                         }
                     }
                     break;

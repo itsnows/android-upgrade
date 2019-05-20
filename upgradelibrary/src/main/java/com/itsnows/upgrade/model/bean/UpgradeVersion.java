@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/8 21:09
  * <p>

@@ -18,7 +18,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/1/13 9:13
  * <p>
@@ -153,7 +153,7 @@ public class Upgrade implements Parcelable {
                                     upgrade.getStable().setDowanloadUrl(text == null ? text : text.trim());
                                 } else if ("md5".equals(childStableNode.getNodeName())) {
                                     String text = childStableNode.getTextContent();
-                                    upgrade.getStable().setMd5(text == null ? text : text.trim());
+                                    upgrade.getStable().setMd5((text == null || text.isEmpty() ? null : text.trim()));
                                 }
                             }
                         } else if ("beta".equals(stableNode.getNodeName())) {
@@ -207,7 +207,7 @@ public class Upgrade implements Parcelable {
                                     upgrade.getBeta().setDowanloadUrl(text == null ? text : text.trim());
                                 } else if ("md5".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBeta().setMd5(text == null ? text : text.trim());
+                                    upgrade.getBeta().setMd5((text == null || text.isEmpty() ? null : text.trim()));
                                 }
                             }
                         }

@@ -1,23 +1,43 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">UpgradeLibrary</string>
-    <string name="check_for_update" tools:ignore="TypographyEllipsis">获取更新中...</string>
-    <string name="check_for_update_failure">获取更新失败，请稍候重试！</string>
-    <string name="check_for_update_notfound">已安装最新版本！</string>
     <string name="dialog_upgrade_title">发现新版本，快下载体验吧！</string>
     <string name="dialog_upgrade_message">1、新增了xxxxxx\n2、修复了xxxxxx\n3、优化了xxxxxx</string>
     <string name="dialog_upgrade_date">发布日期 [%1$s]</string>
     <string name="dialog_upgrade_versions">版本号 [%1$s]</string>
+    <string name="dialog_upgrade_size">安装包 [%1$s]</string>
+    <string name="dialog_upgrade_progress">%1$d%%</string>
+
     <string name="dialog_upgrade_btn_negative">以后再说</string>
     <string name="dialog_upgrade_btn_positive">立即体验</string>
     <string name="dialog_upgrade_btn_neutral">忽略更新</string>
     <string name="dialog_upgrade_btn_pause">暂停</string>
     <string name="dialog_upgrade_btn_resume">继续</string>
     <string name="dialog_upgrade_btn_complete">完成</string>
-    <string name="dialog_upgrade_progress">%1$d%%</string>
-    <string name="download_start" tools:ignore="TypographyEllipsis">下载连接中...</string>
-    <string name="download_pause">下载暂停</string>
-    <string name="download_cancel">下载取消</string>
-    <string name="download_error">下载出错</string>
-    <string name="download_complete">下载完成</string>
-    <string name="download_check" tools:ignore="TypographyEllipsis">安装包效验中...</string>
+    <string name="dialog_upgrade_btn_check">效验中&#8230;</string>
+    <string name="dialog_upgrade_btn_install">安装中&#8230;</string>
+    <string name="dialog_upgrade_btn_reset">重试</string>
+    <string name="dialog_upgrade_btn_launch">启动</string>
+
+    <string name="message_connect_success">连接同步服务成功</string>
+    <string name="message_connect_failure">连接同步服务失败，已连接客户端实例！</string>
+    <string name="message_disconnect_success">断开连接同步服务成功</string>
+    <string name="message_disconnect_failure">断开连接同步服务失败</string>
+
+    <string name="message_check_for_update">获取更新中&#8230;</string>
+    <string name="message_check_for_update_failure">获取更新失败，请稍候重试！</string>
+    <string name="message_check_for_update_not_found">已安装最新版本！</string>
+    <string name="message_download_start">下载连接中&#8230;.</string>
+    <string name="message_download_pause">下载暂停</string>
+    <string name="message_download_cancel">下载取消</string>
+    <string name="message_download_error">下载出错</string>
+    <string name="message_download_complete">下载完成</string>
+    <string name="message_install_check">安装包效验中&#8230;</string>
+    <string name="message_install_start">安装中&#8230;</string>
+    <string name="message_install_error">安装出错</string>
+    <string name="message_install_complete">安装完成</string>
+    <string name="message_install_cancel">安装取消</string>
+    <string name="message_install_package_invalid">安装包无效</string>
+    <string name="message_install_package_delete">安装包已删除</string>
+    <string name="message_install_not_root">设备无root权限</string>
+
 </resources>

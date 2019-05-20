@@ -1,5 +1,6 @@
 package com.upgrade;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -12,12 +13,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.itsnows.upgrade.Util;
-import com.itsnows.upgrade.common.UpgradeClient;
-import com.itsnows.upgrade.common.UpgradeManager;
+import com.itsnows.upgrade.OnDownloadListener;
+import com.itsnows.upgrade.OnUpgradeListener;
+import com.itsnows.upgrade.UpgradeClient;
+import com.itsnows.upgrade.UpgradeException;
+import com.itsnows.upgrade.UpgradeManager;
+import com.itsnows.upgrade.UpgradeUtil;
 import com.itsnows.upgrade.model.bean.Upgrade;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
-import com.itsnows.upgrade.service.UpgradeService;
 
 import java.io.File;
 
@@ -58,25 +61,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkUpdates() {
-//        manager.checkForUpdates(new UpgradeOptions.Builder()
-//                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-//                // 通知栏标题（可选）
-//                .setTitle("腾讯QQ")
-//                // 通知栏描述（可选）
-//                .setDescription("更新通知栏")
-//                // 下载链接或更新文档链接
-//                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
-//                // 下载文件存储路径（可选）
-//                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-//                // 是否支持多线性下载（可选）
-//                .setMultithreadEnabled(true)
-//                // 线程池大小（可选）
-//                .setMultithreadPools(10)
-//                // 文件MD5（可选）
-//                .setMd5(null)
-//                .build(), false);
-        File file =new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk");
-        Util.installApk(this, file.getPath());
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                // 通知栏标题（可选）
+                .setTitle("腾讯QQ")
+                // 通知栏描述（可选）
+                .setDescription("更新通知栏")
+                // 下载链接或更新文档链接
+                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                // 下载文件存储路径（可选）
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                // 是否支持多线性下载（可选）
+                .setMultithreadEnabled(true)
+                // 线程池大小（可选）
+                .setMultithreadPools(10)
+                // 文件MD5（可选）
+                .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(true)
+                .build(), false);
     }
 
     private void autoCheckUpdates() {
@@ -96,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMultithreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(true)
                 .build(), true);
     }
 
@@ -116,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMultithreadPools(10)
                 // 文件MD5（可选）
                 .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(true)
                 .build(), false);
     }
 
@@ -129,10 +136,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)
                 .setMd5(null)
-                .build(), new UpgradeManager.OnUpgradeListener() {
+                .setAutocleanEnabled(true)
+                .build(), new OnUpgradeListener() {
 
             @Override
-            public void onUpdateAvailable(UpgradeClient manager) {
+            public void onUpdateAvailable(UpgradeClient client) {
 
             }
 
@@ -160,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://gdown.baidu.com/model/wisegame/16f98e07f392294b/QQ_794.apk")
+                .setUrl("http://gdown.baidu.com/data/wisegame/2965a5c112549eb8/QQ_996.apk")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）
@@ -169,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMultithreadPools(1)
                 // 文件MD5（可选）
                 .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(true)
                 .build(), false);
     }
 
@@ -184,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             logs.append(stable.getLogs().get(i));
             logs.append(i < stable.getLogs().size() - 1 ? "\n" : "");
         }
-        new AlertDialog.Builder(MainActivity.this)
+        final Dialog dialog = new AlertDialog.Builder(MainActivity.this)
                 .setTitle("发现新版本 v" + stable.getVersionName())
                 .setMessage(logs.toString())
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -193,70 +203,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         dialog.dismiss();
                     }
                 }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                client.setOnBinderServiceLisenter(new UpgradeClient.OnBinderServiceLisenter() {
                     @Override
-                    public void onBinder(UpgradeService upgradeService) {
-                        upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
-
-                            @Override
-                            public void onStart() {
-                                super.onStart();
-                                Log.d(TAG, "onStart");
-                            }
-
-                            @Override
-                            public void onProgress(long max, long progress) {
-                                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(max));
-                            }
-
-                            @Override
-                            public void onPause() {
-                                super.onPause();
-                                Log.d(TAG, "onPause");
-                            }
-
-                            @Override
-                            public void onCancel() {
-                                super.onCancel();
-                                Log.d(TAG, "onCancel");
-                            }
-
-                            @Override
-                            public void onError() {
-                                Log.d(TAG, "onError");
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                dialog.dismiss();
-                                Log.d(TAG, "onComplete");
-                            }
-                        });
-
+                    public void onClick(final DialogInterface dialog, int which) {
+                        // 开始下载
+                        client.start();
                     }
-
+                }).setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
-                    public void onUnbinder() {
-                        Log.d(TAG, "onUnbinder");
+                    public void onDismiss(DialogInterface dialog) {
+                        client.remove();
                     }
-                });
-                // 开始下载
-                client.binder();
-            }
-        }).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                }).create();
+        client.setOnDownloadListener(new OnDownloadListener() {
+
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                client.unbinder();
+            public void onStart() {
+                super.onStart();
+                Log.d(TAG, "onStart");
             }
-        }).show();
+
+            @Override
+            public void onProgress(long max, long progress) {
+                Log.d(TAG, "onProgress：" + UpgradeUtil.formatByte(progress) + "/" + UpgradeUtil.formatByte(max));
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+                Log.d(TAG, "onPause");
+            }
+
+            @Override
+            public void onCancel() {
+                super.onCancel();
+                Log.d(TAG, "onCancel");
+            }
+
+            @Override
+            public void onError(UpgradeException e) {
+                Log.d(TAG, "onError");
+            }
+
+            @Override
+            public void onComplete() {
+                dialog.dismiss();
+                Log.d(TAG, "onComplete");
+            }
+        });
+        dialog.show();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Util.REQUEST_CODE_WRITE_EXTERNAL_STORAGE ||
+        if (requestCode == UpgradeUtil.REQUEST_CODE_WRITE_EXTERNAL_STORAGE ||
                 grantResults.length == 1 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             customerDownloadUpdates();
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 customerCheckUpdates();
                 break;
             case R.id.button_check_updates_custom_download:
-                if (Util.mayRequestExternalStorage(this, true)) {
+                if (UpgradeUtil.mayRequestExternalStorage(this, true)) {
                     customerDownloadUpdates();
                 }
                 break;

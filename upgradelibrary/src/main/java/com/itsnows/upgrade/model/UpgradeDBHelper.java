@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 22:21
  * <p>

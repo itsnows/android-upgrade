@@ -4,7 +4,7 @@ import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 20:41
  * <p>

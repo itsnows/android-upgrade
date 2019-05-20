@@ -1,8 +1,9 @@
-package com.itsnows.upgrade.common;
+package com.itsnows.upgrade;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,8 +26,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.itsnows.upgrade.R;
-import com.itsnows.upgrade.Util;
 import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.Upgrade;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
@@ -34,14 +33,14 @@ import com.itsnows.upgrade.model.bean.UpgradeVersion;
 import com.itsnows.upgrade.service.UpgradeService;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/1/12 15:29
  * <p>
  * UpgradeDialog
  */
 
-public class UpgradeDialog extends AlertDialog implements View.OnClickListener, UpgradeClient.OnBinderServiceLisenter {
+public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     public static final String TAG = UpgradeDialog.class.getSimpleName();
     private LinearLayoutCompat llHeadBar;
     private AppCompatTextView tvTitle;
@@ -62,7 +61,6 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     private Activity activity;
     @NonNull
     private Upgrade upgrade;
-    private UpgradeService upgradeService;
     private UpgradeClient upgradeClient;
     private boolean isRequestPermission;
 
@@ -76,7 +74,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         this.activity = (Activity) context;
     }
 
-    private UpgradeDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
+    private UpgradeDialog(@NonNull Context context, boolean cancelable,
+                          @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
         this.activity = (Activity) context;
     }
@@ -87,7 +86,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
      * @return
      */
     @SuppressLint("RestrictedApi")
-    public static UpgradeDialog newInstance(@NonNull Activity activity, @NonNull Upgrade upgrade, UpgradeOptions upgradeOptions) {
+    public static UpgradeDialog newInstance(@NonNull Activity activity, @NonNull Upgrade upgrade,
+                                            @NonNull UpgradeOptions upgradeOptions) {
         Preconditions.checkNotNull(upgrade);
         Preconditions.checkNotNull(upgradeOptions);
         UpgradeDialog upgradeDialog = new UpgradeDialog(activity);
@@ -106,7 +106,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             return;
         }
 
-        if (!Util.mayRequestExternalStorage(activity, false)) {
+        if (!UpgradeUtil.mayRequestExternalStorage(activity, false)) {
             return;
         }
 
@@ -123,25 +123,129 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
-        this.upgradeClient = new UpgradeClient(activity, upgradeOptions);
+        upgradeClient = UpgradeClient.add(activity, upgradeOptions);
+        upgradeClient.setOnConnectLisenter(new onConnectLisenter() {
+            @Override
+            public void onConnected() {
+                showProgress();
+            }
+
+            @Override
+            public void onDisconnected() {
+
+            }
+        });
+        upgradeClient.setOnDownloadListener(new OnDownloadListener() {
+            @Override
+            public void onStart() {
+                super.onStart();
+                btnProgress.setEnabled(true);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_pause));
+                btnProgress.setTag("download_start");
+                Log.d(TAG, "download_start");
+            }
+
+            @Override
+            public void onProgress(long max, long progress) {
+                int tempProgress = (int) ((float) progress / max * 100);
+                if (tempProgress > pbProgressBar.getProgress()) {
+                    tvProgress.setText(getString(R.string.dialog_upgrade_progress,
+                            tempProgress > 100 ? 100 : tempProgress));
+                    pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
+                }
+                btnProgress.setEnabled(true);
+                btnProgress.setTag("download_progress");
+                Log.d(TAG, "download_progress");
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+                btnProgress.setEnabled(true);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
+                btnProgress.setTag("download_pause");
+                Log.d(TAG, "download_pause");
+            }
+
+            @Override
+            public void onCancel() {
+                dismiss();
+                btnProgress.setEnabled(true);
+                btnProgress.setTag("download_cancel");
+                Log.d(TAG, "download_cancel");
+            }
+
+            @Override
+            public void onError(UpgradeException e) {
+                btnProgress.setEnabled(true);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
+                Log.d(TAG, "download_cancel");
+            }
+
+            @Override
+            public void onComplete() {
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_complete));
+                btnProgress.setTag("download_complete");
+            }
+        });
+        upgradeClient.setOnInstallListener(new OnInstallListener() {
+
+            @Override
+            public void onCheck() {
+                btnProgress.setEnabled(false);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_check));
+                btnProgress.setTag("install_check");
+            }
+
+            @Override
+            public void onStart() {
+                btnProgress.setEnabled(false);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_install));
+                btnProgress.setTag("install_start");
+            }
+
+            @Override
+            public void onCancel() {
+                btnProgress.setEnabled(true);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
+                btnProgress.setTag("install_cancel");
+            }
+
+            @Override
+            public void onError(UpgradeException e) {
+                btnProgress.setEnabled(true);
+                if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_INVALID) {
+                    btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
+                }
+                btnProgress.setTag("install_error");
+            }
+
+            @Override
+            public void onComplete() {
+                btnProgress.setEnabled(true);
+                btnProgress.setText(getString(R.string.dialog_upgrade_btn_launch));
+                btnProgress.setTag("install_complete");
+                dismiss();
+            }
+        });
     }
 
     private void initView() {
         llHeadBar = findViewById(R.id.ll_dialog_upgrade_head_bar);
-        tvTitle = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_title);
-        tvDate = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_date);
-        tvVersions = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_version);
-        tvLogs = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_logs);
+        tvTitle = findViewById(R.id.tv_dialog_upgrade_title);
+        tvDate = findViewById(R.id.tv_dialog_upgrade_date);
+        tvVersions = findViewById(R.id.tv_dialog_upgrade_version);
+        tvLogs = findViewById(R.id.tv_dialog_upgrade_logs);
 
         vDoneButton = findViewById(R.id.v_dialog_upgrade_done_button);
-        btnNegative = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_negative);
-        btnNeutral = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_neutral);
-        btnPositive = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_positive);
+        btnNegative = findViewById(R.id.btn_dialog_upgrade_negative);
+        btnNeutral = findViewById(R.id.btn_dialog_upgrade_neutral);
+        btnPositive = findViewById(R.id.btn_dialog_upgrade_positive);
 
         vProgress = findViewById(R.id.v_dialog_upgrade_progress);
-        tvProgress = (AppCompatTextView) findViewById(R.id.tv_dialog_upgrade_progress);
-        pbProgressBar = (ProgressBar) findViewById(R.id.pb_dialog_upgrade_progressbar);
-        btnProgress = (AppCompatButton) findViewById(R.id.btn_dialog_upgrade_progress);
+        tvProgress = findViewById(R.id.tv_dialog_upgrade_progress);
+        pbProgressBar = findViewById(R.id.pb_dialog_upgrade_progressbar);
+        btnProgress = findViewById(R.id.btn_dialog_upgrade_progress);
 
         llHeadBar.setBackground(getHeadDrawable());
         pbProgressBar.setProgressDrawable(getProgressDrawable());
@@ -152,8 +256,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         tvProgress.setText(getString(R.string.dialog_upgrade_progress, 0));
         tvProgress.setTextColor(getColorAccent());
         btnPositive.setTextColor(getColorAccent());
-        btnProgress.setTextColor(getColorAccent());
-        btnProgress.setEnabled(false);
+        btnProgress.setTextColor(getAccentColorStateList());
         btnNeutral.setOnClickListener(this);
         btnNegative.setOnClickListener(this);
         btnPositive.setOnClickListener(this);
@@ -166,7 +269,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
 
         showDoneButton();
 
-        if (Util.isServiceRunning(getContext(), UpgradeService.class.getName())) {
+        if (UpgradeUtil.isServiceRunning(getContext(), UpgradeService.class.getName())) {
             executeUpgrade();
         }
     }
@@ -179,15 +282,15 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         return getContext().getResources().getString(id, formatArgs);
     }
 
-    private int getColorPrimary() {
-        TypedValue typedValue = new TypedValue();
-        activity.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-        return typedValue.data;
-    }
-
     private int getColorAccent() {
         TypedValue typedValue = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
+        return typedValue.data;
+    }
+
+    private int getColorPrimary() {
+        TypedValue typedValue = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
         return typedValue.data;
     }
 
@@ -229,6 +332,19 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         ld1.setId(0, android.R.id.background);
         ld1.setId(1, android.R.id.progress);
         return ld1;
+    }
+
+    private ColorStateList getAccentColorStateList() {
+        int color = getColorAccent();
+        int red = (color & 0x00ff0000) >> 16;
+        int green = (color & 0x0000ff00) >> 8;
+        int blue = (color & 0x000000ff);
+        int[] colors = new int[]{getColorAccent(),
+                Color.argb(0x4d, red, green, blue)};
+        int[][] states = new int[][]{
+                {android.R.attr.state_enabled, 0},
+                {}};
+        return new ColorStateList(states, colors);
     }
 
     /**
@@ -321,6 +437,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
         }
         if (vProgress.getVisibility() == View.GONE) {
             vProgress.setVisibility(View.VISIBLE);
+            btnProgress.setEnabled(false);
         }
     }
 
@@ -350,8 +467,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
      * 执行升级
      */
     private void executeUpgrade() {
-        upgradeClient.setOnBinderServiceLisenter(this);
-        upgradeClient.binder();
+        upgradeClient.start();
     }
 
     @Override
@@ -362,7 +478,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
     @Override
     public void dismiss() {
         super.dismiss();
-        upgradeClient.unbinder();
+        upgradeClient.remove();
     }
 
     @Override
@@ -374,89 +490,28 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener, 
             dismiss();
             ignoreUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_positive) {
-            if (!Util.mayRequestExternalStorage(activity, true)) {
+            if (!UpgradeUtil.mayRequestExternalStorage(activity, true)) {
                 isRequestPermission = true;
                 return;
             }
             executeUpgrade();
         } else if (id == R.id.btn_dialog_upgrade_progress) {
-            if (upgradeService == null) {
+            if (upgradeClient == null) {
                 return;
             }
             String tag = (String) v.getTag();
-            if ("onStart".equals(tag) || "onProgress".equals(tag)) {
-                upgradeService.pause();
-            } else if ("onPause".equals(tag) || "onError".equals(tag)) {
-                upgradeService.resume();
-            } else if ("onComplete".equals(tag)) {
-                dismiss();
-                upgradeService.complete();
+            if ("download_start".equals(tag) || "download_progress".equals(tag)) {
+                upgradeClient.pause();
+            } else if ("download_pause".equals(tag) || "download_error".equals(tag)) {
+                upgradeClient.resume();
+            } else if ("download_complete".equals(tag)) {
+                upgradeClient.install();
+                if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
+                    dismiss();
+                }
+            } else if ("install_error".equals(tag)) {
+                upgradeClient.resume();
             }
         }
-    }
-
-    @Override
-    public void onBinder(UpgradeService upgradeService) {
-        UpgradeDialog.this.upgradeService = upgradeService;
-        upgradeService.setOnDownloadListener(new UpgradeService.OnDownloadListener() {
-
-            @Override
-            public void onStart() {
-                super.onStart();
-                btnProgress.setEnabled(true);
-                btnProgress.setText(getString(R.string.dialog_upgrade_btn_pause));
-                btnProgress.setTag("onStart");
-                Log.d(TAG, "onStart");
-            }
-
-            @Override
-            public void onProgress(long max, long progress) {
-                int tempProgress = (int) ((float) progress / max * 100);
-                if (tempProgress > pbProgressBar.getProgress()) {
-                    tvProgress.setText(getString(R.string.dialog_upgrade_progress, tempProgress > 100 ? 100 : tempProgress));
-                    pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
-                }
-                btnProgress.setEnabled(true);
-                btnProgress.setTag("onProgress");
-                Log.d(TAG, "onProgress：" + Util.formatByte(progress) + "/" + Util.formatByte(max));
-            }
-
-            @Override
-            public void onPause() {
-                super.onPause();
-                btnProgress.setEnabled(true);
-                btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                btnProgress.setTag("onPause");
-                Log.d(TAG, "onPause");
-            }
-
-            @Override
-            public void onCancel() {
-                dismiss();
-                btnProgress.setEnabled(true);
-                btnProgress.setTag("onCancel");
-                Log.d(TAG, "onCancel");
-            }
-
-            @Override
-            public void onError() {
-                btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                btnProgress.setTag("onError");
-                Log.d(TAG, "onError");
-            }
-
-            @Override
-            public void onComplete() {
-                btnProgress.setText(getString(R.string.dialog_upgrade_btn_complete));
-                btnProgress.setTag("onComplete");
-                Log.d(TAG, "onComplete");
-            }
-        });
-        showProgress();
-    }
-
-    @Override
-    public void onUnbinder() {
-        Log.d(TAG, "onUnbinder");
     }
 }

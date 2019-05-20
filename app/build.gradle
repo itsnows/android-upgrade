@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.3'
     defaultConfig {
         applicationId "com.upgrade"
         minSdkVersion 17
-        targetSdkVersion 27
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -22,22 +22,12 @@ android {
     }
     flavorDimensions("main")
     productFlavors {
-        beta {
-            applicationIdSuffix ".beta"
-            versionNameSuffix "-beta"
-            dimension "main"
-        }
-
-        stable {
-            applicationIdSuffix ".stable"
-            dimension "main"
-        }
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.0.0'
+    implementation 'com.android.support:appcompat-v7:26.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation project(':upgradelibrary')
 //    implementation 'com.github.itsnows:android-upgrade:1.0.6'

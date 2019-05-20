@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import java.io.File;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/10 18:13
  * <p>
@@ -58,16 +58,26 @@ public final class UpgradeOptions implements Parcelable {
      * 多线程下载线程池最大数量
      */
     private final int multithreadPools;
+    /**
+     * 是否自动安装安装包
+     */
+    private final boolean automountEnabled;
+    /**
+     * 是否自动清除安装包
+     */
+    private final boolean autocleanEnabled;
 
-    private UpgradeOptions(Builder builder) {
-        this.icon = builder.icon;
-        this.title = builder.title;
-        this.description = builder.description;
-        this.storage = builder.storage;
-        this.url = builder.url;
-        this.md5 = builder.md5;
-        this.multithreadEnabled = builder.multithreadEnabled;
-        this.multithreadPools = builder.multithreadPools;
+    private UpgradeOptions(Params params) {
+        icon = params.icon;
+        title = params.title;
+        description = params.description;
+        storage = params.storage;
+        url = params.url;
+        md5 = params.md5;
+        multithreadEnabled = params.multithreadEnabled;
+        multithreadPools = params.multithreadPools;
+        automountEnabled = params.autocleanEnabled;
+        autocleanEnabled = params.autocleanEnabled;
     }
 
     protected UpgradeOptions(Parcel in) {
@@ -79,6 +89,8 @@ public final class UpgradeOptions implements Parcelable {
         md5 = in.readString();
         multithreadEnabled = in.readByte() != 0;
         multithreadPools = in.readInt();
+        automountEnabled = in.readByte() != 0;
+        autocleanEnabled = in.readByte() != 0;
     }
 
     @Override
@@ -91,6 +103,8 @@ public final class UpgradeOptions implements Parcelable {
         dest.writeString(md5);
         dest.writeByte((byte) (multithreadEnabled ? 1 : 0));
         dest.writeInt(multithreadPools);
+        dest.writeInt((byte) (automountEnabled ? 1 : 0));
+        dest.writeInt((byte) (autocleanEnabled ? 1 : 0));
     }
 
     @Override
@@ -130,62 +144,87 @@ public final class UpgradeOptions implements Parcelable {
         return multithreadPools;
     }
 
+    public boolean isAutomountEnabled() {
+        return automountEnabled;
+    }
+
+    public boolean isAutocleanEnabled() {
+        return autocleanEnabled;
+    }
+
     public static class Builder {
-        private Bitmap icon;
-        private CharSequence title;
-        private CharSequence description;
-        private File storage;
-        private String url;
-        private String md5;
-        private boolean multithreadEnabled;
-        private int multithreadPools;
+        private Params params;
 
         public Builder() {
+            params = new Params();
         }
 
         public Builder setIcon(Bitmap icon) {
-            this.icon = icon;
+            params.icon = icon;
             return this;
         }
 
         public Builder setTitle(CharSequence title) {
-            this.title = title;
+            params.title = title;
             return this;
         }
 
         public Builder setDescription(CharSequence description) {
-            this.description = description;
+            params.description = description;
             return this;
         }
 
         public Builder setStorage(File storage) {
-            this.storage = storage;
+            params.storage = storage;
             return this;
         }
 
         public Builder setUrl(String url) {
-            this.url = url;
+            params.url = url;
             return this;
         }
 
         public Builder setMd5(String md5) {
-            this.md5 = md5;
+            params.md5 = md5;
             return this;
         }
 
         public Builder setMultithreadEnabled(boolean enabled) {
-            this.multithreadEnabled = enabled;
+            params.multithreadEnabled = enabled;
             return this;
         }
 
         public Builder setMultithreadPools(int pools) {
-            this.multithreadPools = pools <= 0 ? 1 : pools;
+            params.multithreadPools = pools < 0 ? 0 : pools;
+            return this;
+        }
+
+        public Builder setAutomountEnabled(boolean enabled) {
+            params.automountEnabled = enabled;
+            return this;
+        }
+
+        public Builder setAutocleanEnabled(boolean enabled) {
+            params.autocleanEnabled = enabled;
             return this;
         }
 
         public UpgradeOptions build() {
-            return new UpgradeOptions(this);
+            return new UpgradeOptions(params);
         }
+    }
+
+    static class Params {
+        Bitmap icon;
+        CharSequence title;
+        CharSequence description;
+        File storage;
+        String url;
+        String md5;
+        boolean multithreadEnabled;
+        int multithreadPools;
+        boolean automountEnabled;
+        boolean autocleanEnabled;
     }
 
 }

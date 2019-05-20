@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/9 9:56
  * <p>

@@ -2,9 +2,6 @@
 
     package="com.itsnows.upgrade">
 
-    <!--允许程序写入外部存储-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <!--允许程序打开网络套接字-->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -20,6 +17,9 @@
     <!--允许程序访问Wi-Fi网络状态信息-->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!--允许程序写入外部存储-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!--允许程序访问安装未知来源应用-->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
@@ -32,7 +32,8 @@
         <service
             android:name=".service.UpgradeService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:process=":upgrade">
             <intent-filter>
                 <action android:name="com.itsnows.upgrade.service.UpgradeService" />
             </intent-filter>

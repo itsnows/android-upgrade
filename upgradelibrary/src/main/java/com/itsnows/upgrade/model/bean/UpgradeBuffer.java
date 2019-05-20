@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Author: SXF
+ * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/1/13 23:56
  * <p>
