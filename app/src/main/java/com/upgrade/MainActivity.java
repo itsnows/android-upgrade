@@ -1,9 +1,10 @@
 package com.upgrade;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -11,6 +12,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.itsnows.upgrade.OnDownloadListener;
@@ -194,26 +197,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             logs.append(stable.getLogs().get(i));
             logs.append(i < stable.getLogs().size() - 1 ? "\n" : "");
         }
-        final Dialog dialog = new AlertDialog.Builder(MainActivity.this)
-                .setTitle("发现新版本 v" + stable.getVersionName())
-                .setMessage(logs.toString())
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, int which) {
-                        // 开始下载
-                        client.start();
-                    }
-                }).setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        client.remove();
-                    }
-                }).create();
+
+        View view = View.inflate(this, R.layout.dialog_custom, null);
+        TextView tvMessage = view.findViewById(R.id.tv_dialog_custom_message);
+        Button btnUpgrade = view.findViewById(R.id.btn_dialog_custom_upgrade);
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                client.remove();
+            }
+        });
+
+        tvMessage.setText(logs.toString());
+        btnUpgrade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 开始下载
+                client.start();
+            }
+        });
         client.setOnDownloadListener(new OnDownloadListener() {
 
             @Override
