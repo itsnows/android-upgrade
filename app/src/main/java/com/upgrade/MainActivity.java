@@ -217,7 +217,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 // 开始下载
-                client.start();
+                if (UpgradeUtil.mayRequestExternalStorage(MainActivity.this, true)) {
+                    client.start();
+                }
+                dialog.dismiss();
             }
         });
         client.setOnDownloadListener(new OnDownloadListener() {

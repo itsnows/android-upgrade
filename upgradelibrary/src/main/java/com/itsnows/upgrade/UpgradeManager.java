@@ -160,7 +160,7 @@ public class UpgradeManager {
                 case RESULT_CODE_TRUE:
                     if (upgrade == null) {
                         if (message.obj instanceof Boolean) {
-                            UpgradeClient.add(activity, builder.build());
+                            UpgradeClient.add(activity, builder.build()).start();
                         } else {
                             if (message.obj == null) {
                                 return;
