@@ -65,6 +65,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @SuppressWarnings("deprecation")
 public class UpgradeService extends Service {
     private static final String TAG = UpgradeService.class.getSimpleName();
+    private static final String PARAMS_UPGRADE_OPTION = "upgrade_option";
 
     /**
      * 连接超时时长
@@ -248,7 +249,7 @@ public class UpgradeService extends Service {
         }
 
         Intent intent = new Intent(context, UpgradeService.class);
-        intent.putExtra("upgrade_option", options);
+        intent.putExtra(PARAMS_UPGRADE_OPTION, options);
         if (!UpgradeUtil.isServiceRunning(context, UpgradeService.class.getName())) {
             context.startService(intent);
         }
@@ -299,7 +300,7 @@ public class UpgradeService extends Service {
             return command;
         }
 
-        UpgradeOptions upgradeOptions = intent.getParcelableExtra("upgrade_option");
+        UpgradeOptions upgradeOptions = intent.getParcelableExtra(PARAMS_UPGRADE_OPTION);
         if (upgradeOptions != null) {
             this.upgradeOption = new UpgradeOptions.Builder()
                     .setIcon(upgradeOptions.getIcon() == null ?
@@ -370,7 +371,7 @@ public class UpgradeService extends Service {
      */
     private void init() {
         if (server == null) {
-            server = new Messenger(ServeHanlder.create(this));
+            server = new Messenger(ServeHandler.create(this));
         }
 
         if (clients == null) {
@@ -578,16 +579,16 @@ public class UpgradeService extends Service {
     /**
      * 服务端消息
      */
-    private static class ServeHanlder extends Handler {
+    private static class ServeHandler extends Handler {
         private SoftReference<UpgradeService> reference;
 
         private static Handler create(UpgradeService service) {
             HandlerThread thread = new HandlerThread("Messenger");
             thread.start();
-            return new ServeHanlder(thread.getLooper(), service);
+            return new ServeHandler(thread.getLooper(), service);
         }
 
-        private ServeHanlder(Looper looper, UpgradeService service) {
+        private ServeHandler(Looper looper, UpgradeService service) {
             super(looper);
             this.reference = new SoftReference<>(service);
         }
