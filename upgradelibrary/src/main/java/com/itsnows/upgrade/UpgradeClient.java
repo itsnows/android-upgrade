@@ -32,7 +32,7 @@ public class UpgradeClient {
     private Messenger client;
     private Messenger server;
     private ServiceConnection connection;
-    private onConnectLisenter onConnectLisenter;
+    private OnConnectListener onConnectListener;
     private OnDownloadListener onDownloadListener;
     private OnInstallListener onInstallListener;
     private boolean isConnected;
@@ -61,10 +61,10 @@ public class UpgradeClient {
     /**
      * 注入连接监听回调接口
      *
-     * @param onConnectLisenter
+     * @param onConnectListener
      */
-    public void setOnConnectLisenter(onConnectLisenter onConnectLisenter) {
-        this.onConnectLisenter = onConnectLisenter;
+    public void setOnConnectListener(OnConnectListener onConnectListener) {
+        this.onConnectListener = onConnectListener;
     }
 
     /**
@@ -222,16 +222,16 @@ public class UpgradeClient {
                 case UpgradeConstant.MSG_KEY_CONNECT_RESP:
                     if (code == 0) {
                         client.isConnected = true;
-                        if (client.onConnectLisenter != null) {
-                            client.onConnectLisenter.onConnected();
+                        if (client.onConnectListener != null) {
+                            client.onConnectListener.onConnected();
                         }
                     }
                     Log.d(TAG, message);
                     break;
                 case UpgradeConstant.MSG_KEY_DISCONNECT_RESP:
                     if (code == 0) {
-                        if (client.onConnectLisenter != null) {
-                            client.onConnectLisenter.onDisconnected();
+                        if (client.onConnectListener != null) {
+                            client.onConnectListener.onDisconnected();
                             client.isConnected = false;
                         }
                     }

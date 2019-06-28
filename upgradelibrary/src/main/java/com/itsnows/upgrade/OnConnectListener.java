@@ -5,9 +5,9 @@ package com.itsnows.upgrade;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 19-5-17 下午2:04
  * <p>
- * onConnectLisenter
+ * OnConnectListener
  */
-public interface onConnectLisenter {
+public interface OnConnectListener {
 
     void onConnected();
 

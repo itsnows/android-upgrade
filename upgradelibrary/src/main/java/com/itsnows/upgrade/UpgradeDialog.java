@@ -124,7 +124,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
         upgradeClient = UpgradeClient.add(activity, upgradeOptions);
-        upgradeClient.setOnConnectLisenter(new onConnectLisenter() {
+        upgradeClient.setOnConnectListener(new OnConnectListener() {
             @Override
             public void onConnected() {
                 showProgress();
