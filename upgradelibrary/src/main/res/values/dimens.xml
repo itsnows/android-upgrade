@@ -3,6 +3,6 @@
     <dimen name="dialog_upgrade_elevation">24dp</dimen>
     <dimen name="dialog_upgrade_corner_radius">2dp</dimen>
     <dimen name="dialog_upgrade_message_font_size">16sp</dimen>
-    <dimen name="dialog_upgrade_button_textsize">14sp</dimen>
-    <dimen name="dialog_upgrade_progress_textsize">10sp</dimen>
+    <dimen name="dialog_upgrade_button_text_size">14sp</dimen>
+    <dimen name="dialog_upgrade_progress_text_size">10sp</dimen>
 </resources>

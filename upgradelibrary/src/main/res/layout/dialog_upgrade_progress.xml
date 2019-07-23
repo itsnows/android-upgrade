@@ -18,7 +18,7 @@
             android:layout_marginStart="24dp"
             android:text="@string/dialog_upgrade_progress"
             android:textColor="@color/dialog_upgrade_accent_color"
-            android:textSize="@dimen/dialog_upgrade_progress_textsize" />
+            android:textSize="@dimen/dialog_upgrade_progress_text_size" />
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_dialog_upgrade_progress"
