@@ -52,7 +52,7 @@ public class UpgradeRepositoryTest {
     @Test
     public void testPetUpgradeVersion() {
         UpgradeVersion upgradeVersion = new UpgradeVersion(1, false);
-        repository.setUpgradeVersion(upgradeVersion);
+        repository.putUpgradeVersion(upgradeVersion);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UpgradeRepositoryTest {
                 1024L,
                 new CopyOnWriteArrayList<UpgradeBuffer.BufferPart>(),
                 System.currentTimeMillis());
-        repository.setUpgradeBuffer(upgradeBuffer);
+        repository.putUpgradeBuffer(upgradeBuffer);
     }
 
 }

@@ -931,7 +931,7 @@ public class UpgradeService extends Service {
                 inputStream = connection.getInputStream();
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startLength);
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[5120];
                 int len = -1;
                 int tempOffset = 0;
                 do {
@@ -944,8 +944,10 @@ public class UpgradeService extends Service {
                         messageHandler.sendEmptyMessage(status);
                         break;
                     }
+                    len = inputStream.read(buffer);
 
-                    if ((len = inputStream.read(buffer)) == -1) {
+                    if (len == -1) {
+                        Log.d("len ", String.valueOf(getName()));
                         if (progress.get() < maxProgress) {
                             break;
                         }
@@ -1031,7 +1033,7 @@ public class UpgradeService extends Service {
             } else {
                 upgradeBuffer.getBufferParts().set(index, bufferPart);
             }
-            repository.setUpgradeBuffer(upgradeBuffer);
+            repository.putUpgradeBuffer(upgradeBuffer);
         }
     }
 

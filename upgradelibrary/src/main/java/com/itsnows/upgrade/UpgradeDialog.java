@@ -450,14 +450,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             UpgradeVersion upgradeVersion = new UpgradeVersion();
             upgradeVersion.setVersion(upgrade.getStable().getVersionCode());
             upgradeVersion.setIgnored(true);
-            repository.setUpgradeVersion(upgradeVersion);
+            repository.putUpgradeVersion(upgradeVersion);
             return;
         }
         if (upgrade.getBeta() != null) {
             UpgradeVersion upgradeVersion = new UpgradeVersion();
             upgradeVersion.setVersion(upgrade.getBeta().getVersionCode());
             upgradeVersion.setIgnored(true);
-            repository.setUpgradeVersion(upgradeVersion);
+            repository.putUpgradeVersion(upgradeVersion);
             return;
         }
         Log.i(TAG, "Execute ignore upgrade failure");

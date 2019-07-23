@@ -21,11 +21,11 @@ public interface UpgradeDataSource {
     UpgradeVersion getUpgradeVersion(int version);
 
     /**
-     * 忽略版本
+     * 保存升忽略版本
      *
      * @param version
      */
-    void setUpgradeVersion(UpgradeVersion version);
+    void putUpgradeVersion(UpgradeVersion version);
 
     /**
      * 获取升级缓存
@@ -36,10 +36,10 @@ public interface UpgradeDataSource {
     UpgradeBuffer getUpgradeBuffer(String url);
 
     /**
-     * 设置升级缓存
+     * 保存升级缓存
      *
      * @param buffer
      */
-    void setUpgradeBuffer(UpgradeBuffer buffer);
+    void putUpgradeBuffer(UpgradeBuffer buffer);
 
 }
