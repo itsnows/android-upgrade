@@ -81,8 +81,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     }
 
     /**
-     * @param activity Activity
-     * @param upgrade  更新实体
+     * @param activity
+     * @param upgrade
      * @return
      */
     @SuppressLint("RestrictedApi")
