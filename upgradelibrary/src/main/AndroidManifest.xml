@@ -32,7 +32,8 @@
         <service
             android:name=".service.UpgradeService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:process=":upgrade">
             <intent-filter>
                 <action android:name="{applicationId}.intent.action.UpgradeService" />
             </intent-filter>

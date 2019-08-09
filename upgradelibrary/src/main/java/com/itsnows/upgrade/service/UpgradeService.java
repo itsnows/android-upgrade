@@ -11,8 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,6 +33,7 @@ import com.itsnows.upgrade.UpgradeUtil;
 import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
+import com.itsnows.upgrade.receiver.NetworkStateReceiver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -175,17 +174,22 @@ public class UpgradeService extends Service {
     /**
      * 消息处理
      */
-    private MessageHandler messageHandler;
-
-    /**
-     * 网络状态变化广播
-     */
-    private NetWorkStateReceiver netWorkStateReceiver;
+    private Handler messageHandler;
 
     /**
      * 网络状态变化广播
      */
     private PackagesReceiver packagesReceiver;
+
+    /**
+     * 网络状态变化广播
+     */
+    private NetworkStateReceiver networkStateReceiver;
+
+    /**
+     * 网络状态变化监听接口
+     */
+    private NetworkStateReceiver.OnNetworkStateListener onNetworkStateListener;
 
     /**
      * 服务端
@@ -331,8 +335,8 @@ public class UpgradeService extends Service {
         if (messageHandler != null) {
             messageHandler.removeCallbacksAndMessages(null);
         }
-        if (netWorkStateReceiver != null) {
-            netWorkStateReceiver.unregisterReceiver(this);
+        if (networkStateReceiver != null) {
+            networkStateReceiver.registerListener(onNetworkStateListener);
         }
         if (packagesReceiver != null) {
             packagesReceiver.unregisterReceiver(this);
@@ -371,7 +375,7 @@ public class UpgradeService extends Service {
      */
     private void init() {
         if (server == null) {
-            server = new Messenger(ServeHandler.create(this));
+            server = new Messenger(ServerHandler.create(this));
         }
 
         if (clients == null) {
@@ -382,9 +386,24 @@ public class UpgradeService extends Service {
             messageHandler = new MessageHandler(this);
         }
 
-        if (netWorkStateReceiver == null) {
-            netWorkStateReceiver = new NetWorkStateReceiver();
-            netWorkStateReceiver.registerReceiver(this);
+        if (networkStateReceiver == null) {
+            networkStateReceiver = new NetworkStateReceiver(this);
+            onNetworkStateListener = networkStateReceiver.registerListener(
+                    new NetworkStateReceiver.OnNetworkStateListener() {
+                        @Override
+                        public void onConnected() {
+                            if (status == STATUS_DOWNLOAD_PAUSE) {
+                                start();
+                            }
+                        }
+
+                        @Override
+                        public void onDisconnected() {
+                            if (status == STATUS_DOWNLOAD_START) {
+                                pause();
+                            }
+                        }
+                    });
         }
 
         if (packagesReceiver == null) {
@@ -416,7 +435,7 @@ public class UpgradeService extends Service {
                     .setGroupSummary(false)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setLargeIcon(upgradeOption.getIcon())
-                    .setContentIntent(getDefalutIntent(PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(getDefaultIntent(PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(upgradeOption.getTitle())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
@@ -427,7 +446,7 @@ public class UpgradeService extends Service {
             builder = new Notification.Builder(this)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setLargeIcon(upgradeOption.getIcon())
-                    .setContentIntent(getDefalutIntent(PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(getDefaultIntent(PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(upgradeOption.getTitle())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
@@ -466,7 +485,7 @@ public class UpgradeService extends Service {
      * @param flags
      * @return
      */
-    private PendingIntent getDefalutIntent(int flags) {
+    private PendingIntent getDefaultIntent(int flags) {
         Intent intent = new Intent(this, UpgradeService.class);
         return PendingIntent.getService(this, 0, intent, flags);
     }
@@ -579,16 +598,16 @@ public class UpgradeService extends Service {
     /**
      * 服务端消息
      */
-    private static class ServeHandler extends Handler {
+    private static class ServerHandler extends Handler {
         private SoftReference<UpgradeService> reference;
 
         private static Handler create(UpgradeService service) {
-            HandlerThread thread = new HandlerThread("Messenger");
+            HandlerThread thread = new HandlerThread("Server");
             thread.start();
-            return new ServeHandler(thread.getLooper(), service);
+            return new ServerHandler(thread.getLooper(), service);
         }
 
-        private ServeHandler(Looper looper, UpgradeService service) {
+        private ServerHandler(Looper looper, UpgradeService service) {
             super(looper);
             this.reference = new SoftReference<>(service);
         }
@@ -1142,57 +1161,6 @@ public class UpgradeService extends Service {
                 timer.cancel();
             }
             timer = null;
-        }
-    }
-
-    /**
-     * 网络状态变化广播
-     */
-    private class NetWorkStateReceiver extends BroadcastReceiver {
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
-            NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            NetworkInfo mobileNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-
-            // WIFI已连接，移动数据已连接
-            if (wifiNetworkInfo.isConnected() && mobileNetworkInfo.isConnected()) {
-                if (status == STATUS_DOWNLOAD_PAUSE) {
-                    start();
-                }
-                return;
-            }
-
-            // WIFI已连接，移动数据已断开
-            if (wifiNetworkInfo.isConnected() && !mobileNetworkInfo.isConnected()) {
-                if (status == STATUS_DOWNLOAD_PAUSE) {
-                    start();
-                }
-                return;
-            }
-
-            // WIFI已断开，移动数据已连接
-            if (!wifiNetworkInfo.isConnected() && mobileNetworkInfo.isConnected()) {
-                if (status == STATUS_DOWNLOAD_PAUSE) {
-                    start();
-                }
-                return;
-            }
-
-            // WIFI已断开，移动数据已断开
-            pause();
-        }
-
-        public void registerReceiver(Context context) {
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            context.registerReceiver(this, intentFilter);
-        }
-
-        public void unregisterReceiver(Context context) {
-            context.unregisterReceiver(this);
         }
     }
 
