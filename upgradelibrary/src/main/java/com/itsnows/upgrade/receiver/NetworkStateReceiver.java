@@ -25,7 +25,6 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
     public NetworkStateReceiver(Context context) {
         this.context = context;
-        this.observable = createObservable();
     }
 
     @Override
@@ -53,10 +52,13 @@ public class NetworkStateReceiver extends BroadcastReceiver {
      * @param listener
      */
     public OnNetworkStateListener registerListener(OnNetworkStateListener listener) {
-        if (listener == null) {
-            return null;
+        if (observable == null) {
+            observable = createObservable();
+            registerReceiver();
         }
-        observable.addObserver(listener);
+        if (listener != null) {
+            observable.addObserver(listener);
+        }
         return listener;
     }
 
@@ -66,17 +68,25 @@ public class NetworkStateReceiver extends BroadcastReceiver {
      * @param listener
      */
     public void unregisterListener(OnNetworkStateListener listener) {
-        if (listener == null) {
+        if (observable == null) {
             return;
         }
-        observable.deleteObserver(listener);
+        if (listener != null) {
+            observable.deleteObserver(listener);
+        }
+        if (observable.countObservers() == 0) {
+            unregisterReceiver();
+        }
     }
 
     /**
      * Unregister all network state change listener interface.
      */
     public void unregisterAllListener() {
-        observable.deleteObservers();
+        if (observable != null) {
+            observable.deleteObservers();
+            unregisterReceiver();
+        }
     }
 
     /**

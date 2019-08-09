@@ -336,7 +336,7 @@ public class UpgradeService extends Service {
             messageHandler.removeCallbacksAndMessages(null);
         }
         if (networkStateReceiver != null) {
-            networkStateReceiver.registerListener(onNetworkStateListener);
+            networkStateReceiver.unregisterListener(onNetworkStateListener);
         }
         if (packagesReceiver != null) {
             packagesReceiver.unregisterReceiver(this);
