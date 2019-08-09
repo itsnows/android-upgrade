@@ -826,7 +826,7 @@ public class UpgradeService extends Service {
                     submit(0, startLength, endLength);
                     return;
                 }
-                int part = 5 * 1024 * 1024;
+                int part = 8 * 1024 * 1024;
                 int pools = 1;
                 if (endLength >= part) {
                     pools = (int) (endLength / part);
