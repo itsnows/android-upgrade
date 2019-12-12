@@ -964,9 +964,10 @@ public class UpgradeService extends Service {
                 inputStream = connection.getInputStream();
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startLength);
-                byte[] buffer = new byte[32 * 1024];
-                int len = -1;
                 int tempOffset = 0;
+                int length = -1;
+                int tempLength = 8 * 1024;
+                byte[] buffer = new byte[tempLength];
                 do {
                     if (status == STATUS_DOWNLOAD_CANCEL) {
                         messageHandler.sendEmptyMessage(status);
@@ -977,18 +978,17 @@ public class UpgradeService extends Service {
                         messageHandler.sendEmptyMessage(status);
                         break;
                     }
-                    len = inputStream.read(buffer);
-
-                    if (len == -1) {
-                        Log.d("len ", String.valueOf(getName()));
+                    length = inputStream.read(buffer);
+                    if (length >= tempLength) {
+                        tempLength += 1024;
+                    }
+                    if (length == -1) {
                         if (progress.get() < maxProgress) {
                             break;
                         }
-
                         if (status == STATUS_DOWNLOAD_COMPLETE) {
                             break;
                         }
-
                         status = STATUS_DOWNLOAD_COMPLETE;
                         messageHandler.sendEmptyMessage(status);
                         break;
@@ -998,9 +998,9 @@ public class UpgradeService extends Service {
                         status = STATUS_DOWNLOAD_PROGRESS;
                     }
 
-                    randomAccessFile.write(buffer, 0, len);
-                    startLength += len;
-                    progress.addAndGet(len);
+                    randomAccessFile.write(buffer, 0, length);
+                    startLength += length;
+                    progress.addAndGet(length);
                     tempOffset = (int) (((float) progress.get() / maxProgress) * 100);
                     if (tempOffset > offset) {
                         offset = tempOffset;
@@ -1127,10 +1127,10 @@ public class UpgradeService extends Service {
             try {
                 fileInputStream = new FileInputStream(upgradeOption.getStorage());
                 messageDigest = MessageDigest.getInstance("MD5");
-                byte[] buffer = new byte[1024];
-                int len = -1;
-                while ((len = fileInputStream.read(buffer)) != -1) {
-                    messageDigest.update(buffer, 0, len);
+                byte[] buffer = new byte[8 * 1024];
+                int length = -1;
+                while ((length = fileInputStream.read(buffer)) != -1) {
+                    messageDigest.update(buffer, 0, length);
                 }
                 BigInteger bigInteger = new BigInteger(1, messageDigest.digest());
                 return TextUtils.equals(bigInteger.toString(), upgradeOption.getMd5());
