@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
+                // 对话框主题（可选）
+                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
+                // 通知栏图标（可选）
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 // 通知栏标题（可选）
                 .setTitle("腾讯QQ")

@@ -18,4 +18,5 @@ public interface OnInstallListener {
     void onError(UpgradeException e);
 
     void onComplete();
+
 }

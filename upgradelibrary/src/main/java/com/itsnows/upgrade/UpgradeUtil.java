@@ -179,6 +179,21 @@ public class UpgradeUtil {
     }
 
     /**
+     * 获取运行中的进程
+     *
+     * @param context
+     * @return
+     */
+    public static List<ActivityManager.RunningAppProcessInfo> getRunningProcess(Context context) {
+        if (context != null) {
+            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> processs = manager.getRunningAppProcesses();
+            return processs;
+        }
+        return null;
+    }
+
+    /**
      * 服务是否运行
      *
      * @param context
@@ -213,6 +228,53 @@ public class UpgradeUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * 重启应用程序
+     *
+     * @param context
+     * @return
+     */
+    public static boolean rebootApp(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        if (packageManager == null) {
+            return false;
+        }
+        Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 杀死指定进程
+     *
+     * @param pid 进程id
+     */
+    public static void killProcess(int pid) {
+        android.os.Process.killProcess(pid);
+    }
+
+    /**
+     * 杀死当前进程
+     */
+    public static void killCurrentProcess() {
+        killProcess(android.os.Process.myPid());
+    }
+
+    /**
+     * 杀死所有进程
+     *
+     * @param context
+     */
+    public static void kiiAllProcess(Context context) {
+        for (ActivityManager.RunningAppProcessInfo appprocess : getRunningProcess(context)) {
+            killProcess(appprocess.pid);
+        }
     }
 
     /**

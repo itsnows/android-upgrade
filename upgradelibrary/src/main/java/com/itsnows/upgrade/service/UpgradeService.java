@@ -139,7 +139,7 @@ public class UpgradeService extends Service {
     /**
      * 延时
      */
-    private static final int DELAY = 200;
+    private static final int DELAY = 250;
 
     /**
      * 升级进度通知栏
@@ -516,7 +516,11 @@ public class UpgradeService extends Service {
      * 重启
      */
     private void reboot() {
-        UpgradeUtil.launch(this, getPackageName());
+        boolean isReboot = UpgradeUtil.rebootApp(this);
+        if (isReboot) {
+            Log.e(TAG, "Install reboot");
+        }
+        UpgradeUtil.kiiAllProcess(this);
     }
 
     /**
@@ -610,7 +614,7 @@ public class UpgradeService extends Service {
         private SoftReference<UpgradeService> reference;
 
         private static Handler create(UpgradeService service) {
-            HandlerThread thread = new HandlerThread("Server");
+            HandlerThread thread = new HandlerThread(ServerHandler.class.getSimpleName());
             thread.start();
             return new ServerHandler(thread.getLooper(), service);
         }
@@ -665,6 +669,8 @@ public class UpgradeService extends Service {
                 case UpgradeConstant.MSG_KEY_INSTALL_START_REQ:
                     service.install();
                     break;
+                case UpgradeConstant.MSG_KEY_INSTALL_REBOOT_REQ:
+                    service.reboot();
                 default:
                     break;
             }
@@ -958,7 +964,7 @@ public class UpgradeService extends Service {
                 inputStream = connection.getInputStream();
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startLength);
-                byte[] buffer = new byte[5120];
+                byte[] buffer = new byte[32 * 1024];
                 int len = -1;
                 int tempOffset = 0;
                 do {

@@ -96,7 +96,7 @@ public class UpgradeClient {
      * 开始
      */
     public void start() {
-        if (!isConnected) {
+        if (!isConnected()) {
             bind();
         }
     }
@@ -105,7 +105,7 @@ public class UpgradeClient {
      * 暂停
      */
     public void pause() {
-        if (isConnected) {
+        if (isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ, null);
         }
     }
@@ -114,7 +114,7 @@ public class UpgradeClient {
      * 继续
      */
     public void resume() {
-        if (isConnected) {
+        if (isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_RESUME_REQ, null);
         }
     }
@@ -123,7 +123,7 @@ public class UpgradeClient {
      * 取消
      */
     public void cancel() {
-        if (isConnected) {
+        if (isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_RESUME_REQ, null);
         }
     }
@@ -132,7 +132,7 @@ public class UpgradeClient {
      * 安装
      */
     public void install() {
-        if (isConnected) {
+        if (isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_INSTALL_START_REQ, null);
         }
     }
@@ -141,7 +141,7 @@ public class UpgradeClient {
      * 重启
      */
     public void reboot() {
-        if (isConnected) {
+        if (isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_INSTALL_REBOOT_REQ, null);
         }
     }
@@ -170,7 +170,7 @@ public class UpgradeClient {
      * 连接升级服务
      */
     private void connect() {
-        if (!isConnected) {
+        if (!isConnected()) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_CONNECT_REQ, null);
         }
     }
@@ -179,7 +179,7 @@ public class UpgradeClient {
      * 断开升级服务
      */
     private void disconnect() {
-        if (isConnected && client != null && server != null) {
+        if (isConnected() && client != null && server != null) {
             sendMessageToServer(UpgradeConstant.MSG_KEY_DISCONNECT_REQ, null);
         }
     }
@@ -314,6 +314,9 @@ public class UpgradeClient {
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onComplete();
                     }
+                    break;
+                case UpgradeConstant.MSG_KEY_INSTALL_REBOOT_RESP:
+                    Log.d(TAG, "Install：onReboot");
                     break;
                 default:
                     break;

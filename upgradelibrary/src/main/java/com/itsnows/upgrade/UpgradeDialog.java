@@ -141,8 +141,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 super.onStart();
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_pause));
-                btnProgress.setTag("download_start");
-                Log.d(TAG, "download_start");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_START_REQ);
+                Log.d(TAG, "Download start");
             }
 
             @Override
@@ -154,8 +154,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                     pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
                 }
                 btnProgress.setEnabled(true);
-                btnProgress.setTag("download_progress");
-                Log.d(TAG, "download_progress");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ);
+                Log.d(TAG, "Download Progress");
             }
 
             @Override
@@ -163,29 +163,29 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 super.onPause();
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                btnProgress.setTag("download_pause");
-                Log.d(TAG, "download_pause");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ);
+                Log.d(TAG, "Download pause");
             }
 
             @Override
             public void onCancel() {
                 dismiss();
                 btnProgress.setEnabled(true);
-                btnProgress.setTag("download_cancel");
-                Log.d(TAG, "download_cancel");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_REQ);
+                Log.d(TAG, "Download cancel");
             }
 
             @Override
             public void onError(UpgradeException e) {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                Log.d(TAG, "download_cancel");
+                Log.d(TAG, "Download cancel");
             }
 
             @Override
             public void onComplete() {
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_complete));
-                btnProgress.setTag("download_complete");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ);
             }
         });
         upgradeClient.setOnInstallListener(new OnInstallListener() {
@@ -194,21 +194,21 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             public void onCheck() {
                 btnProgress.setEnabled(false);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_check));
-                btnProgress.setTag("install_check");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_CHECK_REQ);
             }
 
             @Override
             public void onStart() {
                 btnProgress.setEnabled(false);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_install));
-                btnProgress.setTag("install_start");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_START_REQ);
             }
 
             @Override
             public void onCancel() {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
-                btnProgress.setTag("install_cancel");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_CANCEL_REQ);
             }
 
             @Override
@@ -217,16 +217,16 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_INVALID) {
                     btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
                 }
-                btnProgress.setTag("install_error");
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ);
             }
 
             @Override
             public void onComplete() {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_launch));
-                btnProgress.setTag("install_complete");
-
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ);
             }
+
         });
     }
 
@@ -499,20 +499,23 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             if (upgradeClient == null) {
                 return;
             }
-            String tag = (String) v.getTag();
-            if ("download_start".equals(tag) || "download_progress".equals(tag)) {
+            int tag = (int) v.getTag();
+            if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_START_REQ
+                    || tag == UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ) {
                 upgradeClient.pause();
-            } else if ("download_pause".equals(tag) || "download_error".equals(tag)) {
+            } else if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ
+                    || tag == UpgradeConstant.MSG_KEY_DOWNLOAD_ERROR_REQ) {
                 upgradeClient.resume();
-            } else if ("download_complete".equals(tag)) {
+            } else if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ) {
                 upgradeClient.install();
                 if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                 }
-            } else if ("install_error".equals(tag)) {
+            } else if (tag == UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ) {
                 upgradeClient.resume();
-            } else if ("install_complete".equals(tag)) {
+            } else if (tag == UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ) {
                 upgradeClient.reboot();
+                dismiss();
             }
         }
     }

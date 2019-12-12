@@ -3,6 +3,7 @@ package com.itsnows.upgrade.model.bean;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.ColorInt;
 
 import java.io.File;
 
@@ -26,6 +27,10 @@ public final class UpgradeOptions implements Parcelable {
             return new UpgradeOptions[size];
         }
     };
+    /**
+     * 对话框主题
+     */
+    private final int theme;
     /**
      * 通知栏图标
      */
@@ -72,6 +77,7 @@ public final class UpgradeOptions implements Parcelable {
     private final boolean autocleanEnabled;
 
     private UpgradeOptions(Params params) {
+        theme = params.theme;
         icon = params.icon;
         title = params.title;
         description = params.description;
@@ -85,6 +91,7 @@ public final class UpgradeOptions implements Parcelable {
     }
 
     protected UpgradeOptions(Parcel in) {
+        theme = in.readInt();
         icon = in.readParcelable(Bitmap.class.getClassLoader());
         title = (CharSequence) in.readValue(CharSequence.class.getClassLoader());
         description = (CharSequence) in.readValue(CharSequence.class.getClassLoader());
@@ -99,6 +106,7 @@ public final class UpgradeOptions implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(theme);
         dest.writeParcelable(icon, flags);
         dest.writeValue(title);
         dest.writeValue(description);
@@ -114,6 +122,10 @@ public final class UpgradeOptions implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    public int getTheme() {
+        return theme;
     }
 
     public Bitmap getIcon() {
@@ -163,6 +175,11 @@ public final class UpgradeOptions implements Parcelable {
             params = new Params();
         }
 
+        public Builder setTheme(@ColorInt int theme) {
+            params.theme = theme;
+            return this;
+        }
+
         public Builder setIcon(Bitmap icon) {
             params.icon = icon;
             return this;
@@ -194,7 +211,7 @@ public final class UpgradeOptions implements Parcelable {
         }
 
         public Builder setMultithreadPools(int pools) {
-            params.multithreadPools = pools < 0 ? 0 : pools;
+            params.multithreadPools = Math.max(pools, 0);
             return this;
         }
 
@@ -219,6 +236,7 @@ public final class UpgradeOptions implements Parcelable {
     }
 
     private static class Params {
+        private int theme;
         private Bitmap icon;
         private CharSequence title;
         private CharSequence description;
