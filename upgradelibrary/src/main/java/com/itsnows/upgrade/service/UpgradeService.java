@@ -513,6 +513,13 @@ public class UpgradeService extends Service {
     }
 
     /**
+     * 重启
+     */
+    private void reboot() {
+        UpgradeUtil.launch(this, getPackageName());
+    }
+
+    /**
      * 开始
      */
     private void start() {
@@ -884,7 +891,7 @@ public class UpgradeService extends Service {
         /**
          * 提交下载任务
          *
-         * @param id          线程ID
+         * @param id          线程id
          * @param startLength 开始下载位置
          * @param entLength   结束下载位置
          */
@@ -896,7 +903,6 @@ public class UpgradeService extends Service {
                 thread = new DownloadThread(id, startLength, entLength);
             }
             thread.start();
-
         }
     }
 
@@ -1067,7 +1073,6 @@ public class UpgradeService extends Service {
         @Override
         public void run() {
             super.run();
-
             try {
                 if (upgradeOption.getMd5() != null) {
                     status = STATUS_INSTALL_CHECK;

@@ -138,6 +138,15 @@ public class UpgradeClient {
     }
 
     /**
+     * 重启
+     */
+    public void reboot() {
+        if (isConnected) {
+            sendMessageToServer(UpgradeConstant.MSG_KEY_INSTALL_REBOOT_REQ, null);
+        }
+    }
+
+    /**
      * 绑定升级服务
      */
     private void bind() {

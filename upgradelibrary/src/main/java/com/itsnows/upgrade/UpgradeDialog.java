@@ -225,7 +225,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_launch));
                 btnProgress.setTag("install_complete");
-                dismiss();
+
             }
         });
     }
@@ -511,6 +511,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 }
             } else if ("install_error".equals(tag)) {
                 upgradeClient.resume();
+            } else if ("install_complete".equals(tag)) {
+                upgradeClient.reboot();
             }
         }
     }

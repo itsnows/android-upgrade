@@ -93,4 +93,10 @@ public class UpgradeConstant {
     public static final int MSG_KEY_INSTALL_COMPLETE_REQ = 0x2131;
     public static final int MSG_KEY_INSTALL_COMPLETE_RESP = 0x2132;
 
+    /**
+     * 安装完成
+     */
+    public static final int MSG_KEY_INSTALL_REBOOT_REQ = 0x2141;
+    public static final int MSG_KEY_INSTALL_REBOOT_RESP = 0x2142;
+
 }

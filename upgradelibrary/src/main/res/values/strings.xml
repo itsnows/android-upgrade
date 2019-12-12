@@ -16,7 +16,7 @@
     <string name="dialog_upgrade_btn_check">效验中&#8230;</string>
     <string name="dialog_upgrade_btn_install">安装中&#8230;</string>
     <string name="dialog_upgrade_btn_reset">重试</string>
-    <string name="dialog_upgrade_btn_launch">启动</string>
+    <string name="dialog_upgrade_btn_launch">重启</string>
 
     <string name="message_connect_success">连接成功</string>
     <string name="message_connect_failure">连接失败，服务已存在客户端实例！</string>
