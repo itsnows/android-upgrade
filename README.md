@@ -84,8 +84,8 @@ Add the dependency<br>
         <versionCode>86</versionCode>
         <!--versionCode：新版App版本名称-->
         <versionName>1.0.8.6</versionName>
-        <!--dowanloadUrl：新版App下载链接-->
-        <dowanloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</dowanloadUrl>
+        <!--downloadUrl：新版App下载链接-->
+        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</downloadUrl>
         <!--md5：新版App安装包完整性-->
         <md5></md5>
     </stable>
@@ -109,8 +109,8 @@ Add the dependency<br>
         <versionCode>86</versionCode>
         <!--versionCode：新版App版本名称-->
         <versionName>1.0.8.6</versionName>
-        <!--dowanloadUrl：新版App下载链接-->
-        <dowanloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</dowanloadUrl>
+        <!--downloadUrl：新版App下载链接-->
+        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</downloadUrl>
         <!--md5：新版App安装包完整性-->
         <md5></md5>
     </beta>

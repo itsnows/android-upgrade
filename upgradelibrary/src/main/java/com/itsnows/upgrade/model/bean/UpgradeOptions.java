@@ -35,7 +35,7 @@ public final class UpgradeOptions implements Parcelable {
      */
     private final CharSequence title;
     /**
-     * 通知内容
+     * 通知栏描述
      */
     private final CharSequence description;
     /**
@@ -50,18 +50,22 @@ public final class UpgradeOptions implements Parcelable {
      * MD5文件完整校验
      */
     private final String md5;
+
+    /**
+     * 多线程下载线程池大小
+     */
+    private final int multithreadPools;
+
     /**
      * 是否支持多线程下载
      */
     private final boolean multithreadEnabled;
-    /**
-     * 多线程下载线程池最大数量
-     */
-    private final int multithreadPools;
+
     /**
      * 是否自动安装安装包
      */
     private final boolean automountEnabled;
+
     /**
      * 是否自动清除安装包
      */
@@ -74,9 +78,9 @@ public final class UpgradeOptions implements Parcelable {
         storage = params.storage;
         url = params.url;
         md5 = params.md5;
-        multithreadEnabled = params.multithreadEnabled;
         multithreadPools = params.multithreadPools;
-        automountEnabled = params.autocleanEnabled;
+        multithreadEnabled = params.multithreadEnabled;
+        automountEnabled = params.automountEnabled;
         autocleanEnabled = params.autocleanEnabled;
     }
 
@@ -87,8 +91,8 @@ public final class UpgradeOptions implements Parcelable {
         storage = (File) in.readSerializable();
         url = in.readString();
         md5 = in.readString();
-        multithreadEnabled = in.readByte() != 0;
         multithreadPools = in.readInt();
+        multithreadEnabled = in.readByte() != 0;
         automountEnabled = in.readByte() != 0;
         autocleanEnabled = in.readByte() != 0;
     }
@@ -101,8 +105,8 @@ public final class UpgradeOptions implements Parcelable {
         dest.writeSerializable(storage);
         dest.writeString(url);
         dest.writeString(md5);
-        dest.writeByte((byte) (multithreadEnabled ? 1 : 0));
         dest.writeInt(multithreadPools);
+        dest.writeByte((byte) (multithreadEnabled ? 1 : 0));
         dest.writeInt((byte) (automountEnabled ? 1 : 0));
         dest.writeInt((byte) (autocleanEnabled ? 1 : 0));
     }
@@ -136,12 +140,12 @@ public final class UpgradeOptions implements Parcelable {
         return md5;
     }
 
-    public boolean isMultithreadEnabled() {
-        return multithreadEnabled;
-    }
-
     public int getMultithreadPools() {
         return multithreadPools;
+    }
+
+    public boolean isMultithreadEnabled() {
+        return multithreadEnabled;
     }
 
     public boolean isAutomountEnabled() {
@@ -189,13 +193,13 @@ public final class UpgradeOptions implements Parcelable {
             return this;
         }
 
-        public Builder setMultithreadEnabled(boolean enabled) {
-            params.multithreadEnabled = enabled;
+        public Builder setMultithreadPools(int pools) {
+            params.multithreadPools = pools < 0 ? 0 : pools;
             return this;
         }
 
-        public Builder setMultithreadPools(int pools) {
-            params.multithreadPools = pools < 0 ? 0 : pools;
+        public Builder setMultithreadEnabled(boolean enabled) {
+            params.multithreadEnabled = enabled;
             return this;
         }
 
@@ -214,17 +218,17 @@ public final class UpgradeOptions implements Parcelable {
         }
     }
 
-    static class Params {
-        Bitmap icon;
-        CharSequence title;
-        CharSequence description;
-        File storage;
-        String url;
-        String md5;
-        boolean multithreadEnabled;
-        int multithreadPools;
-        boolean automountEnabled;
-        boolean autocleanEnabled;
+    private static class Params {
+        private Bitmap icon;
+        private CharSequence title;
+        private CharSequence description;
+        private File storage;
+        private String url;
+        private String md5;
+        private int multithreadPools;
+        private boolean multithreadEnabled;
+        private boolean automountEnabled;
+        private boolean autocleanEnabled;
     }
 
 }

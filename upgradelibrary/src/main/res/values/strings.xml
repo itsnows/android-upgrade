@@ -22,10 +22,9 @@
     <string name="message_connect_failure">连接失败，服务已存在客户端实例！</string>
     <string name="message_disconnect_success">断开连接成功</string>
     <string name="message_disconnect_failure">断开连接失败</string>
-
     <string name="message_check_for_update">获取更新中&#8230;</string>
     <string name="message_check_for_update_failure">获取更新失败，请稍候重试！</string>
-    <string name="message_check_for_update_not_found">已安装最新版本！</string>
+    <string name="message_check_for_update_no_available">已安装最新版本！</string>
     <string name="message_download_start">下载连接中&#8230;.</string>
     <string name="message_download_pause">下载暂停</string>
     <string name="message_download_cancel">下载取消</string>
@@ -37,7 +36,7 @@
     <string name="message_install_complete">安装完成</string>
     <string name="message_install_cancel">安装取消</string>
     <string name="message_install_package_invalid">安装包无效</string>
-    <string name="message_install_package_delete">安装包已删除</string>
+    <string name="message_install_package_delete">安装已完成，自动删除安装包</string>
     <string name="message_install_not_root">设备无root权限</string>
 
 </resources>

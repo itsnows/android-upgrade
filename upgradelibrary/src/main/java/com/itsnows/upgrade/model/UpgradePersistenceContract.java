@@ -5,9 +5,9 @@ package com.itsnows.upgrade.model;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 2018/2/6 22:26
  * <p>
- * UpgradePersistenceContrat
+ * UpgradePersistenceContract
  */
-public class UpgradePersistenceContrat {
+public class UpgradePersistenceContract {
 
     public static abstract class UpgradeVersionEntry {
         public static final String TABLE_NAME = "upgrade_version";

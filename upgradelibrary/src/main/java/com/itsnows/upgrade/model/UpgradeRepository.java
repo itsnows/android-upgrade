@@ -45,8 +45,8 @@ public class UpgradeRepository implements UpgradeDataSource {
     public UpgradeVersion getUpgradeVersion(int versionCode) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String sql = "SELECT * FROM " +
-                UpgradePersistenceContrat.UpgradeVersionEntry.TABLE_NAME + " WHERE " +
-                UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION + "=?";
+                UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + " WHERE " +
+                UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "=?";
         String[] selectionArgs = new String[]{String.valueOf(versionCode)};
         Cursor cursor = null;
         try {
@@ -54,9 +54,9 @@ public class UpgradeRepository implements UpgradeDataSource {
             while (cursor.moveToNext()) {
                 UpgradeVersion upgradeVersion = new UpgradeVersion();
                 upgradeVersion.setVersion(cursor.getInt(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION)));
+                        UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION)));
                 upgradeVersion.setIgnored(cursor.getInt(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED)) == 1);
+                        UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED)) == 1);
                 return upgradeVersion;
             }
         } catch (Exception e) {
@@ -76,9 +76,9 @@ public class UpgradeRepository implements UpgradeDataSource {
     public void putUpgradeVersion(UpgradeVersion version) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String sql = "INSERT OR REPLACE INTO "
-                + UpgradePersistenceContrat.UpgradeVersionEntry.TABLE_NAME + "("
-                + UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_VERSION + ","
-                + UpgradePersistenceContrat.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
+                + UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + "("
+                + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + ","
+                + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
         try {
             Object[] bindArgs = new Object[]{
                     version.getVersion(),
@@ -97,8 +97,8 @@ public class UpgradeRepository implements UpgradeDataSource {
     public UpgradeBuffer getUpgradeBuffer(String url) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String sql = "SELECT * FROM " +
-                UpgradePersistenceContrat.UpgradeBufferEntry.TABLE_NAME + " WHERE " +
-                UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "=?";
+                UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + " WHERE " +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "=?";
         String[] selectionArgs = new String[]{url};
         Cursor cursor = null;
         try {
@@ -106,15 +106,15 @@ public class UpgradeRepository implements UpgradeDataSource {
             while (cursor.moveToNext()) {
                 UpgradeBuffer upgradeBuffer = new UpgradeBuffer();
                 upgradeBuffer.setDownloadUrl(cursor.getString(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL)));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL)));
                 upgradeBuffer.setFileMd5(cursor.getString(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5)));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5)));
                 upgradeBuffer.setFileLength(cursor.getLong(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH)));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH)));
                 upgradeBuffer.setBufferLength(cursor.getLong(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH)));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH)));
                 String bufferPart = cursor.getString(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART));
                 List<UpgradeBuffer.BufferPart> bufferParts = new CopyOnWriteArrayList<>();
                 JSONArray ja = new JSONArray(bufferPart);
                 for (int index = 0; index < ja.length(); index++) {
@@ -125,7 +125,7 @@ public class UpgradeRepository implements UpgradeDataSource {
                 }
                 upgradeBuffer.setBufferParts(bufferParts);
                 upgradeBuffer.setLastModified(cursor.getLong(cursor.getColumnIndex(
-                        UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED)));
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED)));
                 return upgradeBuffer;
             }
         } catch (Exception e) {
@@ -144,14 +144,14 @@ public class UpgradeRepository implements UpgradeDataSource {
     @Override
     public void putUpgradeBuffer(UpgradeBuffer buffer) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        String sql = "INSERT OR REPLACE INTO "
-                + UpgradePersistenceContrat.UpgradeBufferEntry.TABLE_NAME + "("
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + ","
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5 + ","
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH + ","
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + ","
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + ","
-                + UpgradePersistenceContrat.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT OR REPLACE INTO " +
+                UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + "(" +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5 + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
 
         JSONArray ja = new JSONArray();
         List<UpgradeBuffer.BufferPart> bufferParts = buffer.getBufferParts();

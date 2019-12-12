@@ -10,6 +10,7 @@ import com.itsnows.upgrade.model.bean.Upgrade;
  * OnUpgradeListener
  */
 public interface OnUpgradeListener {
+
     void onUpdateAvailable(UpgradeClient client);
 
     void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client);
@@ -17,4 +18,5 @@ public interface OnUpgradeListener {
     void onUpdateAvailable(Upgrade.Beta bate, UpgradeClient client);
 
     void onNoUpdateAvailable(String message);
+
 }

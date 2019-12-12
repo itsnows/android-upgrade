@@ -45,8 +45,8 @@ public class Upgrade implements Parcelable {
             return new Upgrade[size];
         }
     };
-    private static final int CONNECT_TIMEOUT = 6 * 1000;
-    private static final int READ_TIMEOUT = 6 * 1000;
+    private static final int CONNECT_TIMEOUT = 20 * 1000;
+    private static final int READ_TIMEOUT = 20 * 1000;
     /**
      * 稳定版
      */
@@ -85,7 +85,7 @@ public class Upgrade implements Parcelable {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new ConnectException();
             }
-            return parser(connection.getInputStream());
+            return parserXml(connection.getInputStream());
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -98,7 +98,7 @@ public class Upgrade implements Parcelable {
      *
      * @param inputStream 更新文档数据流
      */
-    public static Upgrade parser(InputStream inputStream) throws Exception {
+    public static Upgrade parserXml(InputStream inputStream) throws Exception {
         Upgrade upgrade = null;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -148,9 +148,9 @@ public class Upgrade implements Parcelable {
                                 } else if ("versionName".equals(childStableNode.getNodeName())) {
                                     String text = childStableNode.getTextContent();
                                     upgrade.getStable().setVersionName(text == null ? text : text.trim());
-                                } else if ("dowanloadUrl".equals(childStableNode.getNodeName())) {
+                                } else if ("downloadUrl".equals(childStableNode.getNodeName())) {
                                     String text = childStableNode.getTextContent();
-                                    upgrade.getStable().setDowanloadUrl(text == null ? text : text.trim());
+                                    upgrade.getStable().setDownloadUrl(text == null ? text : text.trim());
                                 } else if ("md5".equals(childStableNode.getNodeName())) {
                                     String text = childStableNode.getTextContent();
                                     upgrade.getStable().setMd5((text == null || text.isEmpty() ? null : text.trim()));
@@ -202,9 +202,9 @@ public class Upgrade implements Parcelable {
                                 } else if ("versionName".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
                                     upgrade.getBeta().setVersionName(text == null ? text : text.trim());
-                                } else if ("dowanloadUrl".equals(childBetaNode.getNodeName())) {
+                                } else if ("downloadUrl".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
-                                    upgrade.getBeta().setDowanloadUrl(text == null ? text : text.trim());
+                                    upgrade.getBeta().setDownloadUrl(text == null ? text : text.trim());
                                 } else if ("md5".equals(childBetaNode.getNodeName())) {
                                     String text = childBetaNode.getTextContent();
                                     upgrade.getBeta().setMd5((text == null || text.isEmpty() ? null : text.trim()));
@@ -252,14 +252,11 @@ public class Upgrade implements Parcelable {
     @Override
     public String toString() {
         return "Upgrade{" +
-                "stable=" + stable +
-                ", beta=" + beta +
+                "stable=" + stable.toString() +
+                ", beta=" + beta.toString() +
                 '}';
     }
 
-    /**
-     * 稳定版
-     */
     public static class Stable implements Parcelable {
 
         public static final Creator<Stable> CREATOR = new Creator<Stable>() {
@@ -296,7 +293,7 @@ public class Upgrade implements Parcelable {
         /**
          * 新版App下载链接
          */
-        private String dowanloadUrl;
+        private String downloadUrl;
         /**
          * 安装包MD5效验
          */
@@ -311,7 +308,7 @@ public class Upgrade implements Parcelable {
             this.logs = logs;
             this.versionCode = versionCode;
             this.versionName = versionName;
-            this.dowanloadUrl = dowanloadUrl;
+            this.downloadUrl = dowanloadUrl;
             this.md5 = md5;
         }
 
@@ -321,7 +318,7 @@ public class Upgrade implements Parcelable {
             logs = in.createStringArrayList();
             versionCode = in.readInt();
             versionName = in.readString();
-            dowanloadUrl = in.readString();
+            downloadUrl = in.readString();
             md5 = in.readString();
         }
 
@@ -365,12 +362,12 @@ public class Upgrade implements Parcelable {
             this.versionName = versionName;
         }
 
-        public String getDowanloadUrl() {
-            return dowanloadUrl;
+        public String getDownloadUrl() {
+            return downloadUrl;
         }
 
-        public void setDowanloadUrl(String dowanloadUrl) {
-            this.dowanloadUrl = dowanloadUrl;
+        public void setDownloadUrl(String downloadUrl) {
+            this.downloadUrl = downloadUrl;
         }
 
         public String getMd5() {
@@ -393,7 +390,7 @@ public class Upgrade implements Parcelable {
             dest.writeStringList(logs);
             dest.writeInt(versionCode);
             dest.writeString(versionName);
-            dest.writeString(dowanloadUrl);
+            dest.writeString(downloadUrl);
             dest.writeString(md5);
         }
 
@@ -405,15 +402,12 @@ public class Upgrade implements Parcelable {
                     ", logs=" + logs +
                     ", versionCode=" + versionCode +
                     ", versionName='" + versionName + '\'' +
-                    ", dowanloadUrl='" + dowanloadUrl + '\'' +
+                    ", downloadUrl='" + downloadUrl + '\'' +
                     ", md5='" + md5 + '\'' +
                     '}';
         }
     }
 
-    /**
-     * 测试版
-     */
     public static class Beta implements Parcelable {
         public static final Creator<Beta> CREATOR = new Creator<Beta>() {
             @Override
@@ -453,7 +447,7 @@ public class Upgrade implements Parcelable {
         /**
          * 新版App下载链接
          */
-        private String dowanloadUrl;
+        private String downloadUrl;
         /**
          * 安装包MD5效验
          */
@@ -469,7 +463,7 @@ public class Upgrade implements Parcelable {
             this.logs = logs;
             this.versionCode = versionCode;
             this.versionName = versionName;
-            this.dowanloadUrl = dowanloadUrl;
+            this.downloadUrl = dowanloadUrl;
             this.md5 = md5;
         }
 
@@ -480,7 +474,7 @@ public class Upgrade implements Parcelable {
             logs = in.createStringArrayList();
             versionCode = in.readInt();
             versionName = in.readString();
-            dowanloadUrl = in.readString();
+            downloadUrl = in.readString();
             md5 = in.readString();
         }
 
@@ -532,12 +526,12 @@ public class Upgrade implements Parcelable {
             this.versionName = versionName;
         }
 
-        public String getDowanloadUrl() {
-            return dowanloadUrl;
+        public String getDownloadUrl() {
+            return downloadUrl;
         }
 
-        public void setDowanloadUrl(String dowanloadUrl) {
-            this.dowanloadUrl = dowanloadUrl;
+        public void setDownloadUrl(String downloadUrl) {
+            this.downloadUrl = downloadUrl;
         }
 
         public String getMd5() {
@@ -556,7 +550,7 @@ public class Upgrade implements Parcelable {
             dest.writeStringList(logs);
             dest.writeInt(versionCode);
             dest.writeString(versionName);
-            dest.writeString(dowanloadUrl);
+            dest.writeString(downloadUrl);
             dest.writeString(md5);
         }
 
@@ -574,7 +568,7 @@ public class Upgrade implements Parcelable {
                     ", logs=" + logs +
                     ", versionCode=" + versionCode +
                     ", versionName='" + versionName + '\'' +
-                    ", dowanloadUrl='" + dowanloadUrl + '\'' +
+                    ", downloadUrl='" + downloadUrl + '\'' +
                     ", md5='" + md5 + '\'' +
                     '}';
         }

@@ -304,8 +304,8 @@ public class UpgradeService extends Service {
             return command;
         }
 
-        UpgradeOptions upgradeOptions = intent.getParcelableExtra(PARAMS_UPGRADE_OPTION);
-        if (upgradeOptions != null) {
+        UpgradeOptions upgradeOptions = null;
+        if (intent != null && (upgradeOptions = intent.getParcelableExtra(PARAMS_UPGRADE_OPTION)) != null) {
             this.upgradeOption = new UpgradeOptions.Builder()
                     .setIcon(upgradeOptions.getIcon() == null ?
                             UpgradeUtil.getAppIcon(this) : upgradeOptions.getIcon())
@@ -319,9 +319,10 @@ public class UpgradeService extends Service {
                     .setMd5(upgradeOptions.getMd5())
                     .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
                     .setMultithreadPools(upgradeOptions.isMultithreadEnabled() ?
-                            upgradeOptions.getMultithreadPools() == 0 ? 100 :
+                            upgradeOptions.getMultithreadPools() == 0 ? 20 :
                                     upgradeOptions.getMultithreadPools() : 0)
                     .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
+                    .setAutomountEnabled(upgradeOptions.isAutomountEnabled())
                     .build();
             initNotify();
             start();
@@ -744,11 +745,12 @@ public class UpgradeService extends Service {
                     break;
                 case STATUS_INSTALL_COMPLETE:
                     service.setNotify(service.getString(R.string.message_install_complete));
-                    // upgradeService.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP, response);
                     if (msg.arg1 == -1 && service.deletePackage()) {
                         Toast.makeText(service, service.getString(
-                                R.string.message_install_package_delete), Toast.LENGTH_SHORT).show();
+                                R.string.message_install_package_delete), Toast.LENGTH_LONG).show();
                     }
+                    service.clearNotify();
                     break;
                 default:
                     break;
@@ -1080,21 +1082,19 @@ public class UpgradeService extends Service {
                     }
                 }
 
-                // status = STATUS_INSTALL_START;
-                // messageHandler.sendEmptyMessage(STATUS_INSTALL_START);
                 if (upgradeOption.isAutomountEnabled() && UpgradeUtil.isRooted()) {
+                    status = STATUS_INSTALL_START;
+                    messageHandler.sendEmptyMessage(STATUS_INSTALL_START);
                     boolean success = UpgradeUtil.installApk(upgradeOption.getStorage().getPath());
                     if (!success) {
-                        status = STATUS_INSTALL_ERROR;
-                        messageHandler.sendEmptyMessage(status);
+                        Message message = Message.obtain();
+                        message.what = status;
+                        message.arg1 = UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT;
+                        messageHandler.sendMessage(message);
                         return;
                     }
-
-                    status = STATUS_INSTALL_ERROR;
-                    Message message = Message.obtain();
-                    message.what = status;
-                    message.arg1 = UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT;
-                    messageHandler.sendMessage(message);
+                    status = STATUS_INSTALL_COMPLETE;
+                    messageHandler.sendEmptyMessage(status);
                     return;
                 }
                 UpgradeUtil.installApk(UpgradeService.this, upgradeOption.getStorage().getPath());

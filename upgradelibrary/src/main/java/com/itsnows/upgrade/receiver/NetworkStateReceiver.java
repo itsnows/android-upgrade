@@ -15,7 +15,7 @@ import java.util.Observer;
  * E-mail: xue.com.fei@outlook.com
  * CreatedTime: 19-8-9 上午11:50
  * <p>
- * NetWorkStateReceiver
+ * NetworkStateReceiver
  */
 public class NetworkStateReceiver extends BroadcastReceiver {
     private static final int NETWORK_STATE_CONNECTED = 9;
@@ -140,7 +140,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     }
 
     /**
-     * The network state change listener interface.
+     * The network state change listener interface {@link OnNetworkStateListener}.
      */
     public static abstract class OnNetworkStateListener implements Observer {
 

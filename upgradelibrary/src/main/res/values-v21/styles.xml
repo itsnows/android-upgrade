@@ -2,7 +2,7 @@
 <resources>
 
     <!--AppTheme.Dialog.ActionButton.Text-->
-    <style name="AppTheme.Dialog.ActionButton.Text" parent="TextAppearance.AppCompat.Button">
+    <style name="AppTheme.Dialog.ActionButton" parent="TextAppearance.AppCompat.Button">
         <item name="android:textSize">@dimen/dialog_upgrade_button_text_size</item>
         <item name="android:singleLine">true</item>
         <item name="android:layout_gravity">center_vertical</item>

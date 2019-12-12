@@ -22,7 +22,7 @@
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_dialog_upgrade_progress"
-            style="@style/AppTheme.Dialog.ActionButton.Text"
+            style="@style/AppTheme.Dialog.ActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

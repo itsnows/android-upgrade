@@ -260,7 +260,7 @@ public class UpgradeUtil {
         int result = cmd("chmod 777 " + apk.getPath() + " \n" +
                 "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install -r " + apk.getPath() + " \n");
         if (result == 0) {
-            Log.d(TAG, "Install apk：Install successfully");
+            Log.d(TAG, "Install apk：Installation successfully");
             return true;
         } else if (result == 1) {
             Log.d(TAG, "Install apk：Installation failed");

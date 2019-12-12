@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
                 .setAutocleanEnabled(true)
+                // 是否自动安装安装包（可选）
+                .setAutomountEnabled(true)
                 .build(), false);
     }
 
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -104,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
                 .setAutocleanEnabled(true)
+                // 是否自动安装安装包（可选）
+                .setAutomountEnabled(true)
                 .build(), true);
     }
 
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-forced.xml")
+                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线程下载（可选）
@@ -126,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
                 .setAutocleanEnabled(true)
+                // 是否自动安装安装包（可选）
+                .setAutomountEnabled(true)
                 .build(), false);
     }
 
@@ -134,12 +140,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(1)
+                .setMultithreadPools(10)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
+                .setAutomountEnabled(true)
                 .build(), new OnUpgradeListener() {
 
             @Override
@@ -149,11 +156,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client) {
-                showUpgradeDialog(stable, client);
+
             }
 
             @Override
             public void onUpdateAvailable(Upgrade.Beta beta, UpgradeClient client) {
+                showUpgradeDialog(beta, client);
             }
 
             @Override
@@ -174,10 +182,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setUrl("http://gdown.baidu.com/data/wisegame/2965a5c112549eb8/QQ_996.apk")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线程下载（可选）
-                .setMultithreadEnabled(true)
                 // 线程池大小（可选）
                 .setMultithreadPools(1)
+                // 是否支持多线程下载（可选）
+                .setMultithreadEnabled(true)
                 // 文件MD5（可选）
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
@@ -188,14 +196,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 显示更新提示（自定义提示）
      *
-     * @param stable Upgrade.Stable
+     * @param beta   Upgrade.Stable
      * @param client UpgradeClient
      */
-    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeClient client) {
+    private void showUpgradeDialog(Upgrade.Beta beta, final UpgradeClient client) {
         StringBuffer logs = new StringBuffer();
-        for (int i = 0; i < stable.getLogs().size(); i++) {
-            logs.append(stable.getLogs().get(i));
-            logs.append(i < stable.getLogs().size() - 1 ? "\n" : "");
+        for (int i = 0; i < beta.getLogs().size(); i++) {
+            logs.append(beta.getLogs().get(i));
+            logs.append(i < beta.getLogs().size() - 1 ? "\n" : "");
         }
 
         View view = View.inflate(this, R.layout.dialog_custom, null);
