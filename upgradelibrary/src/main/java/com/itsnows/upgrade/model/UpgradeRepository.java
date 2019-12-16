@@ -9,7 +9,6 @@ import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -152,35 +151,28 @@ public class UpgradeRepository implements UpgradeDataSource {
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
-
-        JSONArray ja = new JSONArray();
-        List<UpgradeBuffer.BufferPart> bufferParts = buffer.getBufferParts();
-        for (int index = 0; index < bufferParts.size(); index++) {
-            JSONObject jo = new JSONObject();
-            try {
+        try {
+            JSONArray ja = new JSONArray();
+            List<UpgradeBuffer.BufferPart> bufferParts = buffer.getBufferParts();
+            for (int index = 0; index < bufferParts.size(); index++) {
+                JSONObject jo = new JSONObject();
                 jo.put("start_length", bufferParts.get(index).getStartLength());
                 jo.put("end_length", bufferParts.get(index).getEndLength());
                 ja.put(index, jo);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        }
-
-        Object[] bindArgs = new Object[]{
-                buffer.getDownloadUrl(),
-                buffer.getFileMd5(),
-                buffer.getFileLength(),
-                buffer.getBufferLength(),
-                ja.toString(),
-                buffer.getLastModified(),
-        };
-        try {
+            Object[] bindArgs = new Object[]{
+                    buffer.getDownloadUrl(),
+                    buffer.getFileMd5(),
+                    buffer.getFileLength(),
+                    buffer.getBufferLength(),
+                    ja.toString(),
+                    buffer.getLastModified()};
             db.execSQL(sql, bindArgs);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (db != null) {
-                // db.close();
+                db.close();
             }
         }
 

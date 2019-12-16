@@ -24,10 +24,11 @@ import android.util.Log;
 
 import com.itsnows.upgrade.provider.UpgradeFileProvider;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.List;
@@ -322,10 +323,10 @@ public class UpgradeUtil {
         int result = cmd("chmod 777 " + apk.getPath() + " \n" +
                 "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install -r " + apk.getPath() + " \n");
         if (result == 0) {
-            Log.d(TAG, "Install apk：Installation successfully");
+            Log.d(TAG, "Install apk：Successfully");
             return true;
         } else if (result == 1) {
-            Log.d(TAG, "Install apk：Installation failed");
+            Log.d(TAG, "Install apk：Failed");
             return false;
         } else {
             Log.d(TAG, "Install apk：Unknown");
@@ -364,22 +365,52 @@ public class UpgradeUtil {
             return -1;
         }
         Process process = null;
-        DataOutputStream dos = null;
+        DataOutputStream outputStream = null;
+        BufferedReader inputReader = null;
+        BufferedReader errorReader = null;
         try {
             Runtime runtime = Runtime.getRuntime();
             process = runtime.exec("su");
-            OutputStream os = process.getOutputStream();
-            dos = new DataOutputStream(os);
-            dos.writeBytes(cmd);
-            dos.writeBytes("exit \n");
-            dos.flush();
-            return process.waitFor();
+            outputStream = new DataOutputStream(process.getOutputStream());
+            inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            outputStream.writeBytes(cmd);
+            outputStream.writeBytes("exit \n");
+            outputStream.flush();
+            int result = process.waitFor();
+            StringBuilder logcat = new StringBuilder();
+            String line = null;
+            while ((line = inputReader.readLine()) != null) {
+                logcat.append(line).append("\n");
+            }
+            while ((line = errorReader.readLine()) != null) {
+                logcat.append(line).append("\n");
+            }
+            Log.d(TAG, "Shell logcat :" + logcat.toString());
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (dos != null) {
+
+            if (errorReader != null) {
                 try {
-                    dos.close();
+                    errorReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (inputReader != null) {
+                try {
+                    inputReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

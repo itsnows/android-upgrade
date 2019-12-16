@@ -139,7 +139,7 @@ public class UpgradeService extends Service {
     /**
      * 延时
      */
-    private static final int DELAY = 250;
+    private static final int DELAY = 400;
 
     /**
      * 升级进度通知栏
@@ -518,7 +518,7 @@ public class UpgradeService extends Service {
     private void reboot() {
         boolean isReboot = UpgradeUtil.rebootApp(this);
         if (isReboot) {
-            Log.e(TAG, "Install reboot");
+            Log.d(TAG, "Install reboot");
         }
         UpgradeUtil.kiiAllProcess(this);
     }
@@ -978,17 +978,21 @@ public class UpgradeService extends Service {
                         messageHandler.sendEmptyMessage(status);
                         break;
                     }
+
                     length = inputStream.read(buffer);
                     if (length >= tempLength) {
                         tempLength += 1024;
                     }
+
                     if (length == -1) {
                         if (progress.get() < maxProgress) {
                             break;
                         }
+
                         if (status == STATUS_DOWNLOAD_COMPLETE) {
                             break;
                         }
+
                         status = STATUS_DOWNLOAD_COMPLETE;
                         messageHandler.sendEmptyMessage(status);
                         break;
@@ -1000,15 +1004,14 @@ public class UpgradeService extends Service {
 
                     randomAccessFile.write(buffer, 0, length);
                     startLength += length;
-                    progress.addAndGet(length);
-                    tempOffset = (int) (((float) progress.get() / maxProgress) * 100);
+                    tempOffset = (int) (((float) progress.addAndGet(length) / maxProgress) * 100);
                     if (tempOffset > offset) {
                         offset = tempOffset;
                         messageHandler.sendEmptyMessage(STATUS_DOWNLOAD_PROGRESS);
                         mark();
                         Log.d(TAG, "Thread：" + getName()
                                 + " Position：" + startLength + "-" + endLength
-                                + " Download：" + offset + "% " + progress + "Byte/" + maxProgress + "Byte");
+                                + " Download：" + offset + "% " + progress.get() + "B/" + maxProgress + "B");
                     }
                 } while (true);
             } catch (Exception e) {
@@ -1099,7 +1102,7 @@ public class UpgradeService extends Service {
                     boolean success = UpgradeUtil.installApk(upgradeOption.getStorage().getPath());
                     if (!success) {
                         Message message = Message.obtain();
-                        message.what = status;
+                        message.what = status = STATUS_INSTALL_ERROR;
                         message.arg1 = UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT;
                         messageHandler.sendMessage(message);
                         return;

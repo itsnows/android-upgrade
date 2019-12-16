@@ -145,6 +145,7 @@ public class UpgradeManager {
             Upgrade upgrade = bundle.getParcelable("upgrade");
             UpgradeOptions upgradeOptions = bundle.getParcelable("upgrade_options");
             UpgradeOptions.Builder builder = new UpgradeOptions.Builder()
+                    .setTheme(upgradeOptions.getTheme())
                     .setIcon(upgradeOptions.getIcon())
                     .setTitle(upgradeOptions.getTitle())
                     .setDescription(upgradeOptions.getDescription())

@@ -6,14 +6,15 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Preconditions;
 import android.support.v7.app.AlertDialog;
@@ -64,19 +65,11 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     private UpgradeClient upgradeClient;
     private boolean isRequestPermission;
 
+    @ColorInt
+    private int theme;
+
     private UpgradeDialog(@NonNull Context context) {
         super(context);
-        this.activity = (Activity) context;
-    }
-
-    private UpgradeDialog(@NonNull Context context, @StyleRes int themeResId) {
-        super(context, themeResId);
-        this.activity = (Activity) context;
-    }
-
-    private UpgradeDialog(@NonNull Context context, boolean cancelable,
-                          @Nullable OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
         this.activity = (Activity) context;
     }
 
@@ -117,12 +110,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setContentView(R.layout.dialog_upgrade);
         initView();
     }
 
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
+        theme = upgradeOptions.getTheme();
         upgradeClient = UpgradeClient.add(activity, upgradeOptions);
         upgradeClient.setOnConnectListener(new OnConnectListener() {
             @Override
@@ -215,7 +210,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             public void onError(UpgradeException e) {
                 btnProgress.setEnabled(true);
                 if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_INVALID) {
-                    btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
+                    btnProgress.setText(String.format("%1$s，%2$s",
+                            getString(R.string.message_install_package_invalid),
+                            getString(R.string.dialog_upgrade_btn_reset)));
+                }
+                if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT) {
+                    btnProgress.setText(String.format("%1$s，%2$s",
+                            getString(R.string.message_install_not_root),
+                            getString(R.string.dialog_upgrade_btn_reset)));
                 }
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ);
             }
@@ -223,10 +225,11 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             @Override
             public void onComplete() {
                 btnProgress.setEnabled(true);
-                btnProgress.setText(getString(R.string.dialog_upgrade_btn_launch));
+                btnProgress.setText(String.format("%1$s，%2$s",
+                        getString(R.string.message_install_complete),
+                        getString(R.string.dialog_upgrade_btn_launch)));
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ);
             }
-
         });
     }
 
@@ -283,6 +286,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     }
 
     private int getColorAccent() {
+        if (theme != 0) return theme;
         TypedValue typedValue = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
         return typedValue.data;
@@ -339,7 +343,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
         int red = (color & 0x00ff0000) >> 16;
         int green = (color & 0x0000ff00) >> 8;
         int blue = (color & 0x000000ff);
-        int[] colors = new int[]{getColorAccent(),
+        int[] colors = new int[]{color,
                 Color.argb(0x4d, red, green, blue)};
         int[][] states = new int[][]{
                 {android.R.attr.state_enabled, 0},

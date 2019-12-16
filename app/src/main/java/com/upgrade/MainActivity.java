@@ -85,9 +85,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 文件MD5（可选）
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
-                .setAutocleanEnabled(true)
+                .setAutocleanEnabled(false)
                 // 是否自动安装安装包（可选）
-                .setAutomountEnabled(true)
+                .setAutomountEnabled(false)
                 .build(), false);
     }
 
@@ -109,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 文件MD5（可选）
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
-                .setAutocleanEnabled(true)
+                .setAutocleanEnabled(false)
                 // 是否自动安装安装包（可选）
-                .setAutomountEnabled(true)
-                .build(), true);
+                .setAutomountEnabled(false)
+                .build(), false);
     }
 
     private void forceCheckUpdates() {

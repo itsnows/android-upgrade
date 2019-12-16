@@ -3,6 +3,8 @@ package com.itsnows.upgrade.model;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
+import org.json.JSONException;
+
 /**
  * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
@@ -40,6 +42,6 @@ public interface UpgradeDataSource {
      *
      * @param buffer
      */
-    void putUpgradeBuffer(UpgradeBuffer buffer);
+    void putUpgradeBuffer(UpgradeBuffer buffer) throws JSONException;
 
 }
