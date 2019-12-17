@@ -5,13 +5,17 @@
 ====
 1.升级模式支持普通升级、强制升级、灰度升级。<br>
 2.安装包下载支持 断点续传，分流下载，动态网络监听下载。<br>
-3.支持更新模板或自定义更新模板或下载链接<br>
-4.支持通知栏显示和对话框显示<br>
+3.支持更新模板或自定义更新模板（json或xml）或下载链接<br>
+4.支持通知栏显示和对话框显示（自定义主题）<br>
 5.支持android 4.2以上设备<br>
 
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297395.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297414.png) 
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297723.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573097.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573103.png) 
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573106.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573116.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573137.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573138.png)
+![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573246.png)
 
 依赖：
 ====
@@ -120,76 +124,54 @@ Add the dependency<br>
 // 自动检测更新
 UpgradeManager manager = new UpgradeManager(this);
 manager.checkForUpdates(new UpgradeOptions.Builder()
-                // 对话框主题（可选）
-                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
-                // 通知栏图标（可选）
-                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                // 通知栏标题（可选）
-                .setTitle("腾讯QQ")
-                // 通知栏描述（可选）
-                .setDescription("更新通知栏")
-                // 下载链接或更新文档链接
-                .setUrl("http://47.108.75.223:8020/doc/app-update.json")
-                // 下载文件存储路径（可选）
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线性下载（可选）
-                .setMultithreadEnabled(true)
-                // 线程池大小（可选）
-                .setMultithreadPools(10)
-                // 文件MD5（可选）
-                .setMd5(null)
-                // 是否自动删除安装包（可选）
-                .setAutocleanEnabled(false)
-                // 是否自动安装安装包（可选）
-                .setAutomountEnabled(false)
-                // 是否自动检测更新
-                .build(), true);
+       // 对话框主题（可选）
+       .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
+       // 通知栏图标（可选）
+       .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+       // 通知栏标题（可选）
+       .setTitle("腾讯QQ")
+       // 通知栏描述（可选）
+       .setDescription("更新通知栏")
+       // 下载链接或更新文档链接
+       .setUrl("http://47.108.75.223:8020/doc/app-update.json")
+       // 下载文件存储路径（可选）
+       .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+       // 是否支持多线性下载（可选）
+       .setMultithreadEnabled(true)
+       // 线程池大小（可选）
+       .setMultithreadPools(10)
+       // 文件MD5（可选）
+       .setMd5(null)
+       // 是否自动删除安装包（可选）
+       .setAutocleanEnabled(false)
+       // 是否自动安装安装包（可选）
+       .setAutomountEnabled(false)
+       // 是否自动检测更新
+       .build(), true);
 		
 // 手动检测更新
 manager.checkForUpdates(new UpgradeOptions.Builder()
-                // 对话框主题（可选）
-                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
-                // 通知栏图标（可选）
-                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                // 通知栏标题（可选）
-                .setTitle("腾讯QQ")
-                // 通知栏描述（可选）
-                .setDescription("更新通知栏")
-                // 下载链接或更新文档链接
-                .setUrl("http://47.108.75.223:8020/doc/app-update.json")
-                // 下载文件存储路径（可选）
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线性下载（可选）
-                .setMultithreadEnabled(true)
-                // 线程池大小（可选）
-                .setMultithreadPools(10)
-                // 文件MD5（可选）
-                .setMd5(null)
-                // 是否自动删除安装包（可选）
-                .setAutocleanEnabled(false)
-                // 是否自动安装安装包（可选）
-                .setAutomountEnabled(false)
-                // 是否自动检测更新
-                .build(), false);
+       .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+       .setTitle("腾讯QQ")
+       .setDescription("更新通知栏")
+       .setUrl("http://47.108.75.223:8020/doc/app-update.json")
+       .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+       .setMultithreadEnabled(true)
+       .setMultithreadPools(10)
+       .setMd5(null)
+       .build(), false);
 		
-// 直接调用下载安装包（无需更新文档）
+// 下载安装包（无需更新文档）
  manager.checkForUpdates(new UpgradeOptions.Builder()
-                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-                // 通知栏标题（可选）
-                .setTitle("腾讯QQ")
-                // 通知栏描述（可选）
-                .setDescription("更新通知栏")
-                // 下载链接或更新文档链接
-                .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
-                // 下载文件存储路径（可选）
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                // 是否支持多线程下载（可选）
-                .setMultithreadEnabled(true)
-                // 线程池大小（可选）
-                .setMultithreadPools(1)
-                // 文件MD5（可选）
-                .setMd5(null)
-                .build(), false);
+        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+        .setTitle("腾讯QQ")
+        .setDescription("更新通知栏")
+        .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+        .setMultithreadEnabled(true)
+        .setMultithreadPools(1)
+        .setMd5(null)
+        .build(), false);
 
 ```
 
