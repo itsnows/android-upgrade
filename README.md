@@ -7,7 +7,7 @@
 2.安装包下载支持 断点续传，分流下载，动态网络监听下载。<br>
 3.支持更新模板或自定义更新模板或下载链接<br>
 4.支持通知栏显示和对话框显示<br>
-5.支持Android 4.2以上所有设备<br>
+5.支持android 4.2以上设备<br>
 
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297395.png)
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1531297414.png) 
@@ -69,12 +69,12 @@ Add the dependency<br>
             <mode>1</mode>
             <!--log：更新说明-->
             <log>
-                <item>#新增通知栏开关</item>
-                <item>#新增卡包</item>
-                <item>#优化稳定性</item>
-                <item>#优化性能</item>
-                <item>#优化框架</item>
-                <item>#修复部分已知Bug</item>
+                <item>#升级模式支持普通升级、强制升级、灰度升级</item>
+                <item>#安装包下载支持 断点续传，分流下载，动态网络监听下载</item>
+                <item>#支持更新模板或自定义更新模板（json或xml）或下载链接</item>
+                <item>#支持通知栏显示和对话框显示（自定义主题）</item>
+                <item>#支持自定义对话框</item>
+                <item>#支持android 4.2以上设备</item>
             </log>
             <!--versionCode：新版App版本号-->
             <versionCode>5</versionCode>
@@ -120,13 +120,16 @@ Add the dependency<br>
 // 自动检测更新
 UpgradeManager manager = new UpgradeManager(this);
 manager.checkForUpdates(new UpgradeOptions.Builder()
+                // 对话框主题（可选）
+                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
+                // 通知栏图标（可选）
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 // 通知栏标题（可选）
                 .setTitle("腾讯QQ")
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                .setUrl("http://47.108.75.223:8020/doc/app-update.json")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -135,17 +138,25 @@ manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setMultithreadPools(10)
                 // 文件MD5（可选）
                 .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(false)
+                // 是否自动安装安装包（可选）
+                .setAutomountEnabled(false)
+                // 是否自动检测更新
                 .build(), true);
 		
 // 手动检测更新
 manager.checkForUpdates(new UpgradeOptions.Builder()
+                // 对话框主题（可选）
+                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
+                // 通知栏图标（可选）
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 // 通知栏标题（可选）
                 .setTitle("腾讯QQ")
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://www.rainen.cn/test/app-update-common.xml")
+                .setUrl("http://47.108.75.223:8020/doc/app-update.json")
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -154,6 +165,11 @@ manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setMultithreadPools(10)
                 // 文件MD5（可选）
                 .setMd5(null)
+                // 是否自动删除安装包（可选）
+                .setAutocleanEnabled(false)
+                // 是否自动安装安装包（可选）
+                .setAutomountEnabled(false)
+                // 是否自动检测更新
                 .build(), false);
 		
 // 直接调用下载安装包（无需更新文档）

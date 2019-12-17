@@ -254,9 +254,10 @@ public class UpgradeService extends Service {
 
         Intent intent = new Intent(context, UpgradeService.class);
         intent.putExtra(PARAMS_UPGRADE_OPTION, options);
-        if (!UpgradeUtil.isServiceRunning(context, UpgradeService.class.getName())) {
-            context.startService(intent);
+        if (UpgradeUtil.isServiceRunning(context, UpgradeService.class.getName())) {
+            Log.d(TAG, "UpgradeService is running");
         }
+        context.startService(intent);
         if (connection != null) {
             context.bindService(intent, connection, Context.BIND_ABOVE_CLIENT);
         }

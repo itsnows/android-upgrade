@@ -202,10 +202,10 @@ public class UpgradeManager {
                                     onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
                                     return;
                                 }
-                                upgrade.setStable(null);
-                                onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
-                                        .setUrl(upgrade.getBeta().getDownloadUrl())
-                                        .setMd5(upgrade.getBeta().getMd5())
+                                upgrade.setBeta(null);
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
+                                        .setUrl(upgrade.getStable().getDownloadUrl())
+                                        .setMd5(upgrade.getStable().getMd5())
                                         .build()));
                             }
                             return;
@@ -245,9 +245,9 @@ public class UpgradeManager {
                                 return;
                             }
                             upgrade.setStable(null);
-                            onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
-                                    .setUrl(upgrade.getStable().getDownloadUrl())
-                                    .setMd5(upgrade.getStable().getMd5())
+                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
+                                    .setUrl(upgrade.getBeta().getDownloadUrl())
+                                    .setMd5(upgrade.getBeta().getMd5())
                                     .build()));
                         }
                         return;

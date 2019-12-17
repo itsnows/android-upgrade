@@ -5,6 +5,8 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
@@ -46,6 +48,9 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
             + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + " INTEGER,PRIMARY KEY("
             + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "))";
 
+    private SQLiteDatabase db;
+    private AtomicBoolean closed;
+
     public UpgradeDBHelper(Context context) {
         this(context, DB_NAME, null, DB_VERSION);
     }
@@ -56,6 +61,7 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
 
     public UpgradeDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
         super(context, name, factory, version, errorHandler);
+        closed = new AtomicBoolean(true);
     }
 
     @Override
@@ -73,4 +79,20 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         super.onDowngrade(db, oldVersion, newVersion);
     }
+
+    @Override
+    public synchronized SQLiteDatabase getWritableDatabase() {
+        return super.getWritableDatabase();
+    }
+
+    @Override
+    public synchronized SQLiteDatabase getReadableDatabase() {
+        return super.getReadableDatabase();
+    }
+
+    @Override
+    public synchronized void close() {
+        super.close();
+    }
+
 }

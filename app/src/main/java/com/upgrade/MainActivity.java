@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.itsnows.upgrade.OnDownloadListener;
 import com.itsnows.upgrade.OnUpgradeListener;
 import com.itsnows.upgrade.UpgradeClient;
+import com.itsnows.upgrade.UpgradeConstant;
 import com.itsnows.upgrade.UpgradeException;
 import com.itsnows.upgrade.UpgradeManager;
 import com.itsnows.upgrade.UpgradeUtil;
@@ -65,6 +66,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     /**
      * 自动检测更新（稳定版：普通升级）
      */
@@ -101,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void commonCheckUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
-                .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
@@ -131,17 +136,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 默认检测更新（测试版：需要提供序列号，可自行测试）
+     * 自定义下载更新（自己实现逻辑代码、更新提示）
      */
     private void customerCheckUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
+                .setUrl("http://47.108.75.223:8020/doc/app-update.xml")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(10)
+                .setMultithreadPools(1)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
                 .setAutomountEnabled(true)
@@ -154,12 +159,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client) {
-
+                showUpgradeDialog(stable, client);
             }
 
             @Override
             public void onUpdateAvailable(Upgrade.Beta beta, UpgradeClient client) {
-                showUpgradeDialog(beta, client);
+
             }
 
             @Override
@@ -189,19 +194,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 显示更新提示（自定义提示）
      *
-     * @param beta   Upgrade.Stable
+     * @param stable Upgrade.Stable
      * @param client UpgradeClient
      */
-    private void showUpgradeDialog(Upgrade.Beta beta, final UpgradeClient client) {
+    private void showUpgradeDialog(Upgrade.Stable stable, final UpgradeClient client) {
         StringBuffer logs = new StringBuffer();
-        for (int i = 0; i < beta.getLogs().size(); i++) {
-            logs.append(beta.getLogs().get(i));
-            logs.append(i < beta.getLogs().size() - 1 ? "\n" : "");
+        for (int i = 0; i < stable.getLogs().size(); i++) {
+            logs.append(stable.getLogs().get(i));
+            logs.append(i < stable.getLogs().size() - 1 ? "\n" : "");
         }
 
         View view = View.inflate(this, R.layout.dialog_custom, null);
         TextView tvMessage = view.findViewById(R.id.tv_dialog_custom_message);
-        Button btnUpgrade = view.findViewById(R.id.btn_dialog_custom_upgrade);
+        final Button btnUpgrade = view.findViewById(R.id.btn_dialog_custom_upgrade);
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
                 .create();
@@ -256,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onComplete() {
-                dialog.dismiss();
+                btnUpgrade.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ);
                 Log.d(TAG, "onComplete");
             }
         });

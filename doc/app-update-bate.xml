@@ -9,12 +9,12 @@
         <mode>1</mode>
         <!--log：更新说明-->
         <log>
-            <item>#新增通知栏开关</item>
-            <item>#新增卡包</item>
-            <item>#优化稳定性</item>
-            <item>#优化性能</item>
-            <item>#优化框架</item>
-            <item>#修复部分已知Bug</item>
+            <item>#升级模式支持普通升级、强制升级、灰度升级</item>
+            <item>#安装包下载支持 断点续传，分流下载，动态网络监听下载</item>
+            <item>#支持更新模板或自定义更新模板（json或xml）或下载链接</item>
+            <item>##支持通知栏显示和对话框显示（自定义主题）</item>
+            <item>#支持自定义对话框</item>
+            <item>#支持android 4.2以上设备</item>
         </log>
         <!--versionCode：新版App版本号-->
         <versionCode>20</versionCode>

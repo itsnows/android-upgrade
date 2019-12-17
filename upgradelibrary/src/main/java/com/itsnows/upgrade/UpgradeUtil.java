@@ -49,6 +49,7 @@ public class UpgradeUtil {
      */
     public static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0x1024;
 
+
     /**
      * 判断申请外部存储所需权限
      *
