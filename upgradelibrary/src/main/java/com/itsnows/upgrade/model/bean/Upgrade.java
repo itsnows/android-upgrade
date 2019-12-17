@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -241,7 +240,7 @@ public class Upgrade implements Parcelable {
         BufferedReader bufferedReader = null;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(
-                    inputStream, StandardCharsets.UTF_8));
+                    inputStream, "utf-8"));
             String line = null;
             StringBuilder json = new StringBuilder();
             while ((line = bufferedReader.readLine()) != null) {
@@ -264,7 +263,8 @@ public class Upgrade implements Parcelable {
                 stable.setVersionName(androidStable.getString("versionName").trim());
                 stable.setDownloadUrl(androidStable.getString("downloadUrl").trim());
                 stable.setMd5(androidStable.getString("md5"));
-                stable.setMd5(stable.getMd5().isEmpty() ? null : stable.getMd5());
+                stable.setMd5("".equals(stable.getMd5())
+                        || "null".equals(stable.getMd5()) ? null : stable.getMd5());
                 upgrade.setStable(stable);
             }
             if (androidBeta != null) {
@@ -285,7 +285,8 @@ public class Upgrade implements Parcelable {
                 beta.setVersionName(androidBeta.getString("versionName").trim());
                 beta.setDownloadUrl(androidBeta.getString("downloadUrl").trim());
                 beta.setMd5(androidBeta.getString("md5"));
-                beta.setMd5(beta.getMd5().isEmpty() ? null : beta.getMd5());
+                beta.setMd5("".equals(beta.getMd5())
+                        || "null".equals(beta.getMd5()) ? null : beta.getMd5());
                 upgrade.setBeta(beta);
             }
             return upgrade;
