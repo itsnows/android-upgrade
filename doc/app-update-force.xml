@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<android>
+
+    <!--稳定版-->
+    <stable>
+        <!--date：更新日期-->
+        <date>2018-02-09</date>
+        <!--mode：更新模式 1普通 2强制-->
+        <mode>2</mode>
+        <!--log：更新说明-->
+        <log>
+            <item>#新增通知栏开关</item>
+            <item>#新增卡包</item>
+            <item>#优化稳定性</item>
+            <item>#优化性能</item>
+            <item>#优化框架</item>
+            <item>#修复部分已知Bug</item>
+        </log>
+        <!--versionCode：新版App版本号-->
+        <versionCode>5</versionCode>
+        <!--versionCode：新版App版本名称-->
+        <versionName>1.0.0.5</versionName>
+        <!--downloadUrl：新版App下载链接-->
+        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
+        </downloadUrl>
+        <!--md5：新版App安装包完整性-->
+        <md5></md5>
+    </stable>
+
+    <!--测试版-->
+    <beta>
+        <!--device：测试版设备序列号-->
+        <device>
+            <sn>JGB9K17928918126</sn>
+            <sn>BTFDU17113013878</sn>
+        </device>
+        <!--date：更新日期-->
+        <date>2018-02-09</date>
+        <!--mode：更新模式 1普通 2强制-->
+        <mode>2</mode>
+        <!--log：更新说明-->
+        <log>
+            <item>#内侧版本</item>
+        </log>
+        <!--versionCode：新版App版本号-->
+        <versionCode>5</versionCode>
+        <!--versionCode：新版App版本名称-->
+        <versionName>1.0.0.5</versionName>
+        <!--downloadUrl：新版App下载链接-->
+        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
+        </downloadUrl>
+        <!--md5：新版App安装包完整性-->
+        <md5></md5>
+    </beta>
+
+</android>
