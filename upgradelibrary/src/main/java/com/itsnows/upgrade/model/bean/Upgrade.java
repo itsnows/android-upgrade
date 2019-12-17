@@ -86,6 +86,9 @@ public class Upgrade implements Parcelable {
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setConnectTimeout(CONNECT_TIMEOUT);
             connection.setReadTimeout(READ_TIMEOUT);
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(false);
+            connection.setUseCaches(false);
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new ConnectException();
             }

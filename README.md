@@ -62,58 +62,55 @@ Add the dependency<br>
 <android>
 
     <!--稳定版-->
-    <stable>
-        <!--date：更新日期-->
-        <date>2018-02-09</date>
-        <!--mode：更新模式 1普通 2强制-->
-        <mode>1</mode>
-        <!--log：更新说明-->
-        <log>
-            <item>#新增商城模块（测试阶段，请勿付款）</item>
-            <item>#新增通知栏开关</item>
-            <item>#更换每日计步算法（由于开发组无华为P10设备，如还是偶发性数据异常情况，请华为P10用户出现问题请及时和我们反馈。）</item>
-            <item>#优化计步模块启动速度</item>
-            <item>#优化运动轨迹（定位偏差，GPS信号不好数据异常）</item>
-            <item>#优化闹钟稳定性</item>
-            <item>#优化App稳定性</item>
-            <item>#优化App性能</item>
-            <item>#优化App框架</item>
-            <item>#修复部分已知Bug</item>
-        </log>
-        <!--versionCode：新版App版本号-->
-        <versionCode>86</versionCode>
-        <!--versionCode：新版App版本名称-->
-        <versionName>1.0.8.6</versionName>
-        <!--downloadUrl：新版App下载链接-->
-        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</downloadUrl>
-        <!--md5：新版App安装包完整性-->
-        <md5></md5>
-    </stable>
+        <stable>
+            <!--date：更新日期-->
+            <date>2018-02-09</date>
+            <!--mode：更新模式 1普通 2强制-->
+            <mode>1</mode>
+            <!--log：更新说明-->
+            <log>
+                <item>#新增通知栏开关</item>
+                <item>#新增卡包</item>
+                <item>#优化稳定性</item>
+                <item>#优化性能</item>
+                <item>#优化框架</item>
+                <item>#修复部分已知Bug</item>
+            </log>
+            <!--versionCode：新版App版本号-->
+            <versionCode>5</versionCode>
+            <!--versionCode：新版App版本名称-->
+            <versionName>1.0.0.5</versionName>
+            <!--downloadUrl：新版App下载链接-->
+            <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
+            </downloadUrl>
+            <!--md5：新版App安装包完整性-->
+            <md5></md5>
+        </stable>
 
-    <!--测试版-->
-    <beta>
-        <!--device：测试版设备序列号-->
-        <device>
-            <sn>HGS847299SQSF4123</sn>
-            <sn>BGTE8567201292312</sn>
-        </device>
-        <!--date：更新日期-->
-        <date>2018-02-09</date>
-        <!--mode：更新模式 1普通 2强制-->
-        <mode>1</mode>
-        <!--log：更新说明-->
-        <log>
-            <item>#内侧版本</item>
-        </log>
-        <!--versionCode：新版App版本号-->
-        <versionCode>86</versionCode>
-        <!--versionCode：新版App版本名称-->
-        <versionName>1.0.8.6</versionName>
-        <!--downloadUrl：新版App下载链接-->
-        <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk</downloadUrl>
-        <!--md5：新版App安装包完整性-->
-        <md5></md5>
-    </beta>
+        <!--测试版-->
+        <beta>
+            <!--device：测试版设备序列号-->
+            <device>
+                <sn>JGB9K17928918126</sn>
+            </device>
+            <!--date：更新日期-->
+            <date>2018-02-09</date>
+            <!--mode：更新模式 1普通 2强制-->
+            <mode>1</mode>
+            <!--log：更新说明-->
+            <log>
+                <item>#内侧版本</item>
+            </log>
+            <!--versionCode：新版App版本号-->
+            <versionCode>5</versionCode>
+            <!--versionCode：新版App版本名称-->
+            <versionName>1.0.0.5</versionName>
+            <!--downloadUrl：新版App下载链接-->
+            <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
+            </downloadUrl>
+            <!--md5：新版App安装包完整性-->
+            <md5></md5>
+        </beta>
 
 </android>
 ```

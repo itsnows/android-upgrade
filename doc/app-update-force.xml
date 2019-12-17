@@ -17,9 +17,9 @@
             <item>#修复部分已知Bug</item>
         </log>
         <!--versionCode：新版App版本号-->
-        <versionCode>5</versionCode>
+        <versionCode>20</versionCode>
         <!--versionCode：新版App版本名称-->
-        <versionName>1.0.0.5</versionName>
+        <versionName>1.2.0</versionName>
         <!--downloadUrl：新版App下载链接-->
         <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
         </downloadUrl>
@@ -32,7 +32,6 @@
         <!--device：测试版设备序列号-->
         <device>
             <sn>JGB9K17928918126</sn>
-            <sn>BTFDU17113013878</sn>
         </device>
         <!--date：更新日期-->
         <date>2018-02-09</date>
@@ -43,9 +42,9 @@
             <item>#内侧版本</item>
         </log>
         <!--versionCode：新版App版本号-->
-        <versionCode>5</versionCode>
+        <versionCode>20</versionCode>
         <!--versionCode：新版App版本名称-->
-        <versionName>1.0.0.5</versionName>
+        <versionName>1.2.0</versionName>
         <!--downloadUrl：新版App下载链接-->
         <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
         </downloadUrl>

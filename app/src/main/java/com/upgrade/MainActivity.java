@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://47.108.75.223:8020/download/app-update.xml")
+                .setUrl("https://raw.githubusercontent.com/itsnows/android-upgrade/master/doc/app-update.xml")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)
