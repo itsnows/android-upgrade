@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -243,7 +244,7 @@ public class Upgrade implements Parcelable {
         BufferedReader bufferedReader = null;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(
-                    inputStream, "utf-8"));
+                    inputStream, StandardCharsets.UTF_8));
             String line = null;
             StringBuilder json = new StringBuilder();
             while ((line = bufferedReader.readLine()) != null) {
