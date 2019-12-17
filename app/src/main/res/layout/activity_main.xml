@@ -7,40 +7,40 @@
     tools:context="com.upgrade.MainActivity">
 
     <Button
-        android:id="@+id/button_check_updates_default_common"
+        android:id="@+id/btn_check_updates_default_common"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_check_updates_default_common_text" />
 
     <Button
-        android:id="@+id/button_check_updates_default_forced"
+        android:id="@+id/btn_check_updates_default_force"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_check_updates_default_forced_text" />
 
     <Button
-        android:id="@+id/button_check_updates_default_bate"
+        android:id="@+id/btn_check_updates_default_bate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="@string/button_check_updates_default_beta_text" />
 
     <Button
-        android:id="@+id/button_check_updates_custom"
+        android:id="@+id/btn_check_updates_custom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_check_updates_custom_text" />
 
     <Button
-        android:id="@+id/button_check_updates_custom_download"
+        android:id="@+id/btn_check_updates_custom_download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_check_updates_custom_download_text" />
 
     <Button
-        android:id="@+id/button_cancle"
+        android:id="@+id/btn_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_cancle_text" />
+        android:text="@string/button_cancel_text" />
 
 </LinearLayout>

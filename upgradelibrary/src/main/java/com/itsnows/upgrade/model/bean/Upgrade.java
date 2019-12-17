@@ -3,14 +3,19 @@ package com.itsnows.upgrade.model.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +89,10 @@ public class Upgrade implements Parcelable {
             connection.setReadTimeout(READ_TIMEOUT);
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new ConnectException();
+            }
+            String contentType = connection.getContentType();
+            if (contentType.contains("application/json")) {
+                return parserJson(connection.getInputStream());
             }
             return parserXml(connection.getInputStream());
         } finally {
@@ -220,6 +229,70 @@ public class Upgrade implements Parcelable {
             }
         }
         return upgrade;
+    }
+
+    /**
+     * 解析更新文档
+     *
+     * @param inputStream
+     * @return
+     */
+    public static Upgrade parserJson(InputStream inputStream) {
+        BufferedReader bufferedReader = null;
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(
+                    inputStream, StandardCharsets.UTF_8));
+            String line = null;
+            StringBuilder json = new StringBuilder();
+            while ((line = bufferedReader.readLine()) != null) {
+                json.append(line);
+            }
+            JSONObject android = new JSONObject(json.toString()).getJSONObject("android");
+            JSONObject androidStable = android.getJSONObject("stable");
+            JSONObject androidBeta = android.getJSONObject("beta");
+            Upgrade upgrade = new Upgrade();
+            if (androidStable != null) {
+                Stable stable = new Stable();
+                stable.setDate(androidStable.getString("date").trim());
+                stable.setMode(androidStable.getInt("mode"));
+                stable.setLogs(new ArrayList<String>());
+                JSONArray log = androidStable.getJSONArray("log");
+                for (int i = 0; log != null && i < log.length(); i++) {
+                    stable.getLogs().add(log.getString(i).trim());
+                }
+                stable.setVersionCode(androidStable.getInt("versionCode"));
+                stable.setVersionName(androidStable.getString("versionName").trim());
+                stable.setDownloadUrl(androidStable.getString("downloadUrl").trim());
+                stable.setMd5(androidStable.getString("md5"));
+                stable.setMd5(stable.getMd5().isEmpty() ? null : stable.getMd5());
+                upgrade.setStable(stable);
+            }
+            if (androidBeta != null) {
+                Beta beta = new Beta();
+                beta.setDevice(new ArrayList<String>());
+                JSONArray device = androidBeta.getJSONArray("device");
+                for (int i = 0; device != null && i < device.length(); i++) {
+                    beta.getDevice().add(device.getString(i));
+                }
+                beta.setDate(androidBeta.getString("date").trim());
+                beta.setMode(androidBeta.getInt("mode"));
+                beta.setLogs(new ArrayList<String>());
+                JSONArray log = androidBeta.getJSONArray("log");
+                for (int i = 0; log != null && i < log.length(); i++) {
+                    beta.getLogs().add(log.getString(i).trim());
+                }
+                beta.setVersionCode(androidBeta.getInt("versionCode"));
+                beta.setVersionName(androidBeta.getString("versionName").trim());
+                beta.setDownloadUrl(androidBeta.getString("downloadUrl").trim());
+                beta.setMd5(androidBeta.getString("md5"));
+                beta.setMd5(beta.getMd5().isEmpty() ? null : beta.getMd5());
+                upgrade.setBeta(beta);
+            }
+            return upgrade;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Stable getStable() {

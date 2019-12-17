@@ -9,21 +9,17 @@
         <mode>1</mode>
         <!--log：更新说明-->
         <log>
-            <item>#新增商城模块（测试阶段，请勿付款）</item>
             <item>#新增通知栏开关</item>
-            <item>#更换每日计步算法（由于开发组无华为P10设备，如还是偶发性数据异常情况，请华为P10用户出现问题请及时和我们反馈。）</item>
-            <item>#优化计步模块启动速度</item>
-            <item>#优化运动轨迹（定位偏差，GPS信号不好数据异常）</item>
-            <item>#优化闹钟稳定性</item>
-            <item>#优化App稳定性</item>
-            <item>#优化App性能</item>
-            <item>#优化App框架</item>
+            <item>#新增卡包</item>
+            <item>#优化稳定性</item>
+            <item>#优化性能</item>
+            <item>#优化框架</item>
             <item>#修复部分已知Bug</item>
         </log>
         <!--versionCode：新版App版本号-->
-        <versionCode>86</versionCode>
+        <versionCode>5</versionCode>
         <!--versionCode：新版App版本名称-->
-        <versionName>1.0.8.6</versionName>
+        <versionName>1.0.0.5</versionName>
         <!--downloadUrl：新版App下载链接-->
         <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
         </downloadUrl>
@@ -37,16 +33,6 @@
         <device>
             <sn>JGB9K17928918126</sn>
             <sn>BTFDU17113013878</sn>
-            <sn>RSIZAINFYSFASKCE</sn>
-            <sn>3a2c55a</sn>
-            <sn>RV8G303QPPD</sn>
-            <sn>AYKNW17C13006681</sn>
-            <sn>f4e3d8e9</sn>
-            <sn>73ead6d60804</sn>
-            <sn>621QEDQ93W5JA</sn>
-            <sn>7eb8859</sn>
-            <sn>LKX7N18105004066</sn>
-            <sn>08776ae70703</sn>
         </device>
         <!--date：更新日期-->
         <date>2018-02-09</date>
@@ -57,9 +43,9 @@
             <item>#内侧版本</item>
         </log>
         <!--versionCode：新版App版本号-->
-        <versionCode>86</versionCode>
+        <versionCode>5</versionCode>
         <!--versionCode：新版App版本名称-->
-        <versionName>1.0.8.6</versionName>
+        <versionName>1.0.0.5</versionName>
         <!--downloadUrl：新版App下载链接-->
         <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
         </downloadUrl>

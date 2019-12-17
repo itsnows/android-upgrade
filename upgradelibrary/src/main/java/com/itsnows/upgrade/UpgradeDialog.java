@@ -216,7 +216,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 }
                 if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT) {
                     btnProgress.setText(String.format("%1$s，%2$s",
-                            getString(R.string.message_install_not_root),
+                            getString(R.string.message_install_device_not_root),
                             getString(R.string.dialog_upgrade_btn_reset)));
                 }
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ);

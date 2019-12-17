@@ -5,5 +5,5 @@
     <string name="button_check_updates_default_beta_text">默认检测更新（测试版：需要提供序列号，可自行测试）</string>
     <string name="button_check_updates_custom_text">自定义检测更新（自己实现更新提示）</string>
     <string name="button_check_updates_custom_download_text">自定义下载更新（自己实现逻辑代码、更新提示）</string>
-    <string name="button_cancle_text">取消</string>
+    <string name="button_cancel_text">取消</string>
 </resources>

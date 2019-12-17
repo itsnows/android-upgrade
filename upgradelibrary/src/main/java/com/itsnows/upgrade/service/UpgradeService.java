@@ -139,7 +139,7 @@ public class UpgradeService extends Service {
     /**
      * 延时
      */
-    private static final int DELAY = 400;
+    private static final int DELAY = 200;
 
     /**
      * 升级进度通知栏
@@ -747,7 +747,7 @@ public class UpgradeService extends Service {
                         return;
                     }
                     if (msg.arg1 == UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT) {
-                        service.setNotify(service.getString(R.string.message_install_not_root));
+                        service.setNotify(service.getString(R.string.message_install_device_not_root));
                         response.putInt("code", UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT);
                         service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
                         return;

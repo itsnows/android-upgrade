@@ -114,12 +114,10 @@ public class UpgradeManager {
                 if (upgradeOptions.getUrl() != null && upgradeOptions.getUrl().endsWith(".apk")) {
                     return message;
                 }
-                if (upgradeOptions.getUrl() != null && upgradeOptions.getUrl().endsWith(".xml")) {
-                    Upgrade upgrade = Upgrade.parser(upgradeOptions.getUrl());
-                    if (upgrade != null) {
-                        message.getData().putParcelable("upgrade", upgrade);
-                        return message;
-                    }
+                Upgrade upgrade = Upgrade.parser(upgradeOptions.getUrl());
+                if (upgrade != null) {
+                    message.getData().putParcelable("upgrade", upgrade);
+                    return message;
                 }
                 throw new IllegalArgumentException("Url：" + upgradeOptions.getUrl() + " link error");
             } catch (Exception e) {
