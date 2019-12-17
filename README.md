@@ -13,7 +13,6 @@
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573103.png) 
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573106.png)
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573116.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573137.png)
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573138.png)
 ![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573246.png)
 
