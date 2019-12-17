@@ -35,8 +35,8 @@ import java.io.File;
  * 支持：动态网络监听下载
  * 支持：8.0 适配
  * <p>
- * 更新文档模板路径：../android-upgrade/upgradelibrary/app-update.xml
- * 更新文档模板路径：../android-upgrade/upgradelibrary/app-update.json
+ * 更新文档模板路径：../doc/app-update.xml
+ * 更新文档模板路径：../doc/app-update.json
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
