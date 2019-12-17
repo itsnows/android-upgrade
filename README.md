@@ -34,7 +34,7 @@ allprojects {
 Add the dependency<br>
 ```groovy
 dependencies {
-	        compile 'com.github.itsnows:android-upgrade:1.1.4'
+	        compile 'com.github.itsnows:android-upgrade:release'
 	}
 ```
 Or Maven:<br>
