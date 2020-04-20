@@ -10,12 +10,13 @@
 4.支持通知栏显示和对话框显示（自定义主题）<br>
 5.支持android 4.2以上设备<br>
 
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573097.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573103.png) 
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573106.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573116.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573138.png)
-![](https://github.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1576573246.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587388932.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587388940.png) 
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587388958.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587389103.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587389107.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587389259.png)
+![](https://gitee.com/itsnows/android-upgrade/raw/master/gif/Screenshot_1587389274.png)
 
 依赖：
 ====

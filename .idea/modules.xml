@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/android-upgrade.iml" filepath="$PROJECT_DIR$/android-upgrade.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" filepath="$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-upgrade.iml" filepath="$PROJECT_DIR$/android-upgrade.iml" group="android-upgrade" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="android-upgrade/app" />
+      <module fileurl="file://$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" filepath="$PROJECT_DIR$/upgradelibrary/upgradelibrary.iml" group="android-upgrade/upgradelibrary" />
     </modules>
   </component>
 </project>

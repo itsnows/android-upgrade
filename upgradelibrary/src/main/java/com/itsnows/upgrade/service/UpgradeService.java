@@ -702,10 +702,11 @@ public class UpgradeService extends Service {
                     service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_START_RESP, response);
                     break;
                 case STATUS_DOWNLOAD_PROGRESS:
-                    service.setNotify(UpgradeUtil.formatByte(service.progress.get()) + "/" +
+                    long progress = service.progress.longValue();
+                    service.setNotify(UpgradeUtil.formatByte(progress) + "/" +
                             UpgradeUtil.formatByte(service.maxProgress));
                     response.putLong("max", service.maxProgress);
-                    response.putLong("progress", service.progress.get());
+                    response.putLong("progress", progress);
                     service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_RESP, response);
                     break;
                 case STATUS_DOWNLOAD_PAUSE:
