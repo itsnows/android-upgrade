@@ -36,7 +36,7 @@ import java.io.File;
  * 支持：动态网络监听下载
  * 支持：自动安装（root权限）
  * 支持：自动清除安装包
- * 支持：8.0 适配
+ * 支持：10.0 适配
  * <p>
  * 更新文档模板路径：../doc/app-update.xml
  * 更新文档模板路径：../doc/app-update.json
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                client.remove();
+                client.death();
             }
         });
 
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                client.remove();
+                client.death();
             }
         });
         dialog.show();

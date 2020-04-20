@@ -38,13 +38,13 @@ public class UpgradeClient {
     private boolean isConnected;
 
     /**
-     * 添加客户端实例，同时绑定活动
+     * 附加客户端实例，同时绑定活动
      *
      * @param context
      * @param options
      * @return
      */
-    public static UpgradeClient add(Context context, UpgradeOptions options) {
+    public static UpgradeClient attach(Context context, UpgradeOptions options) {
         if (context == null) {
             throw new IllegalArgumentException("Context can not be null");
         }
@@ -88,7 +88,7 @@ public class UpgradeClient {
     /**
      * 销毁客户端实例，同时解除绑定活动
      */
-    public void remove() {
+    public void death() {
         disconnect();
     }
 
@@ -285,10 +285,10 @@ public class UpgradeClient {
                         client.onDownloadListener.onComplete();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_CHECK_RESP:
-                    Log.d(TAG, "Install：onCheck");
+                case UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_RESP:
+                    Log.d(TAG, "Install：onValidate");
                     if (client.onInstallListener != null) {
-                        client.onInstallListener.onCheck();
+                        client.onInstallListener.onValidate();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_START_RESP:

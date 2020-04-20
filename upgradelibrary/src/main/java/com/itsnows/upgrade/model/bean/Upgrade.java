@@ -10,6 +10,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
@@ -82,25 +85,41 @@ public class Upgrade implements Parcelable {
      * @throws Exception
      */
     public static Upgrade parser(String url) throws Exception {
-        HttpURLConnection connection = null;
+        HttpURLConnection conn = null;
         try {
-            connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setConnectTimeout(CONNECT_TIMEOUT);
-            connection.setReadTimeout(READ_TIMEOUT);
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(false);
-            connection.setUseCaches(false);
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setConnectTimeout(CONNECT_TIMEOUT);
+            conn.setReadTimeout(READ_TIMEOUT);
+            conn.setDoOutput(false);
+            conn.setUseCaches(false);
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new ConnectException();
             }
-            String contentType = connection.getContentType();
-            if (contentType.contains("application/json")) {
-                return parserJson(connection.getInputStream());
+            InputStream readerStream = conn.getInputStream();
+            ByteArrayOutputStream bufferStream = new ByteArrayOutputStream();
+            int len = -1;
+            int tmp = -1;
+            byte[] buf = new byte[8096];
+            while ((tmp = readerStream.read(buf)) != -1) {
+                len += tmp;
+                if (len > 1024 * 1024) {
+                    throw new IOException("Update document content length cannot greater than 1024KB.");
+                }
+                bufferStream.write(buf, 0, tmp);
             }
-            return parserXml(connection.getInputStream());
+            readerStream.close();
+            byte[] buffer = bufferStream.toByteArray();
+            String str = new String(buffer, StandardCharsets.UTF_8).trim();
+            str = str.substring(0, Math.min(str.length(), 2));
+            if (str.contains("[") || str.contains("{")) {
+                return parserJson(new ByteArrayInputStream(buffer));
+            } else if (str.contains("<")) {
+                return parserXml(new ByteArrayInputStream(buffer));
+            }
+            throw new IOException("Upgrade document format not supported.");
         } finally {
-            if (connection != null) {
-                connection.disconnect();
+            if (conn != null) {
+                conn.disconnect();
             }
         }
     }
@@ -243,8 +262,7 @@ public class Upgrade implements Parcelable {
     public static Upgrade parserJson(InputStream inputStream) {
         BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(
-                    inputStream, StandardCharsets.UTF_8));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line = null;
             StringBuilder json = new StringBuilder();
             while ((line = bufferedReader.readLine()) != null) {

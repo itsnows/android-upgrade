@@ -63,8 +63,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("deprecation")
 public class UpgradeService extends Service {
-    private static final String TAG = UpgradeService.class.getSimpleName();
-    private static final String PARAMS_UPGRADE_OPTION = "upgrade_option";
+    static final String TAG = UpgradeService.class.getSimpleName();
+    static final String PARAMS_UPGRADE_OPTION = "upgrade_option";
 
     /**
      * 连接超时时长
@@ -109,7 +109,7 @@ public class UpgradeService extends Service {
     /**
      * 安装效验
      */
-    private static final int STATUS_INSTALL_CHECK = 0x2001;
+    private static final int STATUS_INSTALL_VALIDATE = 0x2001;
 
     /**
      * 安装开始
@@ -728,9 +728,9 @@ public class UpgradeService extends Service {
                         service.install();
                     }
                     break;
-                case STATUS_INSTALL_CHECK:
-                    service.setNotify(service.getString(R.string.message_install_check));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_CHECK_RESP, response);
+                case STATUS_INSTALL_VALIDATE:
+                    service.setNotify(service.getString(R.string.message_install_validate));
+                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_RESP, response);
                     break;
                 case STATUS_INSTALL_START:
                     service.setNotify(service.getString(R.string.message_install_start));
@@ -742,14 +742,18 @@ public class UpgradeService extends Service {
                     break;
                 case STATUS_INSTALL_ERROR:
                     if (msg.arg1 == UpgradeException.ERROR_CODE_PACKAGE_INVALID) {
-                        service.setNotify(service.getString(R.string.message_install_package_invalid));
+                        service.setNotify(String.format("%1$s，%2$s",
+                                service.getString(R.string.message_install_package_invalid),
+                                service.getString(R.string.dialog_upgrade_btn_reset)));
                         response.putInt("code", UpgradeException.ERROR_CODE_PACKAGE_INVALID);
                         service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
                         return;
                     }
-                    if (msg.arg1 == UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT) {
-                        service.setNotify(service.getString(R.string.message_install_device_not_root));
-                        response.putInt("code", UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT);
+                    if (msg.arg1 == UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL) {
+                        service.setNotify(String.format("%1$s，%2$s",
+                                service.getString(R.string.message_install_error),
+                                service.getString(R.string.dialog_upgrade_btn_reset)));
+                        response.putInt("code", UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL);
                         service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
                         return;
                     }
@@ -875,21 +879,21 @@ public class UpgradeService extends Service {
          * @return
          */
         private long length(String url) throws IOException {
-            HttpURLConnection readConnection = null;
+            HttpURLConnection con = null;
             try {
-                readConnection = (HttpURLConnection) new URL(url).openConnection();
-                readConnection.setRequestMethod("GET");
-                readConnection.setDoInput(true);
-                readConnection.setDoOutput(false);
-                readConnection.setConnectTimeout(CONNECT_TIMEOUT);
-                readConnection.setReadTimeout(READ_TIMEOUT);
-                readConnection.connect();
-                if (readConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    return readConnection.getContentLength();
+                con = (HttpURLConnection) new URL(url).openConnection();
+                con.setRequestMethod("GET");
+                con.setDoInput(true);
+                con.setDoOutput(false);
+                con.setConnectTimeout(CONNECT_TIMEOUT);
+                con.setReadTimeout(READ_TIMEOUT);
+                con.connect();
+                if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    return con.getContentLength();
                 }
             } finally {
-                if (readConnection != null) {
-                    readConnection.disconnect();
+                if (con != null) {
+                    con.disconnect();
                 }
             }
             return -1;
@@ -935,7 +939,6 @@ public class UpgradeService extends Service {
             Log.d(TAG, "DownloadThread initialized");
         }
 
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         public void run() {
             super.run();
@@ -1078,16 +1081,18 @@ public class UpgradeService extends Service {
      * 安装线程
      */
     private class InstallThread extends Thread {
-        private Timer timer;
 
         @Override
         public void run() {
             super.run();
             try {
                 if (upgradeOption.getMd5() != null) {
-                    status = STATUS_INSTALL_CHECK;
-                    messageHandler.sendEmptyMessage(STATUS_INSTALL_CHECK);
-                    if (!check()) {
+                    status = STATUS_INSTALL_VALIDATE;
+                    messageHandler.sendEmptyMessage(STATUS_INSTALL_VALIDATE);
+                    if (!validate()) {
+                        if (upgradeOption.getStorage().exists()) {
+                            upgradeOption.getStorage().delete();
+                        }
                         status = STATUS_INSTALL_ERROR;
                         Message message = new Message();
                         message.what = status;
@@ -1104,8 +1109,9 @@ public class UpgradeService extends Service {
                     if (!success) {
                         Message message = Message.obtain();
                         message.what = status = STATUS_INSTALL_ERROR;
-                        message.arg1 = UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT;
+                        message.arg1 = UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL;
                         messageHandler.sendMessage(message);
+                        UpgradeUtil.installApk(UpgradeService.this, upgradeOption.getStorage().getPath());
                         return;
                     }
                     status = STATUS_INSTALL_COMPLETE;
@@ -1113,19 +1119,18 @@ public class UpgradeService extends Service {
                     return;
                 }
                 UpgradeUtil.installApk(UpgradeService.this, upgradeOption.getStorage().getPath());
-                // startTimer();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         /**
-         * 检测文件完整性
+         * 效验文件完整性
          *
          * @return
          */
         @SuppressWarnings("TryFinallyCanBeTryWithResources")
-        private boolean check() throws IOException {
+        private boolean validate() throws IOException {
             MessageDigest messageDigest = null;
             FileInputStream fileInputStream = null;
             try {
@@ -1146,36 +1151,6 @@ public class UpgradeService extends Service {
                 }
             }
             return false;
-        }
-
-        /**
-         * 开始检测安装计时器
-         */
-        private void startTimer() {
-            if (timer != null) {
-                timer = null;
-            }
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (UpgradeUtil.isActivityTop(UpgradeService.this, getPackageName())) {
-                        status = STATUS_INSTALL_CANCEL;
-                        messageHandler.sendEmptyMessage(STATUS_INSTALL_CANCEL);
-                        stopTimer();
-                    }
-                }
-            }, 3000, 1000);
-        }
-
-        /**
-         * 结束检测安装计时器
-         */
-        private void stopTimer() {
-            if (timer != null) {
-                timer.cancel();
-            }
-            timer = null;
         }
     }
 

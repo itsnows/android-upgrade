@@ -160,8 +160,9 @@ Add the dependency<br>
 
 3.代码调用<br>
 ```java
-// 自动检测更新
 UpgradeManager manager = new UpgradeManager(this);
+
+// 自动检测更新
 manager.checkForUpdates(new UpgradeOptions.Builder()
        // 对话框主题（可选）
        .setTheme(ContextCompat.getColor(this, R.color.colorPrimary))

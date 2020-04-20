@@ -66,8 +66,8 @@ public class UpgradeConstant {
     /**
      * 安装效验
      */
-    public static final int MSG_KEY_INSTALL_CHECK_REQ = 0x2091;
-    public static final int MSG_KEY_INSTALL_CHECK_RESP = 0x2092;
+    public static final int MSG_KEY_INSTALL_VALIDATE_REQ = 0x2091;
+    public static final int MSG_KEY_INSTALL_VALIDATE_RESP = 0x2092;
 
     /**
      * 安装开始

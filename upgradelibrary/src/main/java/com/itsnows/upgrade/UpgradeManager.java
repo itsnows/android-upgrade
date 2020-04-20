@@ -38,8 +38,8 @@ public class UpgradeManager {
     /**
      * 检测更新
      *
-     * @param options     更新选项
-     * @param isAuto 是否自动检测更新
+     * @param options 更新选项
+     * @param isAuto  是否自动检测更新
      */
     @SuppressLint("RestrictedApi")
     public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAuto) {
@@ -158,11 +158,11 @@ public class UpgradeManager {
                 case RESULT_CODE_TRUE:
                     if (upgrade == null) {
                         if (message.obj == null || message.obj instanceof Boolean) {
-                            UpgradeClient.add(activity, builder.build()).start();
+                            UpgradeClient.attach(activity, builder.build()).start();
                             return;
                         }
                         OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                        onUpgradeListener.onUpdateAvailable(UpgradeClient.add(activity, builder.build()));
+                        onUpgradeListener.onUpdateAvailable(UpgradeClient.attach(activity, builder.build()));
                         return;
                     }
                     if (upgrade.getStable() != null && upgrade.getBeta() != null) {
@@ -203,7 +203,7 @@ public class UpgradeManager {
                                     return;
                                 }
                                 upgrade.setBeta(null);
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
+                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.attach(activity, builder
                                         .setUrl(upgrade.getStable().getDownloadUrl())
                                         .setMd5(upgrade.getStable().getMd5())
                                         .build()));
@@ -245,7 +245,7 @@ public class UpgradeManager {
                                 return;
                             }
                             upgrade.setStable(null);
-                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
+                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.attach(activity, builder
                                     .setUrl(upgrade.getBeta().getDownloadUrl())
                                     .setMd5(upgrade.getBeta().getMd5())
                                     .build()));
@@ -297,7 +297,7 @@ public class UpgradeManager {
                                 onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
                                 return;
                             }
-                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
+                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.attach(activity, builder
                                     .setUrl(upgrade.getBeta().getDownloadUrl())
                                     .setMd5(upgrade.getBeta().getMd5())
                                     .build()));
@@ -331,7 +331,7 @@ public class UpgradeManager {
                                 onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
                                 return;
                             }
-                            onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
+                            onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.attach(activity, builder
                                     .setUrl(upgrade.getStable().getDownloadUrl())
                                     .setMd5(upgrade.getStable().getMd5())
                                     .build()));

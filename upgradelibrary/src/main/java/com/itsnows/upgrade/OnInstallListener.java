@@ -9,7 +9,7 @@ package com.itsnows.upgrade;
  */
 public interface OnInstallListener {
 
-    void onCheck();
+    void onValidate();
 
     void onStart();
 

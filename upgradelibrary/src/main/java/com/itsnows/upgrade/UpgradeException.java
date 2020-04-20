@@ -17,9 +17,9 @@ public class UpgradeException extends IOException {
     public static final int ERROR_CODE_PACKAGE_INVALID = 10020;
 
     /**
-     * 设备无root权限
+     * 后台安装失败
      */
-    public static final int ERROR_CODE_PACKAGE_NO_ROOT = 10050;
+    public static final int ERROR_CODE_BACKGROUND_INSTALL_FAIL = 10050;
 
     /**
      * 未知错误

@@ -30,13 +30,12 @@
     <string name="message_download_cancel">下载取消</string>
     <string name="message_download_error">下载出错</string>
     <string name="message_download_complete">下载完成</string>
-    <string name="message_install_check">安装包效验中&#8230;</string>
+    <string name="message_install_validate">安装包效验中&#8230;</string>
     <string name="message_install_start">安装中&#8230;</string>
-    <string name="message_install_error">安装出错</string>
+    <string name="message_install_error">安装失败</string>
     <string name="message_install_complete">安装完成</string>
     <string name="message_install_cancel">安装取消</string>
     <string name="message_install_package_invalid">安装包无效</string>
     <string name="message_install_package_delete">安装已完成，自动删除安装包</string>
-    <string name="message_install_device_not_root">设备无root权限</string>
 
 </resources>

@@ -116,7 +116,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
         this.upgrade = upgrade;
         theme = upgradeOptions.getTheme();
-        upgradeClient = UpgradeClient.add(activity, upgradeOptions);
+        upgradeClient = UpgradeClient.attach(activity, upgradeOptions);
         upgradeClient.setOnConnectListener(new OnConnectListener() {
             @Override
             public void onConnected() {
@@ -184,10 +184,10 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
         upgradeClient.setOnInstallListener(new OnInstallListener() {
 
             @Override
-            public void onCheck() {
+            public void onValidate() {
                 btnProgress.setEnabled(false);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_check));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_CHECK_REQ);
+                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_REQ);
             }
 
             @Override
@@ -212,9 +212,9 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                             getString(R.string.message_install_package_invalid),
                             getString(R.string.dialog_upgrade_btn_reset)));
                 }
-                if (e.getCode() == UpgradeException.ERROR_CODE_PACKAGE_NO_ROOT) {
+                if (e.getCode() == UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL) {
                     btnProgress.setText(String.format("%1$s，%2$s",
-                            getString(R.string.message_install_device_not_root),
+                            getString(R.string.message_install_error),
                             getString(R.string.dialog_upgrade_btn_reset)));
                 }
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ);
@@ -480,7 +480,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     @Override
     public void dismiss() {
         super.dismiss();
-        upgradeClient.remove();
+        upgradeClient.death();
     }
 
     @Override
