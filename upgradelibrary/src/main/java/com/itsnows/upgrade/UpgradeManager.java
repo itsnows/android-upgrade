@@ -39,11 +39,11 @@ public class UpgradeManager {
      * 检测更新
      *
      * @param options     更新选项
-     * @param isAutoCheck 是否自动检测更新
+     * @param isAuto 是否自动检测更新
      */
     @SuppressLint("RestrictedApi")
-    public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAutoCheck) {
-        execute(Preconditions.checkNotNull(options), isAutoCheck);
+    public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAuto) {
+        execute(Preconditions.checkNotNull(options), isAuto);
     }
 
     /**

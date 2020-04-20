@@ -22,7 +22,6 @@
         android:id="@+id/btn_check_updates_default_bate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
         android:text="@string/button_check_updates_default_beta_text" />
 
     <Button

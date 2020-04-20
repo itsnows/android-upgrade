@@ -4,7 +4,8 @@
 简介：
 ====
 1.升级模式支持普通升级、强制升级、灰度升级。<br>
-2.安装包下载支持 断点续传，分流下载，动态网络监听下载。<br>
+2.下载支持 断点续传、分流下载、动态网络监听下载。<br>
+2.安装支持 自动安装申请sd卡和安装权限、自动安装（root权限）、自动清除安装包。<br>
 3.支持更新模板或自定义更新模板（json或xml）或下载链接<br>
 4.支持通知栏显示和对话框显示（自定义主题）<br>
 5.支持android 4.2以上设备<br>
@@ -59,7 +60,7 @@ Add the dependency<br>
 使用：
 ====
 
-1.更新文档<br>
+1.更新文档（xml）<br>
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android>
@@ -73,8 +74,8 @@ Add the dependency<br>
             <!--log：更新说明-->
             <log>
                 <item>#升级模式支持普通升级、强制升级、灰度升级</item>
-                <item>#安装包下载支持 断点续传，分流下载，动态网络监听下载</item>
-                <item>#支持更新模板或自定义更新模板（json或xml）或下载链接</item>
+                <item>#下载支持断点续传、分流下载、动态网络监听下载</item>
+                <item>#安装支持自动安装申请sd卡和安装权限、自动安装（root权限）、自动清除安装包</item>
                 <item>#支持通知栏显示和对话框显示（自定义主题）</item>
                 <item>#支持自定义对话框</item>
                 <item>#支持android 4.2以上设备</item>
@@ -118,7 +119,46 @@ Add the dependency<br>
 </android>
 ```
 
-2.代码调用<br>
+2.更新文档（json）<br>
+```json
+{
+  "android": {
+    "stable": {
+      "date": "2018-02-09",
+      "mode": 1,
+      "log": [
+        "#升级模式支持普通升级、强制升级、灰度升级",
+        "#下载支持断点续传、分流下载、动态网络监听下载",
+        "#安装支持自动安装申请sd卡和安装权限、自动安装（root权限）、自动清除安装包",
+        "#支持更新模板或自定义更新模板（json或xml）或下载链接",
+        "#支持通知栏显示和对话框显示（自定义主题）",
+        "#支持自定义对话框",
+        "#支持android 4.2以上设备"
+      ],
+      "versionCode": 20,
+      "versionName": "1.2.0",
+      "downloadUrl": "http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk",
+      "md5": null
+    },
+    "beta": {
+      "device": [
+        "JGB9K17928918126"
+      ],
+      "date": "2018-02-09",
+      "mode": 1,
+      "log": [
+        "#内侧版本"
+      ],
+      "versionCode": 20,
+      "versionName": "1.2.0",
+      "downloadUrl": "http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk",
+      "md5": null
+    }
+  }
+}
+```
+
+3.代码调用<br>
 ```java
 // 自动检测更新
 UpgradeManager manager = new UpgradeManager(this);
@@ -132,7 +172,7 @@ manager.checkForUpdates(new UpgradeOptions.Builder()
        // 通知栏描述（可选）
        .setDescription("更新通知栏")
        // 下载链接或更新文档链接
-       .setUrl("http://47.108.75.223:8020/doc/app-update.json")
+       .setUrl("https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.json")
        // 下载文件存储路径（可选）
        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
        // 是否支持多线性下载（可选）
@@ -153,24 +193,64 @@ manager.checkForUpdates(new UpgradeOptions.Builder()
        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
        .setTitle("腾讯QQ")
        .setDescription("更新通知栏")
-       .setUrl("http://47.108.75.223:8020/doc/app-update.json")
+       .setUrl("https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.json")
        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
        .setMultithreadEnabled(true)
-       .setMultithreadPools(10)
+       .setMultithreadPools(1)
+       .build(), true);
+
+// 自定义下载更新
+manager.checkForUpdates(new UpgradeOptions.Builder()
+       .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+       .setTitle("腾讯QQ")
+       .setDescription("更新通知栏")
+       .setUrl("https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.json")
+       .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+       .setMultithreadEnabled(true)
+       .setMultithreadPools(1)
        .setMd5(null)
-       .build(), false);
+       .setAutocleanEnabled(true)
+       .setAutomountEnabled(true)
+       .build(), new OnUpgradeListener() {
+
+            // 安装包下载（无需更新文档）
+            @Override
+            public void onUpdateAvailable(UpgradeClient client) {
+
+            }
+
+            // 发布版本
+            @Override
+            public void onUpdateAvailable(Upgrade.Stable stable, UpgradeClient client) {
+            }
+
+            // 测试版本
+            @Override
+            public void onUpdateAvailable(Upgrade.Beta beta, UpgradeClient client) {
+
+            }
+
+            // 没有可用的更新
+            @Override
+            public void onNoUpdateAvailable(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
 		
 // 下载安装包（无需更新文档）
- manager.checkForUpdates(new UpgradeOptions.Builder()
-        .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
-        .setTitle("腾讯QQ")
-        .setDescription("更新通知栏")
-        .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
-        .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-        .setMultithreadEnabled(true)
-        .setMultithreadPools(1)
-        .setMd5(null)
-        .build(), false);
+manager.checkForUpdates(new UpgradeOptions.Builder()
+       .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+       .setTitle("腾讯QQ")
+       .setDescription("更新通知栏")
+       .setUrl("http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk")
+       .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+       .setMultithreadEnabled(true)
+       .setMultithreadPools(1)
+       .setMd5(null)
+       .build(), false);
+
+// 取消检测
+manager.cancel();
 
 ```
 

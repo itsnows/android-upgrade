@@ -34,6 +34,8 @@ import java.io.File;
  * 支持：暂停、取消
  * 支持：分流下载
  * 支持：动态网络监听下载
+ * 支持：自动安装（root权限）
+ * 支持：自动清除安装包
  * 支持：8.0 适配
  * <p>
  * 更新文档模板路径：../doc/app-update.xml
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl("http://47.108.75.223:8020/doc/app-update.json")
+                .setUrl(Constant.URL_DOC_JSON)
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://47.108.75.223:8020/doc/app-update.xml")
+                .setUrl(Constant.URL_DOC_XML)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)
@@ -125,7 +127,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://47.108.75.223:8020/doc/app-update-force.xml")
+                .setUrl(Constant.URL_DOC_FORCE_XML)
+                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setMultithreadEnabled(true)
+                .setMultithreadPools(10)
+                .setMd5(null)
+                .setAutocleanEnabled(true)
+                .setAutomountEnabled(true)
+                .build(), false);
+    }
+
+    /**
+     * 默认检测更新（测试版：普通升级）
+     */
+    private void betaCheckUpdates() {
+        manager.checkForUpdates(new UpgradeOptions.Builder()
+                .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+                .setTitle("腾讯QQ")
+                .setDescription("更新通知栏")
+                .setUrl(Constant.URL_DOC_BATE_XML)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(10)
@@ -143,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl("http://47.108.75.223:8020/doc/app-update.xml")
+                .setUrl(Constant.URL_DOC_XML)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)
@@ -154,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onUpdateAvailable(UpgradeClient client) {
-
             }
 
             @Override
@@ -294,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 forceCheckUpdates();
                 break;
             case R.id.btn_check_updates_default_bate:
+                betaCheckUpdates();
                 break;
             case R.id.btn_check_updates_custom:
                 customerCheckUpdates();
