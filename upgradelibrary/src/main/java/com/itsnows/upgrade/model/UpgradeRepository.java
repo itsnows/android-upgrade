@@ -4,10 +4,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
+import com.itsnows.upgrade.UpgradeLogger;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeVersion;
+import com.itsnows.upgrade.model.db.UpgradeDBHelper;
+import com.itsnows.upgrade.model.db.UpgradePersistenceContract;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -179,7 +181,7 @@ public class UpgradeRepository implements UpgradeDataSource {
                         buffer.getLastModified()};
                 db.execSQL(sql, bindArgs);
                 long endTime = System.currentTimeMillis();
-                Log.d(TAG, "Elapsed time: " + (endTime - startTime));
+                UpgradeLogger.d(TAG, "Elapsed time: " + (endTime - startTime));
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

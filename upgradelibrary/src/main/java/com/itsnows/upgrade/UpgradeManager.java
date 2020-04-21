@@ -8,7 +8,6 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Preconditions;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.itsnows.upgrade.model.UpgradeRepository;
@@ -82,7 +81,7 @@ public class UpgradeManager {
         if (!task.isCancelled()) {
             task.cancel(false);
         }
-        Log.d(TAG, "Cancel checked updates");
+        UpgradeLogger.d(TAG, "Cancel checked updates");
     }
 
     /**

@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
 import com.itsnows.upgrade.service.UpgradeService;
@@ -235,7 +234,7 @@ public class UpgradeClient {
                             client.onConnectListener.onConnected();
                         }
                     }
-                    Log.d(TAG, message);
+                    UpgradeLogger.d(TAG, message);
                     break;
                 case UpgradeConstant.MSG_KEY_DISCONNECT_RESP:
                     if (code == 0) {
@@ -244,17 +243,17 @@ public class UpgradeClient {
                             client.isConnected = false;
                         }
                     }
-                    Log.d(TAG, message);
+                    UpgradeLogger.d(TAG, message);
                     client.unbind();
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_START_RESP:
-                    Log.d(TAG, "Download：onStart");
+                    UpgradeLogger.d(TAG, "Download：onStart");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onStart();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_RESP:
-                    Log.d(TAG, "Download：onProgress：");
+                    UpgradeLogger.d(TAG, "Download：onProgress：");
                     long max = data.getLong("max");
                     long progress = data.getLong("progress");
                     if (client.onDownloadListener != null) {
@@ -262,61 +261,61 @@ public class UpgradeClient {
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_RESP:
-                    Log.d(TAG, "Download：onPause");
+                    UpgradeLogger.d(TAG, "Download：onPause");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onPause();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_RESP:
-                    Log.d(TAG, "Download：onCancel");
+                    UpgradeLogger.d(TAG, "Download：onCancel");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onCancel();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_ERROR_RESP:
-                    Log.d(TAG, "Download：onError");
+                    UpgradeLogger.d(TAG, "Download：onError");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onError(new UpgradeException());
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_RESP:
-                    Log.d(TAG, "Download：onComplete");
+                    UpgradeLogger.d(TAG, "Download：onComplete");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onComplete();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_RESP:
-                    Log.d(TAG, "Install：onValidate");
+                    UpgradeLogger.d(TAG, "Install：onValidate");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onValidate();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_START_RESP:
-                    Log.d(TAG, "Install：onStart");
+                    UpgradeLogger.d(TAG, "Install：onStart");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onStart();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_CANCEL_RESP:
-                    Log.d(TAG, "Install：onCancel");
+                    UpgradeLogger.d(TAG, "Install：onCancel");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onCancel();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP:
-                    Log.d(TAG, "Install：onError");
+                    UpgradeLogger.d(TAG, "Install：onError");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onError(new UpgradeException(code));
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP:
-                    Log.d(TAG, "Install：onComplete");
+                    UpgradeLogger.d(TAG, "Install：onComplete");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onComplete();
                     }
                     break;
                 case UpgradeConstant.MSG_KEY_INSTALL_REBOOT_RESP:
-                    Log.d(TAG, "Install：onReboot");
+                    UpgradeLogger.d(TAG, "Install：onReboot");
                     break;
                 default:
                     break;

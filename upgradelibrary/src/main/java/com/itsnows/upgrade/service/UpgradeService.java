@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.itsnows.upgrade.R;
 import com.itsnows.upgrade.UpgradeConstant;
 import com.itsnows.upgrade.UpgradeException;
+import com.itsnows.upgrade.UpgradeLogger;
 import com.itsnows.upgrade.UpgradeUtil;
 import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
@@ -48,6 +49,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -202,11 +204,6 @@ public class UpgradeService extends Service {
     private List<Messenger> clients;
 
     /**
-     * 双击取消标记
-     */
-    private boolean isCancel;
-
-    /**
      * 状态
      */
     private volatile int status;
@@ -224,7 +221,17 @@ public class UpgradeService extends Service {
     /**
      * 下载进度
      */
-    private volatile AtomicLong progress;
+    private AtomicLong progress;
+
+    /**
+     * 是否取消
+     */
+    private boolean isCancel;
+
+    /**
+     * 是否初始化
+     */
+    private boolean isInit;
 
     /**
      * 启动
@@ -376,19 +383,12 @@ public class UpgradeService extends Service {
      * 初始化
      */
     private void init() {
-        if (server == null) {
+        if (!isInit) {
+            isInit = true;
+            progress = new AtomicLong();
             server = new Messenger(ServerHandler.create(this));
-        }
-
-        if (clients == null) {
             clients = new CopyOnWriteArrayList<>();
-        }
-
-        if (messageHandler == null) {
             messageHandler = new MessageHandler(this);
-        }
-
-        if (networkStateReceiver == null) {
             networkStateReceiver = new NetworkStateReceiver(this);
             onNetworkStateListener = networkStateReceiver.registerListener(
                     new NetworkStateReceiver.OnNetworkStateListener() {
@@ -406,14 +406,8 @@ public class UpgradeService extends Service {
                             }
                         }
                     });
-        }
-
-        if (packagesReceiver == null) {
             packagesReceiver = new PackagesReceiver();
             packagesReceiver.registerReceiver(this);
-        }
-
-        if (repository == null) {
             repository = UpgradeRepository.getInstance(this);
         }
     }
@@ -431,6 +425,7 @@ public class UpgradeService extends Service {
             channel.setShowBadge(false);
             channel.setSound(null, null);
             channel.setVibrationPattern(null);
+            channel.setBypassDnd(true);
             notificationManager.createNotificationChannel(channel);
             builder = new Notification.Builder(this, String.valueOf(NOTIFY_ID))
                     .setGroup(String.valueOf(NOTIFY_ID))
@@ -439,6 +434,7 @@ public class UpgradeService extends Service {
                     .setLargeIcon(upgradeOption.getIcon())
                     .setContentIntent(getDefaultIntent(PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(upgradeOption.getTitle())
+                    .setSubText(upgradeOption.getDescription())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
@@ -450,6 +446,7 @@ public class UpgradeService extends Service {
                     .setLargeIcon(upgradeOption.getIcon())
                     .setContentIntent(getDefaultIntent(PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(upgradeOption.getTitle())
+                    .setSubText(upgradeOption.getDescription())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
@@ -460,6 +457,8 @@ public class UpgradeService extends Service {
 
     /**
      * 设置通知栏
+     *
+     * @param description
      */
     private void setNotify(String description) {
         if (status == STATUS_DOWNLOAD_START) {
@@ -880,21 +879,21 @@ public class UpgradeService extends Service {
          * @return
          */
         private long length(String url) throws IOException {
-            HttpURLConnection con = null;
+            HttpURLConnection connection = null;
             try {
-                con = (HttpURLConnection) new URL(url).openConnection();
-                con.setRequestMethod("GET");
-                con.setDoInput(true);
-                con.setDoOutput(false);
-                con.setConnectTimeout(CONNECT_TIMEOUT);
-                con.setReadTimeout(READ_TIMEOUT);
-                con.connect();
-                if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    return con.getContentLength();
+                connection = (HttpURLConnection) new URL(url).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setDoInput(true);
+                connection.setDoOutput(false);
+                connection.setConnectTimeout(CONNECT_TIMEOUT);
+                connection.setReadTimeout(READ_TIMEOUT);
+                connection.connect();
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    return connection.getContentLength();
                 }
             } finally {
-                if (con != null) {
-                    con.disconnect();
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
             return -1;
@@ -969,10 +968,10 @@ public class UpgradeService extends Service {
                 inputStream = connection.getInputStream();
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startLength);
-                int tempOffset = 0;
                 int length = -1;
-                int tempLength = 8 * 1024;
-                byte[] buffer = new byte[tempLength];
+                int tmpLength = 8 * 1024;
+                int tmpOffset = 0;
+                byte[] buffer = new byte[tmpLength];
                 do {
                     if (status == STATUS_DOWNLOAD_CANCEL) {
                         messageHandler.sendEmptyMessage(status);
@@ -984,22 +983,15 @@ public class UpgradeService extends Service {
                         break;
                     }
 
-                    length = inputStream.read(buffer);
-                    if (length >= tempLength) {
-                        tempLength += 1024;
-                    }
-
-                    if (length == -1) {
-                        if (progress.get() < maxProgress) {
+                    if ((length = inputStream.read(buffer)) == -1) {
+                        if (progress.longValue() < maxProgress) {
                             break;
                         }
 
-                        if (status == STATUS_DOWNLOAD_COMPLETE) {
-                            break;
+                        if (status != STATUS_DOWNLOAD_COMPLETE) {
+                            status = STATUS_DOWNLOAD_COMPLETE;
+                            messageHandler.sendEmptyMessage(status);
                         }
-
-                        status = STATUS_DOWNLOAD_COMPLETE;
-                        messageHandler.sendEmptyMessage(status);
                         break;
                     }
 
@@ -1009,18 +1001,23 @@ public class UpgradeService extends Service {
 
                     randomAccessFile.write(buffer, 0, length);
                     startLength += length;
-                    tempOffset = (int) (((float) progress.addAndGet(length) / maxProgress) * 100);
-                    if (tempOffset > offset) {
-                        offset = tempOffset;
-                        messageHandler.sendEmptyMessage(STATUS_DOWNLOAD_PROGRESS);
+                    tmpOffset = (int) (((float) progress.addAndGet(length) / maxProgress) * 100);
+                    if (tmpOffset > offset) {
+                        offset = tmpOffset;
+                        if (status == STATUS_DOWNLOAD_PROGRESS) {
+                            messageHandler.sendEmptyMessage(status);
+                        }
                         mark();
-                        Log.d(TAG, "Thread：" + getName()
-                                + " Position：" + startLength + "-" + endLength
-                                + " Download：" + offset + "% " + progress.get() + "B/" + maxProgress + "B");
+                        if (UpgradeLogger.getLevel() == UpgradeLogger.DEBUG) {
+                            UpgradeLogger.d(TAG, String.format(Locale.getDefault(),
+                                    "Thread：%1$s Position：%2$d-%3$d Download：%4$d%% %5$dB/%6$dB",
+                                    getName(), startLength, endLength, offset, progress.longValue(), maxProgress));
+                        }
                     }
                 } while (true);
             } catch (Exception e) {
                 e.printStackTrace();
+                UpgradeLogger.e(TAG, e.getMessage());
                 status = STATUS_DOWNLOAD_ERROR;
                 messageHandler.sendEmptyMessage(status);
             } finally {
@@ -1130,7 +1127,6 @@ public class UpgradeService extends Service {
          *
          * @return
          */
-        @SuppressWarnings("TryFinallyCanBeTryWithResources")
         private boolean validate() throws IOException {
             MessageDigest messageDigest = null;
             FileInputStream fileInputStream = null;
@@ -1169,9 +1165,9 @@ public class UpgradeService extends Service {
 
             String action = intent.getAction();
             if (Intent.ACTION_PACKAGE_ADDED.equals(action)) {
-                Log.i(TAG, "onReceive：Added " + packageName);
+                UpgradeLogger.i(TAG, "onReceive：Added " + packageName);
             } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
-                Log.i(TAG, "onReceive：Replaced " + packageName);
+                UpgradeLogger.i(TAG, "onReceive：Replaced " + packageName);
 
                 status = STATUS_INSTALL_COMPLETE;
                 Message message = Message.obtain();
@@ -1181,7 +1177,7 @@ public class UpgradeService extends Service {
                 }
                 messageHandler.sendMessage(message);
             } else if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                Log.i(TAG, "onReceive：Removed " + packageName);
+                UpgradeLogger.i(TAG, "onReceive：Removed " + packageName);
             }
         }
 

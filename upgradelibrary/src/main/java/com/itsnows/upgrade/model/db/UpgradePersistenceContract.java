@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.model;
+package com.itsnows.upgrade.model.db;
 
 /**
  * Author: itsnows

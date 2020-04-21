@@ -1,4 +1,4 @@
-package com.itsnows.upgrade.model;
+package com.itsnows.upgrade.model.db;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
@@ -72,6 +72,11 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         super.onDowngrade(db, oldVersion, newVersion);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
     }
 
     @Override

@@ -43,6 +43,10 @@ import java.io.File;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String DOC_JSON_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.json";
+    private static final String DOC_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.xml";
+    private static final String DOC_BATE_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update-bate.xml";
+    private static final String DOC_FORCE_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update-force.xml";
     private UpgradeManager manager;
 
     @Override
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏描述（可选）
                 .setDescription("更新通知栏")
                 // 下载链接或更新文档链接
-                .setUrl(Constant.URL_DOC_JSON)
+                .setUrl(DOC_JSON_URL)
                 // 下载文件存储路径（可选）
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
@@ -111,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("更新通知栏")
-                .setUrl(Constant.URL_DOC_XML)
+                .setDescription("下载")
+                .setUrl(DOC_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)
@@ -126,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("更新通知栏")
-                .setUrl(Constant.URL_DOC_FORCE_XML)
+                .setDescription("下载")
+                .setUrl(DOC_FORCE_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(10)
@@ -145,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl(Constant.URL_DOC_BATE_XML)
+                .setUrl(DOC_BATE_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(10)
@@ -163,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
                 .setDescription("更新通知栏")
-                .setUrl(Constant.URL_DOC_XML)
+                .setUrl(DOC_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
                 .setMultithreadPools(1)

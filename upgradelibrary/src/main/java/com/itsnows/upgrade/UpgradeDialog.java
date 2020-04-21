@@ -20,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutCompat;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -135,7 +134,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_pause));
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_START_REQ);
-                Log.d(TAG, "Download start");
+                UpgradeLogger.d(TAG, "Download start");
             }
 
             @Override
@@ -148,7 +147,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 }
                 btnProgress.setEnabled(true);
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ);
-                Log.d(TAG, "Download Progress");
+                UpgradeLogger.d(TAG, "Download Progress");
             }
 
             @Override
@@ -157,7 +156,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ);
-                Log.d(TAG, "Download pause");
+                UpgradeLogger.d(TAG, "Download pause");
             }
 
             @Override
@@ -165,14 +164,14 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 dismiss();
                 btnProgress.setEnabled(true);
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_REQ);
-                Log.d(TAG, "Download cancel");
+                UpgradeLogger.d(TAG, "Download cancel");
             }
 
             @Override
             public void onError(UpgradeException e) {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                Log.d(TAG, "Download cancel");
+                UpgradeLogger.d(TAG, "Download cancel");
             }
 
             @Override
@@ -462,7 +461,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             repository.putUpgradeVersion(upgradeVersion);
             return;
         }
-        Log.i(TAG, "Execute ignore upgrade failure");
+        UpgradeLogger.i(TAG, "Execute ignore upgrade failure");
     }
 
     /**

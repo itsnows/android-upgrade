@@ -359,6 +359,9 @@ public class UpgradeUtil {
 
     /**
      * 执行命令
+     *
+     * @param cmd
+     * @return
      */
     public static int cmd(String cmd) {
         if (cmd == null || cmd.length() == 0) {
