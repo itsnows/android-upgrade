@@ -302,7 +302,7 @@ public class UpgradeService extends Service {
             return command;
         }
 
-        if (status == STATUS_DOWNLOAD_ERROR) {
+        if (status == STATUS_DOWNLOAD_ERROR || status == STATUS_INSTALL_ERROR) {
             resume();
             return command;
         }
