@@ -37,12 +37,12 @@ public class UpgradeManager {
     /**
      * 检测更新
      *
-     * @param options 更新选项
-     * @param isAuto  是否自动检测更新
+     * @param options     更新选项
+     * @param isAutoCheck 是否自动检测更新
      */
     @SuppressLint("RestrictedApi")
-    public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAuto) {
-        execute(Preconditions.checkNotNull(options), isAuto);
+    public void checkForUpdates(@NonNull UpgradeOptions options, boolean isAutoCheck) {
+        execute(Preconditions.checkNotNull(options), isAutoCheck);
     }
 
     /**
@@ -187,25 +187,23 @@ public class UpgradeManager {
                                         .setMd5(upgrade.getStable().getMd5())
                                         .build()).show();
                             } else {
-                                if (message.obj == null) {
-                                    return;
+                                if (message.obj != null) {
+                                    OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
+                                    UpgradeVersion version = UpgradeRepository.getInstance(activity)
+                                            .getUpgradeVersion(upgrade.getStable().getVersionCode());
+                                    if (version != null && version.isIgnored()) {
+                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
+                                        return;
+                                    }
+                                    if (upgrade.getStable().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                        onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
+                                        return;
+                                    }
+                                    onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
+                                            .setUrl(upgrade.getStable().getDownloadUrl())
+                                            .setMd5(upgrade.getStable().getMd5())
+                                            .build()));
                                 }
-                                OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                                UpgradeVersion version = UpgradeRepository.getInstance(activity)
-                                        .getUpgradeVersion(upgrade.getStable().getVersionCode());
-                                if (version != null && version.isIgnored()) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
-                                    return;
-                                }
-                                if (upgrade.getStable().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
-                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
-                                    return;
-                                }
-                                upgrade.setBeta(null);
-                                onUpgradeListener.onUpdateAvailable(upgrade.getStable(), UpgradeClient.add(activity, builder
-                                        .setUrl(upgrade.getStable().getDownloadUrl())
-                                        .setMd5(upgrade.getStable().getMd5())
-                                        .build()));
                             }
                             return;
                         }
@@ -229,25 +227,24 @@ public class UpgradeManager {
                                     .setMd5(upgrade.getBeta().getMd5())
                                     .build()).show();
                         } else {
-                            if (message.obj == null) {
-                                return;
+                            if (message.obj != null) {
+                                OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
+                                UpgradeVersion version = UpgradeRepository.getInstance(activity)
+                                        .getUpgradeVersion(upgrade.getBeta().getVersionCode());
+                                if (version != null && version.isIgnored()) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
+                                    return;
+                                }
+                                if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
+                                    onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
+                                    return;
+                                }
+                                upgrade.setStable(null);
+                                onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
+                                        .setUrl(upgrade.getBeta().getDownloadUrl())
+                                        .setMd5(upgrade.getBeta().getMd5())
+                                        .build()));
                             }
-                            OnUpgradeListener onUpgradeListener = (OnUpgradeListener) message.obj;
-                            UpgradeVersion version = UpgradeRepository.getInstance(activity)
-                                    .getUpgradeVersion(upgrade.getBeta().getVersionCode());
-                            if (version != null && version.isIgnored()) {
-                                onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
-                                return;
-                            }
-                            if (upgrade.getBeta().getVersionCode() <= UpgradeUtil.getVersionCode(activity)) {
-                                onUpgradeListener.onNoUpdateAvailable(activity.getString(R.string.message_check_for_update_no_available));
-                                return;
-                            }
-                            upgrade.setStable(null);
-                            onUpgradeListener.onUpdateAvailable(upgrade.getBeta(), UpgradeClient.add(activity, builder
-                                    .setUrl(upgrade.getBeta().getDownloadUrl())
-                                    .setMd5(upgrade.getBeta().getMd5())
-                                    .build()));
                         }
                         return;
                     }
