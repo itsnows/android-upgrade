@@ -229,14 +229,15 @@ public class UpgradeUtil {
      * 重启应用程序
      *
      * @param context
+     * @param packageName
      * @return
      */
-    public static boolean rebootApp(Context context) {
+    public static boolean rebootApp(Context context, String packageName) {
         PackageManager packageManager = context.getPackageManager();
         if (packageManager == null) {
             return false;
         }
-        Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+        Intent intent = packageManager.getLaunchIntentForPackage(packageName);
         if (intent != null) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);

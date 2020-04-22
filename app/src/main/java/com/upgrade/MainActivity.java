@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 文件MD5（可选）
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
-                .setAutocleanEnabled(false)
+                .setAutocleanEnabled(true)
                 // 是否自动安装安装包（可选）
-                .setAutomountEnabled(false)
+                .setAutomountEnabled(true)
                 // 是否自动检测更新
                 .build(), true);
     }

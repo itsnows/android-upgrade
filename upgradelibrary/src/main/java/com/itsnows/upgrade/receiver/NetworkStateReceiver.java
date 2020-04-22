@@ -130,7 +130,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
     /**
      * The network state change {@link Observable}.
      */
-    private class NetworkStateObservable extends Observable {
+    private static class NetworkStateObservable extends Observable {
 
         @Override
         public void notifyObservers(Object arg) {

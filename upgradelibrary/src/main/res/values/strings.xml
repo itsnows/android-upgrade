@@ -36,6 +36,6 @@
     <string name="message_install_complete">安装完成</string>
     <string name="message_install_cancel">安装取消</string>
     <string name="message_install_package_invalid">安装包无效</string>
-    <string name="message_install_package_delete">安装已完成，自动删除安装包</string>
+    <string name="message_install_package_delete">安装已完成，已自动删除安装包</string>
 
 </resources>

@@ -10,13 +10,13 @@ import android.util.Log;
  * UpgradeLogger
  */
 public class UpgradeLogger {
-    public static final String TAG = UpgradeLogger.class.getSimpleName();
-    public static final int VERBOSE = 5;
-    public static final int DEBUG = 4;
-    public static final int INFO = 3;
-    public static final int WARN = 2;
-    public static final int ERROR = 1;
-    public static final int NONE = 0;
+    private static final String TAG = UpgradeLogger.class.getSimpleName();
+    private static final int VERBOSE = 5;
+    private static final int DEBUG = 4;
+    private static final int INFO = 3;
+    private static final int WARN = 2;
+    private static final int ERROR = 1;
+    private static final int NONE = 0;
     private static int level = VERBOSE;
 
     /**

@@ -5,10 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
@@ -34,6 +32,7 @@ import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
 import com.itsnows.upgrade.receiver.NetworkStateReceiver;
+import com.itsnows.upgrade.receiver.PackagesReceiver;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -65,8 +64,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("deprecation")
 public class UpgradeService extends Service {
-    static final String TAG = UpgradeService.class.getSimpleName();
-    static final String PARAMS_UPGRADE_OPTION = "upgrade_option";
+    private static final String TAG = UpgradeService.class.getSimpleName();
+    private static final String PARAMS_UPGRADE_OPTION = "upgrade_option";
 
     /**
      * 连接超时时长
@@ -144,6 +143,11 @@ public class UpgradeService extends Service {
     private static final int DELAY = 200;
 
     /**
+     * 升级安装包
+     */
+    private String upgradePackage;
+
+    /**
      * 升级进度通知栏
      */
     private Notification.Builder builder;
@@ -179,7 +183,7 @@ public class UpgradeService extends Service {
     private Handler messageHandler;
 
     /**
-     * 网络状态变化广播
+     * 包变化广播
      */
     private PackagesReceiver packagesReceiver;
 
@@ -187,11 +191,6 @@ public class UpgradeService extends Service {
      * 网络状态变化广播
      */
     private NetworkStateReceiver networkStateReceiver;
-
-    /**
-     * 网络状态变化监听接口
-     */
-    private NetworkStateReceiver.OnNetworkStateListener onNetworkStateListener;
 
     /**
      * 服务端
@@ -222,11 +221,6 @@ public class UpgradeService extends Service {
      * 下载进度
      */
     private volatile AtomicLong progress;
-
-    /**
-     * 下载进度
-     */
-    private volatile long tmpProgress;
 
     /**
      * 是否取消
@@ -352,7 +346,7 @@ public class UpgradeService extends Service {
             messageHandler.removeCallbacksAndMessages(null);
         }
         if (networkStateReceiver != null) {
-            networkStateReceiver.unregisterListener(onNetworkStateListener);
+            networkStateReceiver.unregisterAllListener();
         }
         if (packagesReceiver != null) {
             packagesReceiver.unregisterReceiver(this);
@@ -396,7 +390,7 @@ public class UpgradeService extends Service {
             clients = new CopyOnWriteArrayList<>();
             messageHandler = new MessageHandler(this);
             networkStateReceiver = new NetworkStateReceiver(this);
-            onNetworkStateListener = networkStateReceiver.registerListener(
+            networkStateReceiver.registerListener(
                     new NetworkStateReceiver.OnNetworkStateListener() {
                         @Override
                         public void onConnected() {
@@ -412,7 +406,32 @@ public class UpgradeService extends Service {
                             }
                         }
                     });
-            packagesReceiver = new PackagesReceiver();
+            packagesReceiver = new PackagesReceiver() {
+
+                @Override
+                public void onPackageAdded(Context context, String packageName) {
+                    UpgradeLogger.i(TAG, "onPackageAdded " + packageName);
+                    onPackageReplaced(context, packageName);
+                }
+
+                @Override
+                public void onPackageReplaced(Context context, String packageName) {
+                    UpgradeLogger.i(TAG, "onPackageReplaced " + packageName);
+                    upgradePackage = packageName;
+                    status = STATUS_INSTALL_COMPLETE;
+                    Message message = Message.obtain();
+                    message.what = status;
+                    if (upgradeOption.isAutocleanEnabled()) {
+                        message.arg1 = -1;
+                    }
+                    messageHandler.sendMessage(message);
+                }
+
+                @Override
+                public void onPackageRemoved(Context context, String packageName) {
+                    UpgradeLogger.i(TAG, "onPackageRemoved " + packageName);
+                }
+            };
             packagesReceiver.registerReceiver(this);
             repository = UpgradeRepository.getInstance(this);
         }
@@ -443,7 +462,7 @@ public class UpgradeService extends Service {
                     .setSubText(upgradeOption.getDescription())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
                     .setOngoing(true)
                     .setDefaults(Notification.FLAG_AUTO_CANCEL);
         } else {
@@ -455,7 +474,7 @@ public class UpgradeService extends Service {
                     .setSubText(upgradeOption.getDescription())
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
                     .setOngoing(true)
                     .setDefaults(Notification.FLAG_AUTO_CANCEL);
         }
@@ -473,6 +492,7 @@ public class UpgradeService extends Service {
             builder.setProgress(100, offset, false);
             builder.setSmallIcon(android.R.drawable.stat_sys_download);
         } else {
+            builder.setAutoCancel(true);
             builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
         }
         builder.setContentText(description);
@@ -499,15 +519,12 @@ public class UpgradeService extends Service {
 
     /**
      * 删除安装包
-     *
-     * @return
      */
-    private boolean deletePackage() {
+    private void deletePackage() {
         File packageFile = upgradeOption.getStorage();
         if (packageFile.exists()) {
-            return packageFile.delete();
+            packageFile.delete();
         }
-        return false;
     }
 
     /**
@@ -519,20 +536,35 @@ public class UpgradeService extends Service {
     }
 
     /**
+     * 重置
+     */
+    private void reset() {
+        if (progress != null) {
+            progress = null;
+        }
+        maxProgress = 0L;
+        offset = 0;
+        isCancel = false;
+        upgradePackage = null;
+    }
+
+    /**
      * 重启
      */
     private void reboot() {
-        boolean isReboot = UpgradeUtil.rebootApp(this);
+        upgradePackage = upgradePackage != null ? upgradePackage : getPackageName();
+        boolean isReboot = UpgradeUtil.rebootApp(this, upgradePackage);
         if (isReboot) {
             UpgradeLogger.d(TAG, "Install reboot");
         }
-        UpgradeUtil.kiiAllProcess(this);
+        UpgradeUtil.killCurrentProcess();
     }
 
     /**
      * 开始
      */
     private void start() {
+        reset();
         if (scheduleThread != null) {
             if (scheduleThread.isAlive() || !scheduleThread.isInterrupted()) {
                 status = STATUS_DOWNLOAD_CANCEL;
@@ -574,6 +606,7 @@ public class UpgradeService extends Service {
         clearNotify();
         install();
     }
+
 
     /**
      * 发送消息到客户端
@@ -770,9 +803,10 @@ public class UpgradeService extends Service {
                 case STATUS_INSTALL_COMPLETE:
                     service.setNotify(service.getString(R.string.message_install_complete));
                     service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP, response);
-                    if (msg.arg1 == -1 && service.deletePackage()) {
-                        Toast.makeText(service, service.getString(
-                                R.string.message_install_package_delete), Toast.LENGTH_LONG).show();
+                    if (msg.arg1 == -1) {
+                        service.deletePackage();
+                        Toast.makeText(service, service.getString(R.string.message_install_package_delete),
+                                Toast.LENGTH_LONG).show();
                     }
                     service.clearNotify();
                     break;
@@ -1153,50 +1187,6 @@ public class UpgradeService extends Service {
                 }
             }
             return false;
-        }
-    }
-
-    /**
-     * 程序状态变化广播
-     */
-    private class PackagesReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String packageName = null;
-            if (intent.getData() != null) {
-                packageName = intent.getData().getSchemeSpecificPart();
-            }
-
-            String action = intent.getAction();
-            if (Intent.ACTION_PACKAGE_ADDED.equals(action)) {
-                UpgradeLogger.i(TAG, "onReceive：Added " + packageName);
-            } else if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
-                UpgradeLogger.i(TAG, "onReceive：Replaced " + packageName);
-
-                status = STATUS_INSTALL_COMPLETE;
-                Message message = Message.obtain();
-                message.what = status;
-                if (upgradeOption.isAutocleanEnabled()) {
-                    message.arg1 = -1;
-                }
-                messageHandler.sendMessage(message);
-            } else if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                UpgradeLogger.i(TAG, "onReceive：Removed " + packageName);
-            }
-        }
-
-        public void registerReceiver(Context context) {
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-            intentFilter.addAction(Intent.ACTION_PACKAGE_REPLACED);
-            intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-            intentFilter.addDataScheme("package");
-            context.registerReceiver(this, intentFilter);
-        }
-
-        public void unregisterReceiver(Context context) {
-            context.unregisterReceiver(this);
         }
     }
 
