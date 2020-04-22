@@ -12,7 +12,7 @@
     <string name="dialog_upgrade_btn_neutral">忽略更新</string>
     <string name="dialog_upgrade_btn_pause">暂停</string>
     <string name="dialog_upgrade_btn_resume">继续</string>
-    <string name="dialog_upgrade_btn_complete">完成</string>
+    <string name="dialog_upgrade_btn_complete">安装</string>
     <string name="dialog_upgrade_btn_check">效验中&#8230;</string>
     <string name="dialog_upgrade_btn_install">安装中&#8230;</string>
     <string name="dialog_upgrade_btn_reset">重试</string>

@@ -5,6 +5,8 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Author: itsnows
  * E-mail: xue.com.fei@outlook.com
@@ -12,30 +14,14 @@ import android.database.sqlite.SQLiteOpenHelper;
  * <p>
  * UpgradeDBHelper
  */
-public class UpgradeDBHelper extends SQLiteOpenHelper {
-
-    /**
-     * 数据库名称
-     */
+public class UpgradeDBHelper {
     private static final String DB_NAME = "upgrade.db";
-
-    /**
-     * 数据库版本
-     */
     private static final int DB_VERSION = 1;
-
-    /**
-     * 版本忽略表
-     */
     private static final String SQL_CREATE_UPGRADE_VERSION = "CREATE TABLE IF NOT EXISTS "
             + UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + " ("
             + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + " INTEGER NOT NULL,"
             + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + " INTEGER,PRIMARY KEY("
             + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "))";
-
-    /**
-     * 版本缓存表
-     */
     private static final String SQL_CREATE_UPGRADE_BUFFER = "CREATE TABLE IF NOT EXISTS "
             + UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + " ("
             + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + " TEXT NOT NULL,"
@@ -46,6 +32,10 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
             + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + " INTEGER,PRIMARY KEY("
             + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "))";
 
+    private SQLiteOpenHelper helper;
+    private SQLiteDatabase db;
+    private AtomicInteger lock;
+
     public UpgradeDBHelper(Context context) {
         this(context, DB_NAME, null, DB_VERSION);
     }
@@ -55,43 +45,57 @@ public class UpgradeDBHelper extends SQLiteOpenHelper {
     }
 
     public UpgradeDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(context, name, factory, version, errorHandler);
+        helper = new UpgradeDBHelperWrapper(context, name, factory, version, errorHandler);
+        lock = new AtomicInteger();
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_UPGRADE_VERSION);
-        db.execSQL(SQL_CREATE_UPGRADE_BUFFER);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        super.onDowngrade(db, oldVersion, newVersion);
-    }
-
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
-    }
-
-    @Override
     public synchronized SQLiteDatabase getWritableDatabase() {
-        return super.getWritableDatabase();
+        if (lock.getAndIncrement() == 0) {
+            db = helper.getWritableDatabase();
+        }
+        return db;
     }
 
-    @Override
     public synchronized SQLiteDatabase getReadableDatabase() {
-        return super.getReadableDatabase();
+        if (lock.getAndIncrement() == 0) {
+            db = helper.getReadableDatabase();
+        }
+        return db;
     }
 
-    @Override
-    public synchronized void close() {
-        super.close();
+    public synchronized void close(SQLiteDatabase db) {
+        if (lock.decrementAndGet() == 0) {
+            db.close();
+        }
+    }
+
+    private static class UpgradeDBHelperWrapper extends SQLiteOpenHelper {
+
+        private UpgradeDBHelperWrapper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
+            super(context, name, factory, version, errorHandler);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(SQL_CREATE_UPGRADE_VERSION);
+            db.execSQL(SQL_CREATE_UPGRADE_BUFFER);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        }
+
+        @Override
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            super.onDowngrade(db, oldVersion, newVersion);
+        }
+
+        @Override
+        public void onOpen(SQLiteDatabase db) {
+            super.onOpen(db);
+        }
+
     }
 
 }

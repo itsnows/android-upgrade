@@ -23,7 +23,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.itsnows.upgrade.R;
@@ -36,6 +35,7 @@ import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeOptions;
 import com.itsnows.upgrade.receiver.NetworkStateReceiver;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -221,7 +221,12 @@ public class UpgradeService extends Service {
     /**
      * 下载进度
      */
-    private AtomicLong progress;
+    private volatile AtomicLong progress;
+
+    /**
+     * 下载进度
+     */
+    private volatile long tmpProgress;
 
     /**
      * 是否取消
@@ -251,6 +256,7 @@ public class UpgradeService extends Service {
      * @param connection 升级服务连接
      */
     public static void start(Context context, UpgradeOptions options, ServiceConnection connection) {
+        UpgradeLogger.d(TAG, "start");
         if (context == null) {
             throw new IllegalArgumentException("Context can not be null");
         }
@@ -262,7 +268,7 @@ public class UpgradeService extends Service {
         Intent intent = new Intent(context, UpgradeService.class);
         intent.putExtra(PARAMS_UPGRADE_OPTION, options);
         if (UpgradeUtil.isServiceRunning(context, UpgradeService.class.getName())) {
-            Log.d(TAG, "UpgradeService is running");
+            UpgradeLogger.d(TAG, "UpgradeService is running");
         }
         context.startService(intent);
         if (connection != null) {
@@ -274,7 +280,7 @@ public class UpgradeService extends Service {
     public void onCreate() {
         super.onCreate();
         init();
-        Log.d(TAG, "onCreate");
+        UpgradeLogger.d(TAG, "onCreate");
     }
 
     @Override
@@ -327,8 +333,9 @@ public class UpgradeService extends Service {
                     .setMd5(upgradeOptions.getMd5())
                     .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
                     .setMultithreadPools(upgradeOptions.isMultithreadEnabled() ?
-                            upgradeOptions.getMultithreadPools() == 0 ? 20 :
-                                    upgradeOptions.getMultithreadPools() : 0)
+                            upgradeOptions.getMultithreadPools() > 0 ?
+                                    upgradeOptions.getMultithreadPools() :
+                                    Runtime.getRuntime().availableProcessors() : 1)
                     .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
                     .setAutomountEnabled(upgradeOptions.isAutomountEnabled())
                     .build();
@@ -366,7 +373,7 @@ public class UpgradeService extends Service {
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        Log.d(TAG, "onRebind");
+        UpgradeLogger.d(TAG, "onRebind");
         messageHandler.sendEmptyMessageDelayed(STATUS_DOWNLOAD_PROGRESS, DELAY);
         Message msg = Message.obtain();
         msg.what = status;
@@ -385,7 +392,6 @@ public class UpgradeService extends Service {
     private void init() {
         if (!isInit) {
             isInit = true;
-            progress = new AtomicLong();
             server = new Messenger(ServerHandler.create(this));
             clients = new CopyOnWriteArrayList<>();
             messageHandler = new MessageHandler(this);
@@ -518,7 +524,7 @@ public class UpgradeService extends Service {
     private void reboot() {
         boolean isReboot = UpgradeUtil.rebootApp(this);
         if (isReboot) {
-            Log.d(TAG, "Install reboot");
+            UpgradeLogger.d(TAG, "Install reboot");
         }
         UpgradeUtil.kiiAllProcess(this);
     }
@@ -701,7 +707,7 @@ public class UpgradeService extends Service {
                     service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_START_RESP, response);
                     break;
                 case STATUS_DOWNLOAD_PROGRESS:
-                    long progress = service.progress.longValue();
+                    long progress = service.progress.get();
                     service.setNotify(UpgradeUtil.formatByte(progress) + "/" +
                             UpgradeUtil.formatByte(service.maxProgress));
                     response.putLong("max", service.maxProgress);
@@ -846,21 +852,23 @@ public class UpgradeService extends Service {
                     submit(0, startLength, endLength);
                     return;
                 }
+
+                int size = 1;
                 int part = 8 * 1024 * 1024;
-                int pools = 1;
                 if (endLength >= part) {
-                    pools = (int) (endLength / part);
+                    size = (int) (endLength / part);
                 }
-                if (pools > upgradeOption.getMultithreadPools()) {
-                    pools = upgradeOption.getMultithreadPools();
-                    part = (int) (endLength / pools);
+                if (size > upgradeOption.getMultithreadPools()) {
+                    size = upgradeOption.getMultithreadPools();
+                    part = (int) (endLength / size);
                 }
+
                 long tempStartLength = 0;
                 long tempEndLength = 0;
-                for (int id = 1; id <= pools; id++) {
+                for (int id = 1; id <= size; id++) {
                     tempStartLength = (id - 1) * part;
                     tempEndLength = tempStartLength + part - 1;
-                    if (id == pools) {
+                    if (id == size) {
                         tempEndLength = endLength;
                     }
                     submit(id - 1, tempStartLength, tempEndLength);
@@ -936,7 +944,7 @@ public class UpgradeService extends Service {
             setName("DownloadThread-" + id);
             setPriority(Thread.NORM_PRIORITY);
             setDaemon(false);
-            Log.d(TAG, "DownloadThread initialized");
+            UpgradeLogger.d(TAG, "DownloadThread initialized " + startLength + "-" + endLength);
         }
 
         @Override
@@ -965,26 +973,26 @@ public class UpgradeService extends Service {
                     }
                 }
 
-                inputStream = connection.getInputStream();
+                inputStream = new BufferedInputStream(connection.getInputStream());
                 randomAccessFile = new RandomAccessFile(file, "rwd");
                 randomAccessFile.seek(startLength);
-                int length = -1;
-                int tmpLength = 8 * 1024;
                 int tmpOffset = 0;
-                byte[] buffer = new byte[tmpLength];
+                int length = -1;
+                int bufferLength = 8 * 1024;
+                byte[] buffer = new byte[bufferLength];
                 do {
-                    if (status == STATUS_DOWNLOAD_CANCEL) {
+                    if (status == STATUS_DOWNLOAD_CANCEL ||
+                            status == STATUS_DOWNLOAD_PAUSE) {
                         messageHandler.sendEmptyMessage(status);
                         break;
                     }
 
-                    if (status == STATUS_DOWNLOAD_PAUSE) {
-                        messageHandler.sendEmptyMessage(status);
-                        break;
+                    length = inputStream.read(buffer);
+                    if (length > bufferLength) {
+                        bufferLength += 1024;
                     }
-
-                    if ((length = inputStream.read(buffer)) == -1) {
-                        if (progress.longValue() < maxProgress) {
+                    if (length == -1) {
+                        if (progress.get() < maxProgress) {
                             break;
                         }
 
@@ -1000,19 +1008,16 @@ public class UpgradeService extends Service {
                     }
 
                     randomAccessFile.write(buffer, 0, length);
-                    startLength += length;
                     tmpOffset = (int) (((float) progress.addAndGet(length) / maxProgress) * 100);
                     if (tmpOffset > offset) {
                         offset = tmpOffset;
                         if (status == STATUS_DOWNLOAD_PROGRESS) {
-                            messageHandler.sendEmptyMessage(status);
+                            messageHandler.sendEmptyMessage(STATUS_DOWNLOAD_PROGRESS);
                         }
                         mark();
-                        if (UpgradeLogger.getLevel() == UpgradeLogger.DEBUG) {
-                            UpgradeLogger.d(TAG, String.format(Locale.getDefault(),
-                                    "Thread：%1$s Position：%2$d-%3$d Download：%4$d%% %5$dB/%6$dB",
-                                    getName(), startLength, endLength, offset, progress.longValue(), maxProgress));
-                        }
+                        UpgradeLogger.d(TAG, String.format(Locale.getDefault(),
+                                "Thread：%1$s Position：%2$d-%3$d Download：%4$d%% %5$dB/%6$dB",
+                                getName(), startLength, endLength, offset, progress.get(), maxProgress));
                     }
                 } while (true);
             } catch (Exception e) {
@@ -1102,7 +1107,7 @@ public class UpgradeService extends Service {
 
                 if (upgradeOption.isAutomountEnabled() && UpgradeUtil.isRooted()) {
                     status = STATUS_INSTALL_START;
-                    messageHandler.sendEmptyMessage(STATUS_INSTALL_START);
+                    messageHandler.sendEmptyMessage(status);
                     boolean success = UpgradeUtil.installApk(upgradeOption.getStorage().getPath());
                     if (!success) {
                         Message message = Message.obtain();

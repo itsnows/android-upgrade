@@ -20,15 +20,6 @@ public class UpgradeLogger {
     private static int level = VERBOSE;
 
     /**
-     * LOGGER LEVEL
-     *
-     * @return
-     */
-    public static int getLevel() {
-        return level;
-    }
-
-    /**
      * VERBOSE
      *
      * @param tag

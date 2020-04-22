@@ -1,13 +1,18 @@
 package com.upgrade;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String DOC_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update.xml";
     private static final String DOC_BATE_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update-bate.xml";
     private static final String DOC_FORCE_XML_URL = "https://gitee.com/itsnows/android-upgrade/raw/master/doc/app-update-force.xml";
+    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0x8052;
     private UpgradeManager manager;
 
     @Override
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 通知栏标题（可选）
                 .setTitle("腾讯QQ")
                 // 通知栏描述（可选）
-                .setDescription("更新通知栏")
+                .setDescription("下载更新")
                 // 下载链接或更新文档链接
                 .setUrl(DOC_JSON_URL)
                 // 下载文件存储路径（可选）
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("下载")
+                .setDescription("下载更新")
                 .setUrl(DOC_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
@@ -130,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("下载")
+                .setDescription("下载更新")
                 .setUrl(DOC_FORCE_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
@@ -143,12 +149,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 默认检测更新（测试版：普通升级）
+     * 提示：灰度升级，需要添加自己设备sn
      */
     private void betaCheckUpdates() {
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("更新通知栏")
+                .setDescription("下载更新")
                 .setUrl(DOC_BATE_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
@@ -166,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("更新通知栏")
+                .setDescription("下载更新")
                 .setUrl(DOC_XML_URL)
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
@@ -204,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.checkForUpdates(new UpgradeOptions.Builder()
                 .setIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setTitle("腾讯QQ")
-                .setDescription("更新通知栏")
+                .setDescription("下载更新")
                 .setUrl("http://gdown.baidu.com/data/wisegame/2965a5c112549eb8/QQ_996.apk")
                 .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
                 .setMultithreadPools(1)
@@ -237,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                client.death();
+                client.remove();
             }
         });
 
@@ -246,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 // 开始下载
-                if (UpgradeUtil.mayRequestExternalStorage(MainActivity.this, true)) {
+                if (mayRequestExternalStorage(MainActivity.this, true)) {
                     client.start();
                 }
                 dialog.dismiss();
@@ -291,18 +298,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                client.death();
+                client.remove();
             }
         });
         dialog.show();
     }
 
+    /**
+     * 判断申请外部存储所需权限
+     *
+     * @param context
+     * @param isActivate
+     * @return
+     */
+    public boolean mayRequestExternalStorage(Context context, boolean isActivate) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (isActivate) {
+            ActivityCompat.requestPermissions((Activity) context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+        }
+        return false;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == UpgradeUtil.REQUEST_CODE_WRITE_EXTERNAL_STORAGE ||
+        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE &&
                 grantResults.length == 1 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             customerDownloadUpdates();
         }
     }
@@ -323,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 customerCheckUpdates();
                 break;
             case R.id.btn_check_updates_custom_download:
-                if (UpgradeUtil.mayRequestExternalStorage(this, true)) {
+                if (mayRequestExternalStorage(this, true)) {
                     customerDownloadUpdates();
                 }
                 break;
@@ -335,4 +364,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
+
 }

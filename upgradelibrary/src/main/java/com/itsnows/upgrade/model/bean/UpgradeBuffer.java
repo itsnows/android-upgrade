@@ -138,18 +138,6 @@ public class UpgradeBuffer implements Parcelable {
         this.lastModified = lastModified;
     }
 
-    @Override
-    public String toString() {
-        return "UpgradeBuffer{" +
-                "downloadUrl='" + downloadUrl + '\'' +
-                ", fileMd5='" + fileMd5 + '\'' +
-                ", fileLength=" + fileLength +
-                ", bufferLength=" + bufferLength +
-                ", shuntParts=" + bufferParts +
-                ", lastModified=" + lastModified +
-                '}';
-    }
-
     public static class BufferPart implements Parcelable {
         public static final Creator<BufferPart> CREATOR = new Creator<BufferPart>() {
             @Override
@@ -205,13 +193,6 @@ public class UpgradeBuffer implements Parcelable {
             this.endLength = endLength;
         }
 
-        @Override
-        public String toString() {
-            return "BufferPart{" +
-                    "startLength=" + startLength +
-                    ", endLength=" + endLength +
-                    '}';
-        }
     }
 
 }

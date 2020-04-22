@@ -43,9 +43,9 @@
             <item>#内侧版本</item>
         </log>
         <!--versionCode：新版App版本号-->
-        <versionCode>20</versionCode>
+        <versionCode>21</versionCode>
         <!--versionCode：新版App版本名称-->
-        <versionName>1.2.0</versionName>
+        <versionName>1.2.1</versionName>
         <!--downloadUrl：新版App下载链接-->
         <downloadUrl>http://gdown.baidu.com/data/wisegame/16f98e07f392294b/QQ_794.apk
         </downloadUrl>

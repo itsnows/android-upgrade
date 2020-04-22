@@ -43,7 +43,7 @@ public class UpgradeClient {
      * @param options
      * @return
      */
-    public static UpgradeClient attach(Context context, UpgradeOptions options) {
+    public static UpgradeClient add(Context context, UpgradeOptions options) {
         if (context == null) {
             throw new IllegalArgumentException("Context can not be null");
         }
@@ -87,7 +87,7 @@ public class UpgradeClient {
     /**
      * 销毁客户端实例，同时解除绑定活动
      */
-    public void death() {
+    public void remove() {
         disconnect();
     }
 
@@ -203,7 +203,7 @@ public class UpgradeClient {
             Message message = Message.obtain();
             message.replyTo = client;
             message.what = key;
-            message.setData(data == null ? new Bundle() : data);
+            message.setData(data != null ? data : new Bundle());
             server.send(message);
         } catch (RemoteException e) {
             e.printStackTrace();

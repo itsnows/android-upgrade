@@ -20,7 +20,6 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 
 import com.itsnows.upgrade.provider.UpgradeFileProvider;
 
@@ -45,11 +44,6 @@ public class UpgradeUtil {
     private static final String TAG = UpgradeUtil.class.getSimpleName();
 
     /**
-     * 外部存储卡权限
-     */
-    public static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0x1024;
-
-    /**
      * 判断申请外部存储所需权限
      *
      * @param context
@@ -66,7 +60,7 @@ public class UpgradeUtil {
         }
         if (isActivate) {
             ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x1024);
         }
         return false;
     }
@@ -323,13 +317,13 @@ public class UpgradeUtil {
         int result = cmd("chmod 777 " + apk.getPath() + " \n" +
                 "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install -r " + apk.getPath() + " \n");
         if (result == 0) {
-            Log.d(TAG, "Install apk：Successfully");
+            UpgradeLogger.d(TAG, "Install apk：Successfully");
             return true;
         } else if (result == 1) {
-            Log.d(TAG, "Install apk：Failed");
+            UpgradeLogger.d(TAG, "Install apk：Failed");
             return false;
         } else {
-            Log.d(TAG, "Install apk：Unknown");
+            UpgradeLogger.d(TAG, "Install apk：Unknown");
             return false;
         }
     }
@@ -389,7 +383,7 @@ public class UpgradeUtil {
             while ((line = errorReader.readLine()) != null) {
                 logcat.append(line).append("\n");
             }
-            Log.d(TAG, "Shell logcat :" + logcat.toString());
+            UpgradeLogger.d(TAG, "Shell logcat :" + logcat.toString());
             return result;
         } catch (Exception e) {
             e.printStackTrace();

@@ -72,11 +72,4 @@ public class UpgradeVersion implements Parcelable {
         return 0;
     }
 
-    @Override
-    public String toString() {
-        return "UpgradeVersion{" +
-                "version=" + version +
-                ", isIgnored=" + isIgnored +
-                '}';
-    }
 }

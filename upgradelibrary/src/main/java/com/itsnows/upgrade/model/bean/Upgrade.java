@@ -345,14 +345,6 @@ public class Upgrade implements Parcelable {
         dest.writeParcelable(beta, flags);
     }
 
-    @Override
-    public String toString() {
-        return "Upgrade{" +
-                "stable=" + stable.toString() +
-                ", beta=" + beta.toString() +
-                '}';
-    }
-
     public static class Stable implements Parcelable {
 
         public static final Creator<Stable> CREATOR = new Creator<Stable>() {
@@ -490,18 +482,6 @@ public class Upgrade implements Parcelable {
             dest.writeString(md5);
         }
 
-        @Override
-        public String toString() {
-            return "Stable{" +
-                    "date='" + date + '\'' +
-                    ", mode=" + mode +
-                    ", logs=" + logs +
-                    ", versionCode=" + versionCode +
-                    ", versionName='" + versionName + '\'' +
-                    ", downloadUrl='" + downloadUrl + '\'' +
-                    ", md5='" + md5 + '\'' +
-                    '}';
-        }
     }
 
     public static class Beta implements Parcelable {
@@ -655,18 +635,5 @@ public class Upgrade implements Parcelable {
             return 0;
         }
 
-        @Override
-        public String toString() {
-            return "Beta{" +
-                    "device=" + device +
-                    ", date='" + date + '\'' +
-                    ", mode=" + mode +
-                    ", logs=" + logs +
-                    ", versionCode=" + versionCode +
-                    ", versionName='" + versionName + '\'' +
-                    ", downloadUrl='" + downloadUrl + '\'' +
-                    ", md5='" + md5 + '\'' +
-                    '}';
-        }
     }
 }

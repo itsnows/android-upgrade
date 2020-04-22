@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -40,7 +39,7 @@ import com.itsnows.upgrade.service.UpgradeService;
  */
 
 public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
-    public static final String TAG = UpgradeDialog.class.getSimpleName();
+    private static final String TAG = UpgradeDialog.class.getSimpleName();
     private LinearLayoutCompat llHeadBar;
     private AppCompatTextView tvTitle;
     private AppCompatTextView tvDate;
@@ -60,20 +59,25 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     private Activity activity;
     @NonNull
     private Upgrade upgrade;
+    @NonNull
+    private UpgradeOptions upgradeOptions;
     private UpgradeClient upgradeClient;
     private boolean isRequestPermission;
 
-    @ColorInt
-    private int theme;
-
-    private UpgradeDialog(@NonNull Context context) {
+    private UpgradeDialog(@NonNull Context context, @NonNull Upgrade upgrade,
+                          @NonNull UpgradeOptions upgradeOptions) {
         super(context);
         this.activity = (Activity) context;
+        this.upgrade = upgrade;
+        this.upgradeOptions = upgradeOptions;
     }
 
     /**
+     * 创建更新对话框
+     *
      * @param activity
      * @param upgrade
+     * @param upgradeOptions
      * @return
      */
     @SuppressLint("RestrictedApi")
@@ -81,9 +85,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                                             @NonNull UpgradeOptions upgradeOptions) {
         Preconditions.checkNotNull(upgrade);
         Preconditions.checkNotNull(upgradeOptions);
-        UpgradeDialog upgradeDialog = new UpgradeDialog(activity);
-        upgradeDialog.initArgs(upgrade, upgradeOptions);
-        return upgradeDialog;
+        return new UpgradeDialog(activity, upgrade, upgradeOptions);
     }
 
     @Override
@@ -110,12 +112,52 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_upgrade);
         initView();
+        initUpgrade();
     }
 
-    private void initArgs(Upgrade upgrade, UpgradeOptions upgradeOptions) {
-        this.upgrade = upgrade;
-        theme = upgradeOptions.getTheme();
-        upgradeClient = UpgradeClient.attach(activity, upgradeOptions);
+    private void initView() {
+        llHeadBar = findViewById(R.id.ll_dialog_upgrade_head_bar);
+        tvTitle = findViewById(R.id.tv_dialog_upgrade_title);
+        tvDate = findViewById(R.id.tv_dialog_upgrade_date);
+        tvVersions = findViewById(R.id.tv_dialog_upgrade_version);
+        tvLogs = findViewById(R.id.tv_dialog_upgrade_logs);
+
+        vDoneButton = findViewById(R.id.v_dialog_upgrade_done_button);
+        btnNegative = findViewById(R.id.btn_dialog_upgrade_negative);
+        btnNeutral = findViewById(R.id.btn_dialog_upgrade_neutral);
+        btnPositive = findViewById(R.id.btn_dialog_upgrade_positive);
+
+        vProgress = findViewById(R.id.v_dialog_upgrade_progress);
+        tvProgress = findViewById(R.id.tv_dialog_upgrade_progress);
+        pbProgressBar = findViewById(R.id.pb_dialog_upgrade_progressbar);
+        btnProgress = findViewById(R.id.btn_dialog_upgrade_progress);
+
+        llHeadBar.setBackground(getHeadDrawable());
+        pbProgressBar.setProgressDrawable(getProgressDrawable());
+        tvTitle.setText(getString(R.string.dialog_upgrade_title));
+        tvDate.setText(getString(R.string.dialog_upgrade_date, getDate()));
+        tvVersions.setText(getString(R.string.dialog_upgrade_versions, getVersionName()));
+        tvLogs.setText(getLogs());
+        tvProgress.setText(getString(R.string.dialog_upgrade_progress, 0));
+        tvProgress.setTextColor(getColorAccent());
+        btnPositive.setTextColor(getColorAccent());
+        btnProgress.setTextColor(getAccentColorStateList());
+        btnNeutral.setOnClickListener(this);
+        btnNegative.setOnClickListener(this);
+        btnPositive.setOnClickListener(this);
+        btnProgress.setOnClickListener(this);
+        if (getMode() == Upgrade.UPGRADE_MODE_FORCED) {
+            btnNeutral.setVisibility(View.GONE);
+            btnNegative.setVisibility(View.GONE);
+            setCancelable(false);
+        }
+
+        showDoneButton();
+
+    }
+
+    private void initUpgrade() {
+        upgradeClient = UpgradeClient.add(activity, upgradeOptions);
         upgradeClient.setOnConnectListener(new OnConnectListener() {
             @Override
             public void onConnected() {
@@ -142,8 +184,8 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 int tempProgress = (int) ((float) progress / max * 100);
                 if (tempProgress > pbProgressBar.getProgress()) {
                     tvProgress.setText(getString(R.string.dialog_upgrade_progress,
-                            tempProgress > 100 ? 100 : tempProgress));
-                    pbProgressBar.setProgress(tempProgress > 100 ? 100 : tempProgress);
+                            Math.min(tempProgress, 100)));
+                    pbProgressBar.setProgress(Math.min(tempProgress, 100));
                 }
                 btnProgress.setEnabled(true);
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ);
@@ -228,48 +270,9 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ);
             }
         });
-    }
-
-    private void initView() {
-        llHeadBar = findViewById(R.id.ll_dialog_upgrade_head_bar);
-        tvTitle = findViewById(R.id.tv_dialog_upgrade_title);
-        tvDate = findViewById(R.id.tv_dialog_upgrade_date);
-        tvVersions = findViewById(R.id.tv_dialog_upgrade_version);
-        tvLogs = findViewById(R.id.tv_dialog_upgrade_logs);
-
-        vDoneButton = findViewById(R.id.v_dialog_upgrade_done_button);
-        btnNegative = findViewById(R.id.btn_dialog_upgrade_negative);
-        btnNeutral = findViewById(R.id.btn_dialog_upgrade_neutral);
-        btnPositive = findViewById(R.id.btn_dialog_upgrade_positive);
-
-        vProgress = findViewById(R.id.v_dialog_upgrade_progress);
-        tvProgress = findViewById(R.id.tv_dialog_upgrade_progress);
-        pbProgressBar = findViewById(R.id.pb_dialog_upgrade_progressbar);
-        btnProgress = findViewById(R.id.btn_dialog_upgrade_progress);
-
-        llHeadBar.setBackground(getHeadDrawable());
-        pbProgressBar.setProgressDrawable(getProgressDrawable());
-        tvTitle.setText(getString(R.string.dialog_upgrade_title));
-        tvDate.setText(getString(R.string.dialog_upgrade_date, getDate()));
-        tvVersions.setText(getString(R.string.dialog_upgrade_versions, getVersionName()));
-        tvLogs.setText(getLogs());
-        tvProgress.setText(getString(R.string.dialog_upgrade_progress, 0));
-        tvProgress.setTextColor(getColorAccent());
-        btnPositive.setTextColor(getColorAccent());
-        btnProgress.setTextColor(getAccentColorStateList());
-        btnNeutral.setOnClickListener(this);
-        btnNegative.setOnClickListener(this);
-        btnPositive.setOnClickListener(this);
-        btnProgress.setOnClickListener(this);
-        if (getMode() == Upgrade.UPGRADE_MODE_FORCED) {
-            btnNeutral.setVisibility(View.GONE);
-            btnNegative.setVisibility(View.GONE);
-            setCancelable(false);
-        }
-
-        showDoneButton();
 
         if (UpgradeUtil.isServiceRunning(getContext(), UpgradeService.class.getName())) {
+            UpgradeLogger.d(TAG, "isServiceRunning");
             executeUpgrade();
         }
     }
@@ -283,7 +286,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     }
 
     private int getColorAccent() {
-        if (theme != 0) return theme;
+        if (upgradeOptions.getTheme() != 0) return upgradeOptions.getTheme();
         TypedValue typedValue = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
         return typedValue.data;
@@ -479,7 +482,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     @Override
     public void dismiss() {
         super.dismiss();
-        upgradeClient.death();
+        upgradeClient.remove();
     }
 
     @Override
