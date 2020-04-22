@@ -33,6 +33,9 @@
         <!--device：测试版设备序列号-->
         <device>
             <sn>JGB9K17928918126</sn>
+
+            <!--模拟器设备-->
+            <sn>unknown</sn>
         </device>
         <!--date：更新日期-->
         <date>2018-02-09</date>
