@@ -1090,25 +1090,24 @@ public class UpgradeService extends Service {
                 upgradeBuffer = new UpgradeBuffer();
                 upgradeBuffer.setDownloadUrl(upgradeOption.getUrl());
                 upgradeBuffer.setFileMd5(upgradeOption.getMd5());
-                upgradeBuffer.setBufferLength(progress.get());
+                upgradeBuffer.setFilePath(upgradeOption.getStorage().getPath());
                 upgradeBuffer.setFileLength(maxProgress);
                 upgradeBuffer.setBufferParts(new CopyOnWriteArrayList<UpgradeBuffer.BufferPart>());
-                upgradeBuffer.setLastModified(System.currentTimeMillis());
             }
             upgradeBuffer.setBufferLength(progress.get());
             upgradeBuffer.setLastModified(System.currentTimeMillis());
-            int index = -1;
-            for (int i = 0; i < upgradeBuffer.getBufferParts().size(); i++) {
-                if (upgradeBuffer.getBufferParts().get(i).getEndLength() == endLength) {
-                    index = i;
+            int selected = -1;
+            for (int index = 0; index < upgradeBuffer.getBufferParts().size(); index++) {
+                if (upgradeBuffer.getBufferParts().get(index).getEndLength() == endLength) {
+                    selected = index;
                     break;
                 }
             }
             UpgradeBuffer.BufferPart bufferPart = new UpgradeBuffer.BufferPart(startLength, endLength);
-            if (index == -1) {
+            if (selected == -1) {
                 upgradeBuffer.getBufferParts().add(bufferPart);
             } else {
-                upgradeBuffer.getBufferParts().set(index, bufferPart);
+                upgradeBuffer.getBufferParts().set(selected, bufferPart);
             }
             repository.putUpgradeBuffer(upgradeBuffer);
         }

@@ -75,10 +75,10 @@ public class UpgradeRepository implements UpgradeDataSource {
     @Override
     public void putUpgradeVersion(UpgradeVersion version) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        String sql = "INSERT OR REPLACE INTO "
-                + UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + "("
-                + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + ","
-                + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
+        String sql = "INSERT OR REPLACE INTO " +
+                UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + "(" +
+                UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "," +
+                UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?,?)";
         try {
             Object[] bindArgs = new Object[]{
                     version.getVersion(),
@@ -107,6 +107,8 @@ public class UpgradeRepository implements UpgradeDataSource {
                         UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL)));
                 upgradeBuffer.setFileMd5(cursor.getString(cursor.getColumnIndex(
                         UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5)));
+                upgradeBuffer.setFilePath(cursor.getString(cursor.getColumnIndex(
+                        UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_PATH)));
                 upgradeBuffer.setFileLength(cursor.getLong(cursor.getColumnIndex(
                         UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH)));
                 upgradeBuffer.setBufferLength(cursor.getLong(cursor.getColumnIndex(
@@ -147,10 +149,11 @@ public class UpgradeRepository implements UpgradeDataSource {
                 UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + "(" +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5 + "," +
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_PATH + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + "," +
                 UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + "," +
-                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?)";
+                UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + ")VALUES(?,?,?,?,?,?,?)";
         try {
             JSONArray ja = new JSONArray();
             List<UpgradeBuffer.BufferPart> bufferParts = buffer.getBufferParts();
@@ -163,6 +166,7 @@ public class UpgradeRepository implements UpgradeDataSource {
             Object[] bindArgs = new Object[]{
                     buffer.getDownloadUrl(),
                     buffer.getFileMd5(),
+                    buffer.getFilePath(),
                     buffer.getFileLength(),
                     buffer.getBufferLength(),
                     ja.toString(),

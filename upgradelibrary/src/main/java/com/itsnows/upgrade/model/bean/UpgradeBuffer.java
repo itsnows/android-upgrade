@@ -34,9 +34,13 @@ public class UpgradeBuffer implements Parcelable {
      */
     private String downloadUrl;
     /**
-     * MD5文件完整校验
+     * 文件完整校验
      */
     private String fileMd5;
+    /**
+     * 文件存储路径
+     */
+    private String filePath;
     /**
      * 文件总长度
      */
@@ -57,9 +61,10 @@ public class UpgradeBuffer implements Parcelable {
     public UpgradeBuffer() {
     }
 
-    public UpgradeBuffer(String downloadUrl, String fileMd5, long fileLength, long bufferLength, List<BufferPart> bufferParts, long lastModified) {
+    public UpgradeBuffer(String downloadUrl, String fileMd5, String filePath, long fileLength, long bufferLength, List<BufferPart> bufferParts, long lastModified) {
         this.downloadUrl = downloadUrl;
         this.fileMd5 = fileMd5;
+        this.filePath = filePath;
         this.fileLength = fileLength;
         this.bufferLength = bufferLength;
         this.bufferParts = bufferParts;
@@ -69,6 +74,7 @@ public class UpgradeBuffer implements Parcelable {
     protected UpgradeBuffer(Parcel in) {
         downloadUrl = in.readString();
         fileMd5 = in.readString();
+        filePath = in.readString();
         fileLength = in.readLong();
         bufferLength = in.readLong();
         bufferParts = in.createTypedArrayList(BufferPart.CREATOR);
@@ -79,6 +85,7 @@ public class UpgradeBuffer implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(downloadUrl);
         dest.writeString(fileMd5);
+        dest.writeString(filePath);
         dest.writeLong(fileLength);
         dest.writeLong(bufferLength);
         dest.writeTypedList(bufferParts);
@@ -104,6 +111,14 @@ public class UpgradeBuffer implements Parcelable {
 
     public void setFileMd5(String fileMd5) {
         this.fileMd5 = fileMd5;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public long getFileLength() {

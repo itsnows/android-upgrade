@@ -51,7 +51,7 @@ public class UpgradeRepositoryTest {
 
     @Test
     public void testPetUpgradeVersion() {
-        UpgradeVersion upgradeVersion = new UpgradeVersion(1, false);
+        UpgradeVersion upgradeVersion = new UpgradeVersion(1, false, false);
         repository.putUpgradeVersion(upgradeVersion);
     }
 
@@ -68,6 +68,7 @@ public class UpgradeRepositoryTest {
     @Test
     public void testPutUpgradeBuffer() {
         UpgradeBuffer upgradeBuffer = new UpgradeBuffer("http://www.baidu.com",
+                null,
                 null,
                 1024L,
                 1024L,

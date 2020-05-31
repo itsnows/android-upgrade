@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 
 import com.itsnows.upgrade.UpgradeLogger;
 import com.itsnows.upgrade.UpgradeUtil;
+import com.itsnows.upgrade.model.UpgradeRepository;
+import com.itsnows.upgrade.model.bean.UpgradeVersion;
 
 /**
  * Author: itsnows
@@ -66,7 +68,12 @@ public class PackagesReceiver extends BroadcastReceiver {
      * @param packageName
      */
     public void onPackageReplaced(Context context, String packageName) {
-        UpgradeUtil.rebootApp(context, context.getPackageName());
+        if (context.getPackageName().equals(packageName)) {
+            UpgradeRepository repository = UpgradeRepository.getInstance(context);
+            UpgradeVersion upgradeVersion = repository.getUpgradeVersion(UpgradeUtil.getVersionCode(context));
+
+            UpgradeUtil.rebootApp(context, context.getPackageName());
+        }
     }
 
     /**

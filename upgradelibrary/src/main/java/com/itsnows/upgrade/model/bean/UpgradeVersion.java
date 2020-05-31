@@ -40,7 +40,7 @@ public class UpgradeVersion implements Parcelable {
     public UpgradeVersion() {
     }
 
-    public UpgradeVersion(int version, boolean isIgnored) {
+    public UpgradeVersion(int version, boolean isIgnored, boolean isInstall) {
         this.version = version;
         this.isIgnored = isIgnored;
     }

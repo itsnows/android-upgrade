@@ -16,22 +16,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class UpgradeDBHelper {
     private static final String DB_NAME = "upgrade.db";
-    private static final int DB_VERSION = 1;
-    private static final String SQL_CREATE_UPGRADE_VERSION = "CREATE TABLE IF NOT EXISTS "
-            + UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + " ("
-            + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + " INTEGER NOT NULL,"
-            + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + " INTEGER,PRIMARY KEY("
-            + UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "))";
-    private static final String SQL_CREATE_UPGRADE_BUFFER = "CREATE TABLE IF NOT EXISTS "
-            + UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + " ("
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + " TEXT NOT NULL,"
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5 + " TEXT,"
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH + " INTEGER,"
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + " INTEGER,"
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + " INTEGER,"
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + " INTEGER,PRIMARY KEY("
-            + UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "))";
-
+    private static final int DB_VERSION = 2;
+    private static final String SQL_CREATE_UPGRADE_VERSION = "CREATE TABLE IF NOT EXISTS " +
+            UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + " (" +
+            UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + " INTEGER NOT NULL," +
+            UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + " INTEGER,PRIMARY KEY(" +
+            UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "))";
+    private static final String SQL_CREATE_UPGRADE_BUFFER = "CREATE TABLE IF NOT EXISTS " +
+            UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME + " (" +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + " TEXT NOT NULL," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_MD5 + " TEXT," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_PATH + " TEXT," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_FILE_LENGTH + " INTEGER," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_LENGTH + " INTEGER," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_BUFFER_PART + " INTEGER," +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_LAST_MODIFIED + " INTEGER,PRIMARY KEY(" +
+            UpgradePersistenceContract.UpgradeBufferEntry.COLUMN_NAME_DOWNLOAD_URL + "))";
     private SQLiteOpenHelper helper;
     private SQLiteDatabase db;
     private AtomicInteger lock;
@@ -83,7 +83,17 @@ public class UpgradeDBHelper {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+            for (int version = oldVersion; version <= newVersion; version++) {
+                switch (version) {
+                    case 2:
+                        db.execSQL("DROP TABLE " + UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME);
+                        db.execSQL("DROP TABLE " + UpgradePersistenceContract.UpgradeBufferEntry.TABLE_NAME);
+                        onCreate(db);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         @Override
