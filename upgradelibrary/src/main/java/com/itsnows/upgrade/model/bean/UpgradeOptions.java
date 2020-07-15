@@ -51,6 +51,7 @@ public final class UpgradeOptions implements Parcelable {
      * 下载链接或更新文档链接
      */
     private final String url;
+
     /**
      * MD5文件完整校验
      */
@@ -76,18 +77,18 @@ public final class UpgradeOptions implements Parcelable {
      */
     private final boolean autocleanEnabled;
 
-    private UpgradeOptions(Params params) {
-        theme = params.theme;
-        icon = params.icon;
-        title = params.title;
-        description = params.description;
-        storage = params.storage;
-        url = params.url;
-        md5 = params.md5;
-        multithreadPools = params.multithreadPools;
-        multithreadEnabled = params.multithreadEnabled;
-        automountEnabled = params.automountEnabled;
-        autocleanEnabled = params.autocleanEnabled;
+    private UpgradeOptions(Parameter parameter) {
+        theme = parameter.theme;
+        icon = parameter.icon;
+        title = parameter.title;
+        description = parameter.description;
+        storage = parameter.storage;
+        url = parameter.url;
+        md5 = parameter.md5;
+        multithreadPools = parameter.multithreadPools;
+        multithreadEnabled = parameter.multithreadEnabled;
+        automountEnabled = parameter.automountEnabled;
+        autocleanEnabled = parameter.autocleanEnabled;
     }
 
     protected UpgradeOptions(Parcel in) {
@@ -169,73 +170,73 @@ public final class UpgradeOptions implements Parcelable {
     }
 
     public static class Builder {
-        private Params params;
+        private Parameter parameter;
 
         public Builder() {
-            params = new Params();
+            parameter = new Parameter();
         }
 
         public Builder setTheme(@ColorInt int theme) {
-            params.theme = theme;
+            parameter.theme = theme;
             return this;
         }
 
         public Builder setIcon(Bitmap icon) {
-            params.icon = icon;
+            parameter.icon = icon;
             return this;
         }
 
         public Builder setTitle(CharSequence title) {
-            params.title = title;
+            parameter.title = title;
             return this;
         }
 
         public Builder setDescription(CharSequence description) {
-            params.description = description;
+            parameter.description = description;
             return this;
         }
 
         public Builder setStorage(File storage) {
-            params.storage = storage;
+            parameter.storage = storage;
             return this;
         }
 
         public Builder setUrl(String url) {
-            params.url = url;
+            parameter.url = url;
             return this;
         }
 
         public Builder setMd5(String md5) {
-            params.md5 = md5;
+            parameter.md5 = md5;
             return this;
         }
 
         public Builder setMultithreadPools(int pools) {
-            params.multithreadPools = Math.max(pools, 0);
+            parameter.multithreadPools = Math.max(pools, 0);
             return this;
         }
 
         public Builder setMultithreadEnabled(boolean enabled) {
-            params.multithreadEnabled = enabled;
+            parameter.multithreadEnabled = enabled;
             return this;
         }
 
         public Builder setAutomountEnabled(boolean enabled) {
-            params.automountEnabled = enabled;
+            parameter.automountEnabled = enabled;
             return this;
         }
 
         public Builder setAutocleanEnabled(boolean enabled) {
-            params.autocleanEnabled = enabled;
+            parameter.autocleanEnabled = enabled;
             return this;
         }
 
         public UpgradeOptions build() {
-            return new UpgradeOptions(params);
+            return new UpgradeOptions(parameter);
         }
     }
 
-    private static class Params {
+    private static class Parameter {
         private int theme;
         private Bitmap icon;
         private CharSequence title;

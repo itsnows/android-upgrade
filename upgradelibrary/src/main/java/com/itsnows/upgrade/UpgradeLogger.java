@@ -60,6 +60,16 @@ public class UpgradeLogger {
     }
 
     /**
+     * WARN
+     *
+     * @param tag
+     * @param throwable
+     */
+    public static void w(String tag, Throwable throwable) {
+        if (level >= WARN) Log.w(tag != null ? tag : TAG, throwable);
+    }
+
+    /**
      * ERROR
      *
      * @param tag

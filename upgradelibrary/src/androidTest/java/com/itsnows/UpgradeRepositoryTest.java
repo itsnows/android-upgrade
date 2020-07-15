@@ -3,8 +3,8 @@ package com.itsnows;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
+import com.itsnows.upgrade.UpgradeLogger;
 import com.itsnows.upgrade.model.UpgradeRepository;
 import com.itsnows.upgrade.model.bean.UpgradeBuffer;
 import com.itsnows.upgrade.model.bean.UpgradeVersion;
@@ -43,15 +43,15 @@ public class UpgradeRepositoryTest {
     public void testGetUpgradeVersion() {
         UpgradeVersion upgradeVersion = repository.getUpgradeVersion(1);
         if (upgradeVersion == null || upgradeVersion.isIgnored()) {
-            Log.i(TAG, "未忽略的版本");
+            UpgradeLogger.i(TAG, "未忽略的版本");
         } else {
-            Log.i(TAG, "已忽略的版本");
+            UpgradeLogger.i(TAG, "已忽略的版本");
         }
     }
 
     @Test
     public void testPetUpgradeVersion() {
-        UpgradeVersion upgradeVersion = new UpgradeVersion(1, false, false);
+        UpgradeVersion upgradeVersion = new UpgradeVersion(1, false);
         repository.putUpgradeVersion(upgradeVersion);
     }
 
@@ -59,9 +59,9 @@ public class UpgradeRepositoryTest {
     public void testGetUpgradeBuffer() {
         UpgradeBuffer upgradeBuffer = repository.getUpgradeBuffer("http://www.baidu.com");
         if (upgradeBuffer == null) {
-            Log.i(TAG, "未缓存的版本");
+            UpgradeLogger.i(TAG, "未缓存的版本");
         } else {
-            Log.i(TAG, "已缓存的版本");
+            UpgradeLogger.i(TAG, "已缓存的版本");
         }
     }
 

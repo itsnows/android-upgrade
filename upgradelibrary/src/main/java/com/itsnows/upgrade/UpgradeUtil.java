@@ -87,9 +87,8 @@ public class UpgradeUtil {
             drawable.draw(canvas);
             return bitmap;
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**
@@ -104,9 +103,8 @@ public class UpgradeUtil {
             PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
             return context.getResources().getString(packageInfo.applicationInfo.labelRes);
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**
@@ -121,9 +119,8 @@ public class UpgradeUtil {
             PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            return -1;
         }
-        return -1;
     }
 
     /**
@@ -135,12 +132,9 @@ public class UpgradeUtil {
         try {
             Field field = Build.class.getField("SERIAL");
             return (String) field.get(null);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -218,7 +212,7 @@ public class UpgradeUtil {
                 .getSystemService(Context.ACTIVITY_SERVICE);
         if (am != null) {
             ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
-            if (cn != null && cn.getPackageName() != null) {
+            if (cn != null) {
                 return packageName.equals(cn.getPackageName());
             }
         }
@@ -318,13 +312,13 @@ public class UpgradeUtil {
         int result = cmd("chmod 777 " + apk.getPath() + " \n" +
                 "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install -r " + apk.getPath() + " \n");
         if (result == 0) {
-            UpgradeLogger.d(TAG, "Install apk：Successfully");
+            UpgradeLogger.d(TAG, "Install apk successfully");
             return true;
         } else if (result == 1) {
-            UpgradeLogger.d(TAG, "Install apk：Failed");
+            UpgradeLogger.d(TAG, "Install apk failed");
             return false;
         } else {
-            UpgradeLogger.d(TAG, "Install apk：Unknown");
+            UpgradeLogger.d(TAG, "Install apk unknown");
             return false;
         }
     }
@@ -384,10 +378,10 @@ public class UpgradeUtil {
             while ((line = errorReader.readLine()) != null) {
                 logcat.append(line).append("\n");
             }
-            UpgradeLogger.d(TAG, "Shell logcat :" + logcat.toString());
+            UpgradeLogger.d(TAG, "Shell logcat " + logcat.toString());
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            UpgradeLogger.d(TAG, "Shell error " + e.toString());
         } finally {
 
             if (errorReader != null) {

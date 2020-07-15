@@ -62,12 +62,7 @@ public class UpgradeRepository implements UpgradeDataSource {
                 return upgradeVersion;
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-            if (db != null) {
-                helper.close(db);
-            }
+            helper.close(cursor, db);
         }
         return null;
     }
@@ -78,16 +73,14 @@ public class UpgradeRepository implements UpgradeDataSource {
         String sql = "INSERT OR REPLACE INTO " +
                 UpgradePersistenceContract.UpgradeVersionEntry.TABLE_NAME + "(" +
                 UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_VERSION + "," +
-                UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?,?)";
+                UpgradePersistenceContract.UpgradeVersionEntry.COLUMN_NAME_IS_IGNORED + ")VALUES(?,?)";
         try {
             Object[] bindArgs = new Object[]{
                     version.getVersion(),
                     version.isIgnored()};
             db.execSQL(sql, bindArgs);
         } finally {
-            if (db != null) {
-                helper.close(db);
-            }
+            helper.close(db);
         }
     }
 
@@ -129,14 +122,9 @@ public class UpgradeRepository implements UpgradeDataSource {
                 return upgradeBuffer;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            UpgradeLogger.w(TAG, e);
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-            if (db != null) {
-                helper.close(db);
-            }
+            helper.close(cursor, db);
         }
         return null;
     }
@@ -175,11 +163,10 @@ public class UpgradeRepository implements UpgradeDataSource {
             long endTime = System.currentTimeMillis();
             UpgradeLogger.d(TAG, "Elapsed time: " + (endTime - startTime));
         } catch (Exception e) {
-            e.printStackTrace();
+            UpgradeLogger.w(TAG, e);
         } finally {
-            if (db != null) {
-                helper.close(db);
-            }
+            helper.close(db);
         }
     }
+
 }

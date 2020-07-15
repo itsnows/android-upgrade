@@ -88,8 +88,8 @@ public class UpgradeManager {
      * 检测更新任务
      */
     private static class CheckForUpdatesTask extends AsyncTask<Object, Void, Message> {
-        private static final int RESULT_CODE_TRUE = 0x1024;
-        private static final int RESULT_CODE_FALSE = 0x1025;
+        private static final int RESULT_SUCCESS = 0x1001;
+        private static final int RESULT_FAILURE = 0x1000;
         private WeakReference<Activity> reference;
 
         private CheckForUpdatesTask(Activity activity) {
@@ -104,7 +104,7 @@ public class UpgradeManager {
         @Override
         protected Message doInBackground(Object... params) {
             Message message = new Message();
-            message.what = RESULT_CODE_TRUE;
+            message.what = RESULT_SUCCESS;
             message.obj = params[1];
             message.setData(new Bundle());
             try {
@@ -120,8 +120,8 @@ public class UpgradeManager {
                 }
                 throw new IllegalArgumentException("Url：" + upgradeOptions.getUrl() + " link error");
             } catch (Exception e) {
-                e.printStackTrace();
-                message.what = RESULT_CODE_FALSE;
+                UpgradeLogger.w(TAG, e);
+                message.what = RESULT_FAILURE;
                 message.getData().putString("message", e.getMessage());
             }
             return message;
@@ -154,7 +154,7 @@ public class UpgradeManager {
                     .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
                     .setMd5(upgradeOptions.getMd5());
             switch (message.what) {
-                case RESULT_CODE_TRUE:
+                case RESULT_SUCCESS:
                     if (upgrade == null) {
                         if (message.obj == null || message.obj instanceof Boolean) {
                             UpgradeClient.add(activity, builder.build()).start();
@@ -334,7 +334,7 @@ public class UpgradeManager {
                         }
                         return;
                     }
-                case RESULT_CODE_FALSE:
+                case RESULT_FAILURE:
                     if (message.obj instanceof Boolean) {
                         boolean isAutoCheck = (boolean) message.obj;
                         if (!isAutoCheck) {

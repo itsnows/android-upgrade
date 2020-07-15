@@ -5,6 +5,8 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -63,9 +65,25 @@ public class UpgradeDBHelper {
         return db;
     }
 
-    public synchronized void close(SQLiteDatabase db) {
+    private synchronized void close(SQLiteDatabase db) {
         if (lock.decrementAndGet() == 0) {
             db.close();
+        }
+    }
+
+    public void close(Closeable... closeables) {
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                if (closeable instanceof SQLiteDatabase) {
+                    close((SQLiteDatabase) closeable);
+                } else {
+                    try {
+                        closeable.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
