@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class Upgrade implements Parcelable {
             }
             readerStream.close();
             byte[] buffer = bufferStream.toByteArray();
-            String str = new String(buffer, "utf-8").trim();
+            String str = new String(buffer, StandardCharsets.UTF_8).trim();
             str = str.substring(0, Math.min(str.length(), 2));
             if (str.contains("[") || str.contains("{")) {
                 return parserJson(new ByteArrayInputStream(buffer));
@@ -263,7 +264,7 @@ public class Upgrade implements Parcelable {
     public static Upgrade parserJson(InputStream inputStream) throws Exception {
         BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line = null;
             StringBuilder json = new StringBuilder();
             while ((line = bufferedReader.readLine()) != null) {
