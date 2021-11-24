@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.itsnows.upgrade">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--允许程序打开网络套接字-->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -33,7 +32,7 @@
 
         <!-- UpgradeService -->
         <service
-            android:name=".service.UpgradeService"
+            android:name="com.itsnows.android.upgrade.service.UpgradeService"
             android:enabled="true"
             android:exported="true"
             android:process=":upgrade">
@@ -44,7 +43,7 @@
 
         <!--PackagesReceiver-->
         <receiver
-            android:name=".receiver.PackagesReceiver"
+            android:name="com.itsnows.android.upgrade.receiver.PackagesReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -58,7 +57,7 @@
 
         <!-- UpgradeFileProvider -->
         <provider
-            android:name=".provider.UpgradeFileProvider"
+            android:name="com.itsnows.android.upgrade.provider.UpgradeFileProvider"
             android:authorities="${applicationId}.UpgradeFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="56dp"
@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_dialog_upgrade_progress"
             style="@style/TextAppearance.AppCompat.Small"
             android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
             android:textColor="@color/dialog_upgrade_accent_color"
             android:textSize="@dimen/dialog_upgrade_progress_text_size" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_dialog_upgrade_progress"
             style="@style/AppTheme.Dialog.ActionButton"
             android:layout_width="wrap_content"
@@ -46,4 +46,4 @@
 
     </RelativeLayout>
 
-</android.support.v7.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

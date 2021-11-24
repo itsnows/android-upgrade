@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.upgrade.MainActivity">
+    tools:context=".MainActivity">
 
     <Button
         android:id="@+id/btn_check_updates_default_common"

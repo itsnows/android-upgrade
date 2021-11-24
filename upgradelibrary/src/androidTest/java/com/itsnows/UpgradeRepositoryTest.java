@@ -4,10 +4,10 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.itsnows.upgrade.UpgradeLogger;
-import com.itsnows.upgrade.model.UpgradeRepository;
-import com.itsnows.upgrade.model.bean.UpgradeBuffer;
-import com.itsnows.upgrade.model.bean.UpgradeVersion;
+import com.itsnows.android.upgrade.UpgradeLogger;
+import com.itsnows.android.upgrade.model.UpgradeRepository;
+import com.itsnows.android.upgrade.model.bean.UpgradeBuffer;
+import com.itsnows.android.upgrade.model.bean.UpgradeVersion;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,9 +17,8 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Author: itsnows
- * E-mail: xue.com.fei@outlook.com
- * CreatedTime: 2018/2/9 9:56
+ * @author itsnows, xue.com.fei@gmail.com
+ * @since 2018/2/9 9:56
  * <p>
  * UpgradeRepositoryTest
  */

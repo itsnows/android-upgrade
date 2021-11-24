@@ -1,1 +1,2 @@
-include ':app',':upgradelibrary'
+include ':app'
+include ':upgradelibrary'
