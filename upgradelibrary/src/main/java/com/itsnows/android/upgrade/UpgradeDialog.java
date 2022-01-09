@@ -172,7 +172,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 super.onStart();
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_pause));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_START_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_DOWNLOAD_START);
                 UpgradeLogger.d(TAG, "Download start");
             }
 
@@ -185,7 +185,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                     pbProgressBar.setProgress(Math.min(tempProgress, 100));
                 }
                 btnProgress.setEnabled(true);
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_DOWNLOAD_PROGRESS);
                 UpgradeLogger.d(TAG, "Download Progress");
             }
 
@@ -194,7 +194,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 super.onPause();
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_resume));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_DOWNLOAD_PAUSE);
                 UpgradeLogger.d(TAG, "Download pause");
             }
 
@@ -202,7 +202,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             public void onCancel() {
                 dismiss();
                 btnProgress.setEnabled(true);
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_DOWNLOAD_CANCEL);
                 UpgradeLogger.d(TAG, "Download cancel");
             }
 
@@ -216,7 +216,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             @Override
             public void onComplete() {
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_complete));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_DOWNLOAD_COMPLETE);
             }
         });
         upgradeClient.setOnInstallListener(new OnInstallListener() {
@@ -225,21 +225,21 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
             public void onValidate() {
                 btnProgress.setEnabled(false);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_check));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_INSTALL_VALIDATE);
             }
 
             @Override
             public void onStart() {
                 btnProgress.setEnabled(false);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_install));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_START_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_INSTALL_START);
             }
 
             @Override
             public void onCancel() {
                 btnProgress.setEnabled(true);
                 btnProgress.setText(getString(R.string.dialog_upgrade_btn_reset));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_CANCEL_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_INSTALL_CANCEL);
             }
 
             @Override
@@ -255,7 +255,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                             getString(R.string.message_install_error),
                             getString(R.string.dialog_upgrade_btn_reset)));
                 }
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_INSTALL_ERROR);
             }
 
             @Override
@@ -264,7 +264,7 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 btnProgress.setText(String.format("%1$s，%2$s",
                         getString(R.string.message_install_complete),
                         getString(R.string.dialog_upgrade_btn_launch)));
-                btnProgress.setTag(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ);
+                btnProgress.setTag(UpgradeConstant.CODE_INSTALL_COMPLETE);
             }
         });
 
@@ -285,13 +285,13 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
     private int getColorAccent() {
         if (upgradeOptions.getTheme() != 0) return upgradeOptions.getTheme();
         TypedValue typedValue = new TypedValue();
-        activity.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
+        activity.getTheme().resolveAttribute(android.R.attr.colorAccent, typedValue, true);
         return typedValue.data;
     }
 
     private int getColorPrimary() {
         TypedValue typedValue = new TypedValue();
-        activity.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        activity.getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
         return typedValue.data;
     }
 
@@ -501,20 +501,20 @@ public class UpgradeDialog extends AlertDialog implements View.OnClickListener {
                 return;
             }
             int tag = (int) v.getTag();
-            if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_START_REQ
-                    || tag == UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_REQ) {
+            if (tag == UpgradeConstant.CODE_DOWNLOAD_START
+                    || tag == UpgradeConstant.CODE_DOWNLOAD_PROGRESS) {
                 upgradeClient.pause();
-            } else if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ
-                    || tag == UpgradeConstant.MSG_KEY_DOWNLOAD_ERROR_REQ) {
+            } else if (tag == UpgradeConstant.CODE_DOWNLOAD_PAUSE
+                    || tag == UpgradeConstant.CODE_DOWNLOAD_ERROR) {
                 upgradeClient.resume();
-            } else if (tag == UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ) {
+            } else if (tag == UpgradeConstant.CODE_DOWNLOAD_COMPLETE) {
                 upgradeClient.install();
                 if (getMode() != Upgrade.UPGRADE_MODE_FORCED) {
                     dismiss();
                 }
-            } else if (tag == UpgradeConstant.MSG_KEY_INSTALL_ERROR_REQ) {
+            } else if (tag == UpgradeConstant.CODE_INSTALL_ERROR) {
                 upgradeClient.resume();
-            } else if (tag == UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_REQ) {
+            } else if (tag == UpgradeConstant.CODE_INSTALL_COMPLETE) {
                 upgradeClient.reboot();
                 dismiss();
             }

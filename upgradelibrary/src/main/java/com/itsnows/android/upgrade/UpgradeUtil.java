@@ -17,6 +17,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -62,6 +63,25 @@ public class UpgradeUtil {
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x1024);
         }
         return false;
+    }
+
+    /**
+     * 获取应用程序路径
+     *
+     * @return
+     */
+    public static String getAppPath(Context context) {
+        String path = context.getPackageName();
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                path = context.getExternalFilesDir(null).getPath();
+            } else {
+                path = Environment.getExternalStorageDirectory() + File.separator + path;
+            }
+        } else {
+            path = Environment.getRootDirectory() + File.separator + path;
+        }
+        return path;
     }
 
     /**

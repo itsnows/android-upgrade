@@ -141,18 +141,7 @@ public class UpgradeManager {
             Bundle bundle = message.getData();
             Upgrade upgrade = bundle.getParcelable("upgrade");
             UpgradeOptions upgradeOptions = bundle.getParcelable("upgrade_options");
-            UpgradeOptions.Builder builder = new UpgradeOptions.Builder()
-                    .setTheme(upgradeOptions.getTheme())
-                    .setIcon(upgradeOptions.getIcon())
-                    .setTitle(upgradeOptions.getTitle())
-                    .setDescription(upgradeOptions.getDescription())
-                    .setStorage(upgradeOptions.getStorage())
-                    .setUrl(upgradeOptions.getUrl())
-                    .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
-                    .setMultithreadPools(upgradeOptions.getMultithreadPools())
-                    .setAutomountEnabled(upgradeOptions.isAutomountEnabled())
-                    .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
-                    .setMd5(upgradeOptions.getMd5());
+            UpgradeOptions.Builder builder = upgradeOptions.newBuilder();
             switch (message.what) {
                 case RESULT_SUCCESS:
                     if (upgrade == null) {

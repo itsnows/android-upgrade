@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -93,11 +92,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 下载链接或更新文档链接
                 .setUrl(DOC_JSON_URL)
                 // 下载文件存储路径（可选）
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
                 // 是否支持多线性下载（可选）
                 .setMultithreadEnabled(true)
                 // 线程池大小（可选）
-                .setMultithreadPools(10)
+                .setMultithreadPool(10)
                 // 文件MD5（可选）
                 .setMd5(null)
                 // 是否自动删除安装包（可选）
@@ -117,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("腾讯QQ")
                 .setDescription("下载更新")
                 .setUrl(DOC_XML_URL)
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(1)
+                .setMultithreadPool(1)
                 .build(), true);
     }
 
@@ -132,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("腾讯QQ")
                 .setDescription("下载更新")
                 .setUrl(DOC_FORCE_XML_URL)
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(10)
+                .setMultithreadPool(10)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
                 .setAutomountEnabled(true)
@@ -151,9 +150,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("腾讯QQ")
                 .setDescription("下载更新")
                 .setUrl(DOC_BATE_XML_URL)
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(10)
+                .setMultithreadPool(10)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
                 .setAutomountEnabled(true)
@@ -169,9 +168,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("腾讯QQ")
                 .setDescription("下载更新")
                 .setUrl(DOC_XML_URL)
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
                 .setMultithreadEnabled(true)
-                .setMultithreadPools(1)
+                .setMultithreadPool(1)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
                 .setAutomountEnabled(true)
@@ -207,8 +206,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("腾讯QQ")
                 .setDescription("下载更新")
                 .setUrl("http://gdown.baidu.com/data/wisegame/2965a5c112549eb8/QQ_996.apk")
-                .setStorage(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/com.upgrade.apk"))
-                .setMultithreadPools(1)
+                .setStorage(new File(UpgradeUtil.getAppPath(this) + "/Download/com.upgrade.apk"))
+                .setMultithreadPool(1)
                 .setMultithreadEnabled(true)
                 .setMd5(null)
                 .setAutocleanEnabled(true)
@@ -285,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onComplete() {
-                btnUpgrade.setTag(UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_REQ);
+                btnUpgrade.setTag(UpgradeConstant.CODE_DOWNLOAD_COMPLETE);
                 Log.d(TAG, "onComplete");
             }
         });

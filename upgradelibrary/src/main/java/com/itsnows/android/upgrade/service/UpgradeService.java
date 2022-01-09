@@ -11,7 +11,6 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -313,24 +312,18 @@ public class UpgradeService extends Service {
 
         UpgradeOptions upgradeOptions = null;
         if (intent != null && (upgradeOptions = intent.getParcelableExtra(PARAMS_UPGRADE_OPTION)) != null) {
-            this.upgradeOption = new UpgradeOptions.Builder()
+            this.upgradeOption = upgradeOptions.newBuilder()
                     .setIcon(upgradeOptions.getIcon() == null ?
                             UpgradeUtil.getAppIcon(this) : upgradeOptions.getIcon())
                     .setTitle(upgradeOptions.getTitle() == null ?
                             UpgradeUtil.getAppName(this) : upgradeOptions.getTitle())
-                    .setDescription(upgradeOptions.getDescription())
                     .setStorage(upgradeOptions.getStorage() == null ?
-                            new File(Environment.getExternalStorageDirectory(),
-                                    getPackageName() + ".apk") : upgradeOptions.getStorage())
-                    .setUrl(upgradeOptions.getUrl())
-                    .setMd5(upgradeOptions.getMd5())
-                    .setMultithreadEnabled(upgradeOptions.isMultithreadEnabled())
-                    .setMultithreadPools(upgradeOptions.isMultithreadEnabled() ?
-                            upgradeOptions.getMultithreadPools() > 0 ?
-                                    upgradeOptions.getMultithreadPools() :
+                            new File(UpgradeUtil.getAppPath(this), getPackageName() + ".apk") :
+                            upgradeOptions.getStorage())
+                    .setMultithreadPool(upgradeOptions.isMultithreadEnabled() ?
+                            upgradeOptions.getMultithreadPool() > 0 ?
+                                    upgradeOptions.getMultithreadPool() :
                                     Runtime.getRuntime().availableProcessors() : 1)
-                    .setAutocleanEnabled(upgradeOptions.isAutocleanEnabled())
-                    .setAutomountEnabled(upgradeOptions.isAutomountEnabled())
                     .build();
             initNotify();
             start();
@@ -627,22 +620,22 @@ public class UpgradeService extends Service {
                 iterator.remove();
                 continue;
             }
-            sendMessageToClient(client, key, data);
+            sendMessageToClient(key, data, client);
         }
     }
 
     /**
      * 发送消息到客户端
      *
-     * @param client
-     * @param key
+     * @param code
      * @param data
+     * @param client
      */
-    private void sendMessageToClient(Messenger client, int key, Bundle data) {
+    private void sendMessageToClient(int code, Bundle data, Messenger client) {
         try {
             Message message = Message.obtain();
             message.replyTo = server;
-            message.what = key;
+            message.what = code;
             message.setData(data == null ? new Bundle() : data);
             client.send(message);
         } catch (RemoteException e) {
@@ -673,13 +666,13 @@ public class UpgradeService extends Service {
             if (service == null) {
                 return;
             }
-            Messenger clint = msg.replyTo;
+            Messenger client = msg.replyTo;
             Bundle response = new Bundle();
             Bundle request = msg.getData();
             switch (msg.what) {
-                case UpgradeConstant.MSG_KEY_CONNECT_REQ:
-                    if (!service.clients.contains(clint)) {
-                        service.clients.add(clint);
+                case UpgradeConstant.CODE_CONNECT:
+                    if (!service.clients.contains(client)) {
+                        service.clients.add(client);
                         response.putInt("code", 0);
                         response.putString("message",
                                 service.getString(R.string.message_connect_success));
@@ -688,31 +681,31 @@ public class UpgradeService extends Service {
                         response.putString("message",
                                 service.getString(R.string.message_connect_failure));
                     }
-                    service.sendMessageToClient(clint, UpgradeConstant.MSG_KEY_CONNECT_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_CONNECT, response, client);
                     break;
-                case UpgradeConstant.MSG_KEY_DISCONNECT_REQ:
-                    boolean success = service.clients.remove(clint);
+                case UpgradeConstant.CODE_DISCONNECT:
+                    boolean success = service.clients.remove(client);
                     if (success) {
                         response.putInt("code", 0);
                         response.putString("message",
                                 service.getString(R.string.message_disconnect_success));
                     } else {
-                        response.putInt("key", UpgradeException.ERROR_CODE_UNKNOWN);
+                        response.putInt("code", UpgradeException.ERROR_CODE_UNKNOWN);
                         response.putString("message",
                                 service.getString(R.string.message_disconnect_failure));
                     }
-                    service.sendMessageToClient(clint, UpgradeConstant.MSG_KEY_DISCONNECT_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DISCONNECT, response, client);
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ:
+                case UpgradeConstant.CODE_DOWNLOAD_PAUSE:
                     service.pause();
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_RESUME_REQ:
+                case UpgradeConstant.CODE_DOWNLOAD_RESUME:
                     service.resume();
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_START_REQ:
+                case UpgradeConstant.CODE_INSTALL_START:
                     service.install();
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_REBOOT_REQ:
+                case UpgradeConstant.CODE_INSTALL_REBOOT:
                     service.reboot();
                 default:
                     break;
@@ -741,7 +734,7 @@ public class UpgradeService extends Service {
             switch (msg.what) {
                 case STATUS_DOWNLOAD_START:
                     service.setNotify(service.getString(R.string.message_download_start));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_START_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_START, response);
                     break;
                 case STATUS_DOWNLOAD_PROGRESS:
                     long progress = service.progress.get();
@@ -749,39 +742,39 @@ public class UpgradeService extends Service {
                             UpgradeUtil.formatByte(service.maxProgress));
                     response.putLong("max", service.maxProgress);
                     response.putLong("progress", progress);
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_PROGRESS, response);
                     break;
                 case STATUS_DOWNLOAD_PAUSE:
                     service.setNotify(service.getString(R.string.message_download_pause));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_PAUSE, response);
                     break;
                 case STATUS_DOWNLOAD_CANCEL:
                     service.setNotify(service.getString(R.string.message_download_cancel));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_CANCEL, response);
                     break;
                 case STATUS_DOWNLOAD_ERROR:
                     service.setNotify(service.getString(R.string.message_download_error));
                     response.putInt("code", UpgradeException.ERROR_CODE_UNKNOWN);
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_ERROR_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_ERROR, response);
                     break;
                 case STATUS_DOWNLOAD_COMPLETE:
                     service.setNotify(service.getString(R.string.message_download_complete));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_DOWNLOAD_COMPLETE, response);
                     if (msg.arg1 != -1) {
                         service.install();
                     }
                     break;
                 case STATUS_INSTALL_VALIDATE:
                     service.setNotify(service.getString(R.string.message_install_validate));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_VALIDATE, response);
                     break;
                 case STATUS_INSTALL_START:
                     service.setNotify(service.getString(R.string.message_install_start));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_START_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_START, response);
                     break;
                 case STATUS_INSTALL_CANCEL:
                     service.setNotify(service.getString(R.string.message_install_cancel));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_CANCEL_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_CANCEL, response);
                     break;
                 case STATUS_INSTALL_ERROR:
                     if (msg.arg1 == UpgradeException.ERROR_CODE_PACKAGE_INVALID) {
@@ -789,7 +782,7 @@ public class UpgradeService extends Service {
                                 service.getString(R.string.message_install_package_invalid),
                                 service.getString(R.string.dialog_upgrade_btn_reset)));
                         response.putInt("code", UpgradeException.ERROR_CODE_PACKAGE_INVALID);
-                        service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
+                        service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_ERROR, response);
                         return;
                     }
                     if (msg.arg1 == UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL) {
@@ -797,16 +790,16 @@ public class UpgradeService extends Service {
                                 service.getString(R.string.message_install_error),
                                 service.getString(R.string.dialog_upgrade_btn_reset)));
                         response.putInt("code", UpgradeException.ERROR_CODE_BACKGROUND_INSTALL_FAIL);
-                        service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
+                        service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_ERROR, response);
                         return;
                     }
                     service.setNotify(service.getString(R.string.message_install_error));
                     response.putInt("code", UpgradeException.ERROR_CODE_UNKNOWN);
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_ERROR, response);
                     break;
                 case STATUS_INSTALL_COMPLETE:
                     service.setNotify(service.getString(R.string.message_install_complete));
-                    service.sendMessageToClient(UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP, response);
+                    service.sendMessageToClient(UpgradeConstant.CODE_INSTALL_COMPLETE, response);
                     if (msg.arg1 == -1) {
                         service.deletePackage();
                         Toast.makeText(service, service.getString(R.string.message_install_package_delete),
@@ -896,8 +889,8 @@ public class UpgradeService extends Service {
                 if (endLength >= part) {
                     size = (int) (endLength / part);
                 }
-                if (size > upgradeOption.getMultithreadPools()) {
-                    size = upgradeOption.getMultithreadPools();
+                if (size > upgradeOption.getMultithreadPool()) {
+                    size = upgradeOption.getMultithreadPool();
                     part = (int) (endLength / size);
                 }
 

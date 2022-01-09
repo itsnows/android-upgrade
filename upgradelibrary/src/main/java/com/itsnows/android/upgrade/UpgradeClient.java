@@ -104,7 +104,7 @@ public class UpgradeClient {
      */
     public void pause() {
         if (isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_DOWNLOAD_PAUSE, null);
         }
     }
 
@@ -113,7 +113,7 @@ public class UpgradeClient {
      */
     public void resume() {
         if (isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_RESUME_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_DOWNLOAD_RESUME, null);
         }
     }
 
@@ -122,7 +122,7 @@ public class UpgradeClient {
      */
     public void cancel() {
         if (isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_DOWNLOAD_RESUME_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_DOWNLOAD_RESUME, null);
         }
     }
 
@@ -131,7 +131,7 @@ public class UpgradeClient {
      */
     public void install() {
         if (isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_INSTALL_START_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_INSTALL_START, null);
         }
     }
 
@@ -140,7 +140,7 @@ public class UpgradeClient {
      */
     public void reboot() {
         if (isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_INSTALL_REBOOT_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_INSTALL_REBOOT, null);
         }
     }
 
@@ -169,7 +169,7 @@ public class UpgradeClient {
      */
     private void connect() {
         if (!isConnected()) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_CONNECT_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_CONNECT, null);
         }
     }
 
@@ -178,7 +178,7 @@ public class UpgradeClient {
      */
     private void disconnect() {
         if (isConnected() && client != null && server != null) {
-            sendMessageToServer(UpgradeConstant.MSG_KEY_DISCONNECT_REQ, null);
+            sendMessageToServer(UpgradeConstant.CODE_DISCONNECT, null);
         }
     }
 
@@ -194,14 +194,14 @@ public class UpgradeClient {
     /**
      * 发送消息到服务端
      *
-     * @param key
+     * @param code
      * @param data
      */
-    private void sendMessageToServer(int key, Bundle data) {
+    private void sendMessageToServer(int code, Bundle data) {
         try {
             Message message = Message.obtain();
             message.replyTo = client;
-            message.what = key;
+            message.what = code;
             message.setData(data != null ? data : new Bundle());
             server.send(message);
         } catch (RemoteException e) {
@@ -226,7 +226,7 @@ public class UpgradeClient {
             int code = data.getInt("code");
             String message = data.getString("message");
             switch (msg.what) {
-                case UpgradeConstant.MSG_KEY_CONNECT_RESP:
+                case UpgradeConstant.CODE_CONNECT:
                     if (code == 0) {
                         client.isConnected = true;
                         if (client.onConnectListener != null) {
@@ -235,7 +235,7 @@ public class UpgradeClient {
                     }
                     UpgradeLogger.d(TAG, message);
                     break;
-                case UpgradeConstant.MSG_KEY_DISCONNECT_RESP:
+                case UpgradeConstant.CODE_DISCONNECT:
                     if (code == 0) {
                         if (client.onConnectListener != null) {
                             client.onConnectListener.onDisconnected();
@@ -245,13 +245,13 @@ public class UpgradeClient {
                     UpgradeLogger.d(TAG, message);
                     client.unbind();
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_START_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_START:
                     UpgradeLogger.d(TAG, "Download：onStart");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onStart();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_PROGRESS_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_PROGRESS:
                     UpgradeLogger.d(TAG, "Download：onProgress：");
                     long max = data.getLong("max");
                     long progress = data.getLong("progress");
@@ -259,61 +259,61 @@ public class UpgradeClient {
                         client.onDownloadListener.onProgress(max, progress);
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_PAUSE_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_PAUSE:
                     UpgradeLogger.d(TAG, "Download：onPause");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onPause();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_CANCEL_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_CANCEL:
                     UpgradeLogger.d(TAG, "Download：onCancel");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onCancel();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_ERROR_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_ERROR:
                     UpgradeLogger.d(TAG, "Download：onError");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onError(new UpgradeException());
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_DOWNLOAD_COMPLETE_RESP:
+                case UpgradeConstant.CODE_DOWNLOAD_COMPLETE:
                     UpgradeLogger.d(TAG, "Download：onComplete");
                     if (client.onDownloadListener != null) {
                         client.onDownloadListener.onComplete();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_VALIDATE_RESP:
+                case UpgradeConstant.CODE_INSTALL_VALIDATE:
                     UpgradeLogger.d(TAG, "Install：onValidate");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onValidate();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_START_RESP:
+                case UpgradeConstant.CODE_INSTALL_START:
                     UpgradeLogger.d(TAG, "Install：onStart");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onStart();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_CANCEL_RESP:
+                case UpgradeConstant.CODE_INSTALL_CANCEL:
                     UpgradeLogger.d(TAG, "Install：onCancel");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onCancel();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_ERROR_RESP:
+                case UpgradeConstant.CODE_INSTALL_ERROR:
                     UpgradeLogger.d(TAG, "Install：onError");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onError(new UpgradeException(code));
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_COMPLETE_RESP:
+                case UpgradeConstant.CODE_INSTALL_COMPLETE:
                     UpgradeLogger.d(TAG, "Install：onComplete");
                     if (client.onInstallListener != null) {
                         client.onInstallListener.onComplete();
                     }
                     break;
-                case UpgradeConstant.MSG_KEY_INSTALL_REBOOT_RESP:
+                case UpgradeConstant.CODE_INSTALL_REBOOT:
                     UpgradeLogger.d(TAG, "Install：onReboot");
                     break;
                 default:

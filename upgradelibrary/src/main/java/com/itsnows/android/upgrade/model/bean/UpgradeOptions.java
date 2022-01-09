@@ -59,7 +59,7 @@ public final class UpgradeOptions implements Parcelable {
     /**
      * 多线程下载线程池大小
      */
-    private final int multithreadPools;
+    private final int multithreadPool;
 
     /**
      * 是否支持多线程下载
@@ -76,18 +76,18 @@ public final class UpgradeOptions implements Parcelable {
      */
     private final boolean autocleanEnabled;
 
-    private UpgradeOptions(Parameter parameter) {
-        theme = parameter.theme;
-        icon = parameter.icon;
-        title = parameter.title;
-        description = parameter.description;
-        storage = parameter.storage;
-        url = parameter.url;
-        md5 = parameter.md5;
-        multithreadPools = parameter.multithreadPools;
-        multithreadEnabled = parameter.multithreadEnabled;
-        automountEnabled = parameter.automountEnabled;
-        autocleanEnabled = parameter.autocleanEnabled;
+    private UpgradeOptions(Builder builder) {
+        theme = builder.theme;
+        icon = builder.icon;
+        title = builder.title;
+        description = builder.description;
+        storage = builder.storage;
+        url = builder.url;
+        md5 = builder.md5;
+        multithreadPool = builder.multithreadPool;
+        multithreadEnabled = builder.multithreadEnabled;
+        automountEnabled = builder.automountEnabled;
+        autocleanEnabled = builder.autocleanEnabled;
     }
 
     protected UpgradeOptions(Parcel in) {
@@ -98,7 +98,7 @@ public final class UpgradeOptions implements Parcelable {
         storage = (File) in.readSerializable();
         url = in.readString();
         md5 = in.readString();
-        multithreadPools = in.readInt();
+        multithreadPool = in.readInt();
         multithreadEnabled = in.readByte() != 0;
         automountEnabled = in.readByte() != 0;
         autocleanEnabled = in.readByte() != 0;
@@ -113,7 +113,7 @@ public final class UpgradeOptions implements Parcelable {
         dest.writeSerializable(storage);
         dest.writeString(url);
         dest.writeString(md5);
-        dest.writeInt(multithreadPools);
+        dest.writeInt(multithreadPool);
         dest.writeByte((byte) (multithreadEnabled ? 1 : 0));
         dest.writeInt((byte) (automountEnabled ? 1 : 0));
         dest.writeInt((byte) (autocleanEnabled ? 1 : 0));
@@ -152,8 +152,8 @@ public final class UpgradeOptions implements Parcelable {
         return md5;
     }
 
-    public int getMultithreadPools() {
-        return multithreadPools;
+    public int getMultithreadPool() {
+        return multithreadPool;
     }
 
     public boolean isMultithreadEnabled() {
@@ -168,74 +168,21 @@ public final class UpgradeOptions implements Parcelable {
         return autocleanEnabled;
     }
 
-    public static class Builder {
-        private final Parameter parameter;
-
-        public Builder() {
-            parameter = new Parameter();
-        }
-
-        public Builder setTheme(@ColorInt int theme) {
-            parameter.theme = theme;
-            return this;
-        }
-
-        public Builder setIcon(Bitmap icon) {
-            parameter.icon = icon;
-            return this;
-        }
-
-        public Builder setTitle(CharSequence title) {
-            parameter.title = title;
-            return this;
-        }
-
-        public Builder setDescription(CharSequence description) {
-            parameter.description = description;
-            return this;
-        }
-
-        public Builder setStorage(File storage) {
-            parameter.storage = storage;
-            return this;
-        }
-
-        public Builder setUrl(String url) {
-            parameter.url = url;
-            return this;
-        }
-
-        public Builder setMd5(String md5) {
-            parameter.md5 = md5;
-            return this;
-        }
-
-        public Builder setMultithreadPools(int pools) {
-            parameter.multithreadPools = Math.max(pools, 0);
-            return this;
-        }
-
-        public Builder setMultithreadEnabled(boolean enabled) {
-            parameter.multithreadEnabled = enabled;
-            return this;
-        }
-
-        public Builder setAutomountEnabled(boolean enabled) {
-            parameter.automountEnabled = enabled;
-            return this;
-        }
-
-        public Builder setAutocleanEnabled(boolean enabled) {
-            parameter.autocleanEnabled = enabled;
-            return this;
-        }
-
-        public UpgradeOptions build() {
-            return new UpgradeOptions(parameter);
-        }
+    public Builder newBuilder() {
+        return new Builder()
+                .setIcon(icon)
+                .setTitle(title)
+                .setDescription(description)
+                .setStorage(storage)
+                .setUrl(url)
+                .setMd5(md5)
+                .setMultithreadEnabled(multithreadEnabled)
+                .setMultithreadPool(multithreadPool)
+                .setAutocleanEnabled(autocleanEnabled)
+                .setAutomountEnabled(automountEnabled);
     }
 
-    private static class Parameter {
+    public static class Builder {
         private int theme;
         private Bitmap icon;
         private CharSequence title;
@@ -243,10 +190,72 @@ public final class UpgradeOptions implements Parcelable {
         private File storage;
         private String url;
         private String md5;
-        private int multithreadPools;
+        private int multithreadPool;
         private boolean multithreadEnabled;
         private boolean automountEnabled;
         private boolean autocleanEnabled;
+
+        public Builder() {
+        }
+
+        public Builder setTheme(@ColorInt int theme) {
+            this.theme = theme;
+            return this;
+        }
+
+        public Builder setIcon(Bitmap icon) {
+            this.icon = icon;
+            return this;
+        }
+
+        public Builder setTitle(CharSequence title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setDescription(CharSequence description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setStorage(File storage) {
+            this.storage = storage;
+            return this;
+        }
+
+        public Builder setUrl(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public Builder setMd5(String md5) {
+            this.md5 = md5;
+            return this;
+        }
+
+        public Builder setMultithreadPool(int pool) {
+            this.multithreadPool = Math.max(pool, 0);
+            return this;
+        }
+
+        public Builder setMultithreadEnabled(boolean enabled) {
+            this.multithreadEnabled = enabled;
+            return this;
+        }
+
+        public Builder setAutomountEnabled(boolean enabled) {
+            this.automountEnabled = enabled;
+            return this;
+        }
+
+        public Builder setAutocleanEnabled(boolean enabled) {
+            this.autocleanEnabled = enabled;
+            return this;
+        }
+
+        public UpgradeOptions build() {
+            return new UpgradeOptions(this);
+        }
     }
 
 }
