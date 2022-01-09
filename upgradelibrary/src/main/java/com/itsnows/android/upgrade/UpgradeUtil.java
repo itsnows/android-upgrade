@@ -47,10 +47,10 @@ public class UpgradeUtil {
      * 判断申请外部存储所需权限
      *
      * @param context
-     * @param isActivate
+     * @param isRequest
      * @return
      */
-    public static boolean mayRequestExternalStorage(Context context, boolean isActivate) {
+    public static boolean mayRequestExternalStorage(Context context, boolean isRequest) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -58,7 +58,7 @@ public class UpgradeUtil {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
-        if (isActivate) {
+        if (isRequest) {
             ActivityCompat.requestPermissions((Activity) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x1024);
         }
@@ -281,8 +281,8 @@ public class UpgradeUtil {
      * @param context
      */
     public static void kiiAllProcess(Context context) {
-        for (ActivityManager.RunningAppProcessInfo appprocess : getRunningProcess(context)) {
-            killProcess(appprocess.pid);
+        for (ActivityManager.RunningAppProcessInfo process : getRunningProcess(context)) {
+            killProcess(process.pid);
         }
     }
 
